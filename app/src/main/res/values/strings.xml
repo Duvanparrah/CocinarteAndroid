@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">CocinArte</string>
+    <string name="titulo_inicio">Inicio</string>
+    <string name="titulo_banquetes">Banquetes</string>
+    <string name="titulo_nutricion">Nutricion</string>
+    <string name="titulo_comunidad">Comunidad</string>
+    <string name="logo_description">Logo de cocinArte</string>
+    <string name="google_icon">Ícono de Google</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_inicio">
+
+    <fragment
+        android:id="@+id/navigation_inicio"
+        android:name="com.camilo.cocinarte.ui.inicio.InicioFragment"
+        android:label="@string/titulo_inicio"
+        tools:layout="@layout/fragment_inicio"/>
+
+    <fragment
+        android:id="@+id/navigation_banquetes"
+        android:name="com.camilo.cocinarte.ui.banquetes.BanqueteFragment"
+        android:label="@string/titulo_banquetes"
+        tools:layout="@layout/fragment_banquete"/>
+
+    <fragment
+        android:id="@+id/navigation_nutricion"
+        android:name="com.camilo.cocinarte.ui.nutricion.NutricionFragment"
+        android:label="@string/titulo_nutricion"
+        tools:layout="@layout/fragment_nutricion"/>
+
+
+    <fragment
+        android:id="@+id/navegar_comunidad"
+        android:name="com.camilo.cocinarte.ui.comunidad.ComunidadFragment"
+        android:label="@string/titulo_comunidad"
+        tools:layout="@layout/fragment_comunidad"/>
+
+
+</navigation>
