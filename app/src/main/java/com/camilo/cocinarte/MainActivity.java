@@ -1,10 +1,11 @@
-package com.camilo.cocinarte; // Asegúrate de modificar por tu package correcto
+package com.camilo.cocinarte;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -17,6 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity"; // Tag para logs
 
+    
     private ActivityMainBinding binding;
     private NavController navController;
     private AppBarConfiguration appBarConfiguration;
@@ -37,6 +39,16 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        // Configurar la Toolbar como ActionBar
+        if (binding.toolbar != null) {
+            setSupportActionBar(binding.toolbar);
+        } else {
+            Log.e(TAG, "onCreate: Toolbar no encontrada en el layout");
+            // Si no hay toolbar, puedes crear una al vuelo o usar NoActionBar en el tema
+            Toolbar toolbar = new Toolbar(this);
+            setSupportActionBar(toolbar);
+        }
+
         // Es mejor usar el binding que findViewById para coherencia
         BottomNavigationView navView = binding.navView;
 
@@ -45,6 +57,8 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+
+        // Ahora es seguro configurar la ActionBar con el NavController
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
 

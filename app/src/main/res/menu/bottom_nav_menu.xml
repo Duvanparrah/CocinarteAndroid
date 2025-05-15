@@ -21,5 +21,4 @@
         android:icon="@drawable/comunidad"
         android:title="@string/titulo_comunidad"/>
 
-
 </menu>

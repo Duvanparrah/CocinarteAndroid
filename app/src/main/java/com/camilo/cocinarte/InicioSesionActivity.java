@@ -15,6 +15,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.camilo.cocinarte.ui.inicio.InicioFragment;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
@@ -58,7 +59,21 @@ public class InicioSesionActivity extends AppCompatActivity {
         buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Llamar al método iniciarSesion en lugar de la navegación directa
                 iniciarSesion();
+            }
+        });
+
+        cardViewGoogle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Implementar inicio de sesión con Google
+                Toast.makeText(InicioSesionActivity.this, "Iniciando sesión con Google", Toast.LENGTH_SHORT).show();
+                // Después del inicio exitoso, navegar a MainActivity con el fragmento de inicio
+                Intent intent = new Intent(InicioSesionActivity.this, MainActivity.class);
+                intent.putExtra("fragment_to_show", "inicio");
+                startActivity(intent);
+                finish();
             }
         });
 
@@ -145,7 +160,7 @@ public class InicioSesionActivity extends AppCompatActivity {
             // Esto asegura que se muestre el fragmento de inicio
             intent.putExtra("fragment_to_show", "inicio");
             startActivity(intent);
-            finish(); // Opcional: cierra la actividad actual para evitar volver atrás
+            finish(); // Cierra la actividad actual para evitar volver atrás
         }
     }
 }

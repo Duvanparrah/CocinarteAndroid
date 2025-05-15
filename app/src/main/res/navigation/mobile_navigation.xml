@@ -23,12 +23,24 @@
         android:label="@string/titulo_nutricion"
         tools:layout="@layout/fragment_nutricion"/>
 
-
     <fragment
         android:id="@+id/navegar_comunidad"
         android:name="com.camilo.cocinarte.ui.comunidad.ComunidadFragment"
         android:label="@string/titulo_comunidad"
-        tools:layout="@layout/fragment_comunidad"/>
+        tools:layout="@layout/fragment_comunidad">
+        <action
+            android:id="@+id/action_navegar_comunidad_to_navegar_comunidad_mis_recetas"
+            app:destination="@id/navegar_comunidad_mis_recetas" />
+    </fragment>
 
+    <fragment
+        android:id="@+id/navegar_comunidad_mis_recetas"
+        android:name="com.camilo.cocinarte.ui.comunidad.Comunidad_mis_recetasFragment"
+        android:label="mis_recetas"
+        tools:layout="@layout/fragment_comunidad_mis_recetas">
+        <action
+            android:id="@+id/action_navegar_comunidad_mis_recetas_to_navegar_comunidad"
+            app:destination="@id/navegar_comunidad" />
+    </fragment>
 
 </navigation>
