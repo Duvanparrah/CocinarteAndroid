@@ -1,10 +1,8 @@
-package com.camilo.cocinarte;
+package com.camilo.cocinarte.ui.nutricion;
 
-import android.animation.ValueAnimator;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +17,8 @@ import androidx.cardview.widget.CardView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.camilo.cocinarte.R;
 
 public class Metodo_de_pago_Activity extends AppCompatActivity {
 

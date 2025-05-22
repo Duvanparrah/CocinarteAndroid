@@ -1,4 +1,4 @@
-package com.camilo.cocinarte;
+package com.camilo.cocinarte.ui.nutricion;
 
 import android.os.Bundle;
 import android.text.Editable;
@@ -16,6 +16,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import com.camilo.cocinarte.R;
 
 public class Tarjeta_creditoActivity extends AppCompatActivity {
 

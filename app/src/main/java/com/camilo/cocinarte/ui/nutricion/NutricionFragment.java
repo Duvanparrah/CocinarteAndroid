@@ -10,7 +10,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-import com.camilo.cocinarte.Metodo_de_pago_Activity;
 import com.camilo.cocinarte.databinding.FragmentNutricionBinding;
 
 public class NutricionFragment extends Fragment {

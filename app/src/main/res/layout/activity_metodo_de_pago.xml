@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".Metodo_de_pago_Activity">
+    tools:context=".ui.nutricion.Metodo_de_pago_Activity">
 
     <!-- Botón de regreso -->
     <ImageButton

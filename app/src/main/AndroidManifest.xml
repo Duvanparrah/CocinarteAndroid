@@ -45,16 +45,16 @@
             android:name=".codigo_recuperacionActivity"
             android:exported="false" />
         <activity
-            android:name=".comprobante_pago_nequiActivity"
+            android:name=".ui.nutricion.comprobante_pago_nequiActivity"
             android:exported="false" />
         <activity
             android:name=".correo_Recuperar_Contrasena_Activity"
             android:exported="false" />
         <activity
-            android:name=".Metodo_de_pago_Activity"
+            android:name=".ui.nutricion.Metodo_de_pago_Activity"
             android:exported="false" />
         <activity
-            android:name=".Tarjeta_creditoActivity"
+            android:name=".ui.nutricion.Tarjeta_creditoActivity"
             android:exported="false" />
 
     </application>
