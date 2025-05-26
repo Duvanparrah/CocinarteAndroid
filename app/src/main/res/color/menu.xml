@@ -1,24 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-
     <item
         android:id="@+id/nav_inicio"
         android:icon="@drawable/inicio"
         android:title="Inicio" />
-
     <item
-        android:id="@+id/nav_banquetes"
+        android:id="@+id/nav_recetas"
         android:icon="@drawable/banquetes"
-        android:title="Banquetes" />
-
+        android:title="banquetes" />
     <item
         android:id="@+id/nav_nutricion"
         android:icon="@drawable/nutricion"
         android:title="Nutrición" />
-
     <item
         android:id="@+id/nav_comunidad"
-        android:icon="@drawable/comunidad"
+        android:icon="@drawable/ic_comunidad"
         android:title="Comunidad" />
-
 </menu>
