@@ -33,22 +33,22 @@
             android:name=".MainActivity"
             android:exported="false" />
         <activity
-            android:name=".InicioSesionActivity"
+            android:name=".ui.authentication.InicioSesionActivity"
             android:exported="false" />
         <activity
-            android:name=".RegistroActivity"
+            android:name=".ui.authentication.RegistroActivity"
             android:exported="false" />
         <activity
-            android:name=".cambio_contrasenaActivity"
+            android:name=".ui.authentication.cambio_contrasenaActivity"
             android:exported="false" />
         <activity
-            android:name=".codigo_recuperacionActivity"
+            android:name=".ui.authentication.codigo_recuperacionActivity"
             android:exported="false" />
         <activity
             android:name=".ui.nutricion.comprobante_pago_nequiActivity"
             android:exported="false" />
         <activity
-            android:name=".correo_Recuperar_Contrasena_Activity"
+            android:name=".ui.authentication.correo_Recuperar_Contrasena_Activity"
             android:exported="false" />
         <activity
             android:name=".ui.nutricion.Metodo_de_pago_Activity"

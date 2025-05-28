@@ -1,4 +1,4 @@
-package com.camilo.cocinarte;
+package com.camilo.cocinarte.ui.authentication;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,11 +15,10 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.camilo.cocinarte.ui.inicio.InicioFragment;
+import com.camilo.cocinarte.MainActivity;
+import com.camilo.cocinarte.R;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
-
-import java.util.regex.Pattern;
 
 public class InicioSesionActivity extends AppCompatActivity {
 

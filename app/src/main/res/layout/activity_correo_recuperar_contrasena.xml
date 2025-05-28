@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F3E0"
-    tools:context=".correo_Recuperar_Contrasena_Activity">
+    tools:context=".ui.authentication.correo_Recuperar_Contrasena_Activity">
 
     <androidx.cardview.widget.CardView
         android:layout_width="0dp"

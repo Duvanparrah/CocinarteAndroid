@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFBE5"
-    tools:context=".cambio_contrasenaActivity">
+    tools:context=".ui.authentication.cambio_contrasenaActivity">
 
 
     <androidx.cardview.widget.CardView
