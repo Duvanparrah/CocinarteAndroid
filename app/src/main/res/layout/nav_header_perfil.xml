@@ -1,178 +1,84 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
+    android:background="@color/amarillo"
     android:paddingLeft="16dp"
     android:paddingTop="24dp"
     android:paddingRight="16dp"
     android:paddingBottom="16dp">
 
-    <!-- Email del usuario -->
-    <TextView
-        android:id="@+id/user_email"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="cristianc17@gmail.com"
-        android:textColor="@color/black"
-        android:textSize="16sp"
-        android:textStyle="bold"
+    <!-- Imagen de título encima de la foto de perfil -->
+
+    <!-- Contenedor de perfil -->
+    <ImageView
+        android:id="@+id/title_image"
+        android:layout_width="162dp"
+        android:layout_height="55dp"
+        android:contentDescription="Título de la aplicación"
+        android:src="@drawable/logo_cocinarte"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- Nombre de usuario y botón de editar -->
     <LinearLayout
-        android:id="@+id/username_container"
+        android:id="@+id/profile_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_height="105dp"
+        android:layout_marginTop="76dp"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/user_email">
-
-        <TextView
-            android:id="@+id/user_name"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="cristianO15"
-            android:textColor="@color/black"
-            android:textSize="14sp" />
-
-        <ImageButton
-            android:id="@+id/edit_profile_button"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:background="@android:color/transparent"
-            android:contentDescription="Editar perfil"
-            android:src="@drawable/ic_edit" />
-    </LinearLayout>
-
-    <!-- Foto de perfil con botón para cambiarla -->
-    <FrameLayout
-        android:id="@+id/profile_pic_container"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/username_container">
+        app:layout_constraintTop_toBottomOf="@id/title_image">
 
+        <!-- Imagen de perfil a la izquierda -->
         <ImageView
             android:id="@+id/profile_image"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@drawable/perfil_chef" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:contentDescription="Imagen de perfil"
+            android:src="@drawable/masculino"
+            android:layout_weight="1"
+            />
 
-        <ImageButton
-            android:id="@+id/change_profile_pic_button"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_gravity="bottom|center_horizontal"
-            android:background="@android:color/transparent"
-            android:contentDescription="Cambiar foto de perfil"
-            android:src="@drawable/ic_upload" />
-    </FrameLayout>
-
-    <!-- Menú -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/profile_pic_container">
-
+        <!-- Contenedor de información a la derecha -->
         <LinearLayout
-            android:id="@+id/soporte_option"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp">
+            android:orientation="vertical"
+            android:layout_weight="1"
+            >
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_soporte" />
-
+            <!-- Nombre del usuario -->
             <TextView
+                android:id="@+id/user_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="Soporte"
+                android:text="Cristianc17"
                 android:textColor="@color/black"
-                android:textSize="16sp" />
-        </LinearLayout>
+                android:textSize="15sp"
+                android:textStyle="bold" />
 
-        <LinearLayout
-            android:id="@+id/cuenta_option"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_cuenta_configuracion" />
-
+            <!-- Email del usuario -->
             <TextView
+                android:id="@+id/user_email"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="Cuenta y configuración"
+                android:text="cristianc17@gmail.com"
                 android:textColor="@color/black"
-                android:textSize="16sp" />
+                android:textSize="11sp" />
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/notificaciones_option"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp">
 
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_notificaciones" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="Notificacion"
-                android:textColor="@color/black"
-                android:textSize="16sp" />
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp"
-            android:background="#E0E0E0" />
-
-        <LinearLayout
-            android:id="@+id/cerrar_sesion_option"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="8dp">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_cerrar_sesion" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="Cerrar sesion"
-                android:textColor="@color/black"
-                android:textSize="16sp" />
-        </LinearLayout>
     </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

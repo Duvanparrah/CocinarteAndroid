@@ -17,4 +17,7 @@
     <color name="blanco">#FFFFFFFF</color>
     <color name="beige">#F5F5DC</color>
     <color name="gris">#666666</color>
+    <color name="amarillo">#F5F5DC</color>
+    <color name="grisoscuro">#2C2C2C</color>;
+
 </resources>

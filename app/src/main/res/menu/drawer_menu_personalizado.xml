@@ -18,9 +18,9 @@
         android:icon="@drawable/ic_notificaciones"
         android:title="Notificacion" />
 
-    <item
+<!--    <item
         android:id="@+id/nav_cerrar_sesion"
         android:icon="@drawable/ic_cerrar_sesion"
-        android:title="Cerrar sesión" />
+        android:title="Cerrar sesión" />-->
 
 </menu>

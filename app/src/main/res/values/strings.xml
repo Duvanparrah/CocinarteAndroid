@@ -28,29 +28,29 @@
     <string name="title_activity_menu_despliegue">menu_despliegue_Activity</string>
 
 
-        <!-- Títulos de la barra de navegación inferior -->
-        <string name="title_home">Inicio</string>
-        <string name="title_search">Buscar</string>
-        <string name="title_add">Agregar</string>
-        <string name="title_notifications">Alertas</string>
-        <string name="title_profile">Perfil</string>
+    <!-- Títulos de la barra de navegación inferior -->
+    <string name="title_home">Inicio</string>
+    <string name="title_search">Buscar</string>
+    <string name="title_add">Agregar</string>
+    <string name="title_notifications">Alertas</string>
+    <string name="title_profile">Perfil</string>
 
-        <!-- Títulos del drawer -->
-        <string name="title_favorites">Favoritos</string>
-        <string name="title_support">Soporte</string>
-        <string name="title_account_settings">Cuenta y configuración</string>
-        <string name="title_drawer_notifications">Notificaciones</string>
-        <string name="title_logout">Cerrar sesión</string>
+    <!-- Títulos del drawer -->
+    <string name="title_favorites">Favoritos</string>
+    <string name="title_support">Soporte</string>
+    <string name="title_account_settings">Cuenta y configuración</string>
+    <string name="title_drawer_notifications">Notificaciones</string>
+    <string name="title_logout">Cerrar sesión</string>
 
-        <!-- Perfil -->
-        <string name="edit_profile">Editar perfil</string>
-        <string name="change_profile_pic">Cambiar foto de perfil</string>
-        <string name="personal_info">Información Personal</string>
-        <string name="security">Seguridad</string>
-        <string name="notifications">Notificaciones</string>
-        <string name="privacy">Privacidad</string>
-        <string name="help">Ayuda</string>
-        <string name="about">Acerca de</string>
-        <string name="save">Guardar</string>
-        <string name="cancel">Cancelar</string>
+    <!-- Perfil -->
+    <string name="edit_profile">Editar perfil</string>
+    <string name="change_profile_pic">Cambiar foto de perfil</string>
+    <string name="personal_info">Información Personal</string>
+    <string name="security">Seguridad</string>
+    <string name="notifications">Notificaciones</string>
+    <string name="privacy">Privacidad</string>
+    <string name="help">Ayuda</string>
+    <string name="about">Acerca de</string>
+    <string name="save">Guardar</string>
+    <string name="cancel">Cancelar</string>
 </resources>
