@@ -3,13 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.camilo.cocinarte">
 
-<<<<<<< Updated upstream
-=======
     <!-- ✅ Permisos necesarios para hacer peticiones al backend -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
->>>>>>> Stashed changes
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -21,80 +18,17 @@
         android:theme="@style/Theme.Cocinarte"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-<<<<<<< Updated upstream
-        <activity
-            android:name=".ui.nutricion.formulario_plan_nutricional_9"
-            android:exported="false" />
-        <activity
-            android:name=".ui.nutricion.formulario_plan_nutricional_8"
-            android:exported="false" />
-        <activity
-            android:name=".ui.nutricion.formulario_plan_nutricional_7"
-            android:exported="false" />
-        <activity
-            android:name=".ui.nutricion.formulario_plan_nutricional_6"
-            android:exported="false" />
-        <activity
-            android:name=".ui.nutricion.formulario_plan_nutricional_4"
-            android:exported="false" />
-        <activity
-            android:name=".ui.nutricion.formulario_plan_nutricional_2$formulario_plan_nutricional_4"
-            android:exported="false" />
-        <activity
-            android:name=".ui.nutricion.formulario_plan_nutricional_3"
-            android:exported="false" />
-        <activity
-            android:name=".ui.nutricion.formulario_plan_nutricional_2"
-            android:exported="false" />
-        <activity
-            android:name=".ui.nutricion.formulario_plan_nutricional"
-            android:exported="false" /> <!-- NavigationActivity como actividad principal -->
-        <activity
-            android:name=".NavigationActivity"
-=======
 
         <!-- Registro como actividad principal -->
         <activity
             android:name=".ui.authentication.InicioSesionActivity"
->>>>>>> Stashed changes
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Cocinarte.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-<<<<<<< Updated upstream
-        </activity> <!-- Otras actividades -->
-        <activity
-            android:name=".MainActivity"
-            android:exported="false" />
-        <activity
-            android:name=".InicioSesionActivity"
-            android:exported="false" />
-        <activity
-            android:name=".RegistroActivity"
-            android:exported="false" />
-        <activity
-            android:name=".cambio_contrasenaActivity"
-            android:exported="false" />
-        <activity
-            android:name=".codigo_recuperacionActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.nutricion.comprobante_pago_nequiActivity"
-            android:exported="false" />
-        <activity
-            android:name=".correo_Recuperar_Contrasena_Activity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.nutricion.Metodo_de_pago_Activity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.nutricion.Tarjeta_creditoActivity"
-            android:exported="false" />
-=======
         </activity>
 
         <!-- Otras actividades -->
@@ -102,13 +36,23 @@
         <activity android:name=".ui.authentication.RegistroActivity" android:exported="false" />
         <activity android:name=".NavigationActivity" android:exported="false" />
         <activity android:name=".ui.authentication.cambio_contrasenaActivity" android:exported="false" />
-        <activity android:name=".ui.authentication.codigo_recuperacionActivity" android:exported="false" />
+<!--        <activity android:name=".ui.authentication.codigo_recuperacionActivity" android:exported="false" />-->
         <activity android:name=".ui.nutricion.comprobante_pago_nequiActivity" android:exported="false" />
         <activity android:name=".ui.authentication.correo_Recuperar_Contrasena_Activity" android:exported="false" />
         <activity android:name=".ui.nutricion.Metodo_de_pago_Activity" android:exported="false" />
         <activity android:name=".ui.nutricion.Tarjeta_creditoActivity" android:exported="false" />
 
->>>>>>> Stashed changes
+        <!-- Formularios nutricionales -->
+        <activity android:name=".ui.nutricion.formulario_plan_nutricional_9" android:exported="false" />
+        <activity android:name=".ui.nutricion.formulario_plan_nutricional_8" android:exported="false" />
+        <activity android:name=".ui.nutricion.formulario_plan_nutricional_7" android:exported="false" />
+        <activity android:name=".ui.nutricion.formulario_plan_nutricional_6" android:exported="false" />
+        <activity android:name=".ui.nutricion.formulario_plan_nutricional_4" android:exported="false" />
+        <activity android:name=".ui.nutricion.formulario_plan_nutricional_2$formulario_plan_nutricional_4" android:exported="false" />
+        <activity android:name=".ui.nutricion.formulario_plan_nutricional_3" android:exported="false" />
+        <activity android:name=".ui.nutricion.formulario_plan_nutricional_2" android:exported="false" />
+        <activity android:name=".ui.nutricion.formulario_plan_nutricional" android:exported="false" />
+
     </application>
 
 </manifest>

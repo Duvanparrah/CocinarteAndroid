@@ -251,12 +251,12 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/Salmon" />
+                        android:src="@drawable/salmon" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Salmón"
+                        android:text="Salmon"
                         android:textSize="14sp"
                         android:layout_marginStart="8dp"
                         android:textColor="@android:color/black" />
@@ -398,7 +398,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/Langosta" />
+                        android:src="@drawable/langosta" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -980,7 +980,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/Chía" />
+                        android:src="@drawable/chia" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -1022,7 +1022,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/Seitán" />
+                        android:src="@drawable/seitan" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -1064,7 +1064,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/Amaranto" />
+                        android:src="@drawable/amaranto" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -1085,7 +1085,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/Quinoa" />
+                        android:src="@drawable/quinoa" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -1230,7 +1230,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/Pasta_integral" />
+                        android:src="@drawable/pasta_integral" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -1251,7 +1251,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/Cuscús" />
+                        android:src="@drawable/cuscus" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -1272,7 +1272,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/Mijo" />
+                        android:src="@drawable/mijo" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -1293,7 +1293,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/Trigosarraceno" />
+                        android:src="@drawable/trigosarraceno" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -1407,7 +1407,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/ñame" />
+                        android:src="@drawable/name" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -1475,7 +1475,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/Harina_de_garbanzo" />
+                        android:src="@drawable/harina_de_garbanzo" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -1517,7 +1517,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/Brocoli" />
+                        android:src="@drawable/brocoli" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -2052,7 +2052,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/piña" />
+                        android:src="@drawable/pina" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -2388,7 +2388,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/avellanas" />
+                        android:src="@drawable/avellana" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -2503,7 +2503,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/Semillascalabaza" />
+                        android:src="@drawable/semillascalabaza" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -2566,7 +2566,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/Aceite_oliva" />
+                        android:src="@drawable/oliva" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -2612,7 +2612,7 @@
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/Mantequilla_maní" />
+                        android:src="@drawable/mantequilla_mani" />
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -2732,27 +2732,7 @@
                 </LinearLayout>
 
                 <!-- Agua de coco -->
-                <LinearLayout
-                    android:id="@+id/btnAguaCoco"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center"
-                    android:padding="8dp"
-                    android:clickable="true"
-                    android:focusable="true">
-                    <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/agua_de_coco" />
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text=""
-                        android:textSize="14sp"
-                        android:layout_marginStart="8dp"
-                        android:textColor="@android:color/black" />
-                </LinearLayout>
+
 
                 <!-- Infusiones -->
                 <LinearLayout

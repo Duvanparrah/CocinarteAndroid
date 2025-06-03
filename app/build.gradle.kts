@@ -35,18 +35,6 @@ android {
 }
 
 dependencies {
-<<<<<<< Updated upstream
-
-    implementation(libs.appcompat)
-    implementation(libs.material)
-    implementation(libs.constraintlayout)
-    implementation(libs.lifecycle.livedata.ktx)
-    implementation(libs.lifecycle.viewmodel.ktx)
-    implementation(libs.navigation.fragment)
-    implementation(libs.navigation.ui)
-    implementation(libs.activity)
-    implementation(libs.legacy.support.v4)
-=======
     // Core Android libraries
     implementation(libs.appcompat)
     implementation(libs.material)
@@ -59,8 +47,9 @@ dependencies {
     implementation(libs.lifecycle.viewmodel.ktx)
 
     // Navigation
-    implementation(libs.navigation.fragment.ktx)
+    implementation(libs.navigation.fragment)
     implementation(libs.navigation.ui)
+
 
     // Retrofit y Gson
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
@@ -75,7 +64,6 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
 
     // Testing
->>>>>>> Stashed changes
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

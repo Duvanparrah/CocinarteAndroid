@@ -95,7 +95,7 @@
                         android:text="A"
                         android:textSize="10sp"
                         android:textColor="#4169E1"
-                        android:background="@drawable/circle_indicator"
+                        android:background="@drawable/circleindicator"
                         android:gravity="center"
                         android:layout_marginHorizontal="8dp" />
 
@@ -105,7 +105,7 @@
                         android:text="C"
                         android:textSize="10sp"
                         android:textColor="#32CD32"
-                        android:background="@drawable/circle_indicator"
+                        android:background="@drawable/circleindicator"
                         android:gravity="center"
                         android:layout_marginHorizontal="8dp" />
 
@@ -115,7 +115,7 @@
                         android:text="S"
                         android:textSize="10sp"
                         android:textColor="#FF6347"
-                        android:background="@drawable/circlein"
+                        android:background="@drawable/circleindicator"
                         android:gravity="center"
                         android:layout_marginHorizontal="8dp" />
 

@@ -47,7 +47,7 @@ public class RegistroActivity extends AppCompatActivity {
         editTextPassword = findViewById(R.id.editTextPassword);
         editTextConfirmPassword = findViewById(R.id.editTextConfirmPassword);
         buttonRegister = findViewById(R.id.buttonRegister);
-        progressBar = findViewById(R.id.progressBar);
+
 
         sessionManager = new SessionManager(this);
 

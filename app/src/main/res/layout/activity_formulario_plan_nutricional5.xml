@@ -91,7 +91,7 @@
             <ImageView
                 android:layout_width="32dp"
                 android:layout_height="32dp"
-                android:src="@drawable/Extremadamente_activo"
+                android:src="@drawable/extremadamente_activo"
                 android:contentDescription="@string/nivel_actividad" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
