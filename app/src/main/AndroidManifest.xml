@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.camilo.cocinarte">
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@drawable/logo"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/logo"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Cocinarte"
+        tools:targetApi="31">
+        <activity
+            android:name=".ui.comunidad.DetalleRecetaFragment"
+            android:exported="false" />
+        <!-- NavigationActivity como actividad principal -->
+        <activity
+            android:name=".NavigationActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Cocinarte.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity> <!-- Otras actividades -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.authentication.InicioSesionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.authentication.RegistroActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.authentication.cambio_contrasenaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.authentication.codigo_recuperacionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.nutricion.comprobante_pago_nequiActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.authentication.correo_Recuperar_Contrasena_Activity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.nutricion.Metodo_de_pago_Activity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.nutricion.Tarjeta_creditoActivity"
+            android:exported="false" />
+
+    </application>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
+</manifest>

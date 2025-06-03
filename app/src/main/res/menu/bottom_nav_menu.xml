@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_inicio"
+        android:icon="@drawable/inicio"
+        android:title="@string/titulo_inicio"/>
+
+    <item
+        android:id="@+id/navigation_banquetes"
+        android:icon="@drawable/banquetes"
+        android:title="@string/titulo_banquetes"/>
+
+    <item
+        android:id="@+id/navigation_nutricion"
+        android:icon="@drawable/nutricion"
+        android:title="@string/titulo_nutricion"/>
+
+    <item
+        android:id="@+id/navegar_comunidad"
+        android:icon="@drawable/comunidad"
+        android:title="@string/titulo_comunidad"/>
+
+</menu>

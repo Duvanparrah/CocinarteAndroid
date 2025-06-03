@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">CocinArte</string>
+    <string name="titulo_inicio">Inicio</string>
+    <string name="titulo_banquetes">Banquetes</string>
+    <string name="titulo_nutricion">Nutricion</string>
+    <string name="titulo_comunidad">Comunidad</string>
+    <string name="logo_description">Logo de cocinArte</string>
+    <string name="google_icon">Ícono de Google</string>
+    <string name="menu">menu</string>
+    <string name="barra_de_busqueda">¿que te gustaria el dia de hoy?...</string>
+    <string name="filtro">filtro</string>
+    <string name="favoritos">favoritos</string>
+
+    <!-- Textos por defecto de Android Studio -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- Menú antiguo (puedes eliminar si no lo usas) -->
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="title_activity_menu_despliegue">menu_despliegue_Activity</string>
+
+
+    <!-- Títulos de la barra de navegación inferior -->
+    <string name="title_home">Inicio</string>
+    <string name="title_search">Buscar</string>
+    <string name="title_add">Agregar</string>
+    <string name="title_notifications">Alertas</string>
+    <string name="title_profile">Perfil</string>
+
+    <!-- Títulos del drawer -->
+    <string name="title_favorites">Favoritos</string>
+    <string name="title_support">Soporte</string>
+    <string name="title_account_settings">Cuenta y configuración</string>
+    <string name="title_drawer_notifications">Notificaciones</string>
+    <string name="title_logout">Cerrar sesión</string>
+    <string name="imagen_receta">Imagen de la receta</string>
+    <string name="ingredientes">Ingredientes</string>
+    <string name="pasos_preparacion">Pasos de preparación</string>
+
+    <!-- Perfil -->
+    <string name="edit_profile">Editar perfil</string>
+    <string name="change_profile_pic">Cambiar foto de perfil</string>
+    <string name="personal_info">Información Personal</string>
+    <string name="security">Seguridad</string>
+    <string name="notifications">Notificaciones</string>
+    <string name="privacy">Privacidad</string>
+    <string name="help">Ayuda</string>
+    <string name="about">Acerca de</string>
+    <string name="save">Guardar</string>
+    <string name="cancel">Cancelar</string>
+    <string name="profile_image_desc">Descripcion de la imagen\n</string>
+    <string name="change_profile_image">Add image\n</string>
+
+    <string-array name="unidades_tiempo">
+        <item>Minutos</item>
+        <item>Horas</item>
+    </string-array>
+
+    <string-array name="dificultades">
+        <item>Baja</item>
+        <item>Media</item>
+        <item>Alta</item>
+    </string-array>
+
+</resources>

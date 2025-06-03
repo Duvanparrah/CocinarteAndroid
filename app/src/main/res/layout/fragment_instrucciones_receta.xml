@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollView_instrucciones"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:id="@+id/seccion_instrucciones"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:padding="16dp"
+        android:visibility="visible">
+
+        <ImageView
+            android:id="@+id/logo_instrucciones"
+            android:layout_width="161dp"
+            android:layout_height="66dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/logo_cocinarte"
+            android:contentDescription="@string/logo_description" />
+
+        <TextView
+            android:id="@+id/tv_preparacion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Preparación paso a paso"
+            android:textSize="18sp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp" />
+
+        <!-- Input + botón agregar paso -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="16dp">
+
+            <EditText
+                android:id="@+id/et_paso"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:hint="1. Agrega los pasos de tu receta"
+                android:inputType="text" />
+
+            <ImageButton
+                android:id="@+id/btn_agregar_paso"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ci_add_add"
+                android:tint="@color/verde"
+                android:contentDescription="Agregar paso"
+                android:background="?attr/selectableItemBackgroundBorderless" />
+        </LinearLayout>
+
+        <!-- Lista de pasos como texto enumerado -->
+        <LinearLayout
+            android:id="@+id/lista_pasos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="12dp"
+            />
+
+
+        <Button
+            android:id="@+id/btn_publicar_receta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Publicar receta"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="32dp"
+            android:textColor="@android:color/white" />
+    </LinearLayout>
+
+</ScrollView>
