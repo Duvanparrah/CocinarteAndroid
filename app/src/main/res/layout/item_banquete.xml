@@ -1,0 +1,129 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:layout_margin="8dp"
+    android:background="@android:color/white">
+
+    <!-- Imagen principal -->
+    <ImageView
+        android:id="@+id/banquete_image"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/banqueteimage"
+        android:contentDescription="@string/descripcion_imagen" />
+
+    <!-- Título del banquete -->
+    <TextView
+        android:id="@+id/banquete_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/nombre_banquete"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="4dp"
+        android:textColor="@android:color/black" />
+
+    <!-- Contenedor de estadísticas -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:baselineAligned="false">
+
+        <!-- Likes -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:baselineAligned="false">
+
+            <ImageView
+                android:id="@+id/corazon_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/corazon"
+                android:contentDescription="@string/icono_like" />
+
+            <TextView
+                android:id="@+id/banquete_likes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="14sp"
+                android:layout_marginStart="4dp"
+                android:textColor="@android:color/black" />
+        </LinearLayout>
+
+        <!-- Comentarios -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:baselineAligned="false">
+
+            <ImageView
+                android:id="@+id/comentar_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/comentar"
+                android:contentDescription="@string/icono_comentar" />
+
+            <TextView
+                android:id="@+id/banquete_comments"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1"
+                android:textSize="14sp"
+                android:layout_marginStart="4dp"
+                android:textColor="@android:color/black" />
+        </LinearLayout>
+
+
+        <!-- Compartidos -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:baselineAligned="false">
+
+            <ImageView
+                android:id="@+id/compartir_icon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/compartir"
+                android:contentDescription="@string/icono_compartir" />
+
+            <TextView
+                android:id="@+id/banquete_shares"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="10"
+                android:textSize="14sp"
+                android:layout_marginStart="4dp"
+                android:textColor="@android:color/black" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Descripción (oculta por defecto) -->
+    <TextView
+        android:id="@+id/banquete_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/descripcion_banquete"
+        android:textSize="14sp"
+        android:layout_marginTop="8dp"
+        android:visibility="gone"
+        android:textColor="@android:color/black" />
+</LinearLayout>

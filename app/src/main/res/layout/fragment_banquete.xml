@@ -10,13 +10,14 @@
     <!-- Top Bar with Logo and Menu -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/top_bar"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:padding="16dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <ImageView
             android:id="@+id/logo_image"
@@ -38,13 +39,14 @@
             android:src="@drawable/star_22"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Search Bar and Filter Button Row -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/search_row"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -54,14 +56,14 @@
         <androidx.cardview.widget.CardView
             android:id="@+id/search_card"
             android:layout_width="0dp"
-            android:layout_height="43dp"
-            android:layout_marginStart="16dp"
+            android:layout_height="49dp"
+            android:layout_marginStart="20dp"
             android:layout_marginEnd="16dp"
             app:cardBackgroundColor="@color/white"
             app:cardCornerRadius="24dp"
             app:cardElevation="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/filter_button"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -83,7 +85,8 @@
                     android:imeOptions="actionSearch"
                     android:inputType="text"
                     android:textColorHint="@color/verde"
-                    android:textSize="17sp" />
+                    android:textSize="17sp"
+                    tools:ignore="HardcodedText" />
 
                 <ImageButton
                     android:id="@+id/search_button"
@@ -95,20 +98,55 @@
                     android:padding="8dp"
                     android:scaleType="fitCenter"
                     android:src="@drawable/logo" />
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
 
-        <ImageButton
-            android:id="@+id/filter_button"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginEnd="16dp"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/filtro"
-            android:src="@drawable/menu"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- Main Content Section inside ScrollView -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/search_row"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp">
+
+            <ImageView
+                android:id="@+id/nuevo_banquete_image"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:contentDescription="Agregar Banquete"
+                android:scaleType="centerCrop"
+                android:src="@drawable/nuevo_banquete" />
+
+            <Button
+                android:id="@+id/btn_nuevo_banquete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Agregar Banquete"
+                android:textSize="18sp"
+                android:backgroundTint="@color/verde"
+                android:textColor="@android:color/white"
+                android:layout_gravity="center"
+                android:padding="8dp"
+                android:drawablePadding="8dp" />
+
+            <LinearLayout
+                android:id="@+id/banquetes_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingTop="16dp" />
+        </LinearLayout>
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

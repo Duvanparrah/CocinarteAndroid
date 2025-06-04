@@ -3,8 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.camilo.cocinarte">
 
-    <!-- Permisos... -->
-
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -16,7 +14,7 @@
         android:theme="@style/Theme.Cocinarte"
         tools:targetApi="31">
 
-        <!-- NavigationActivity como actividad principal -->
+        <!-- Actividad Principal -->
         <activity
             android:name=".NavigationActivity"
             android:exported="true"
@@ -28,33 +26,39 @@
             </intent-filter>
         </activity>
 
+        <!-- Actividad InformacionBanquete -->
+        <activity
+            android:name=".InformacionBanquete"
+            android:exported="false"
+            android:theme="@style/Theme.Cocinarte" />
+
         <!-- Otras actividades -->
         <activity
             android:name=".MainActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.authentication.InicioSesionActivity"
+            android:name=".InicioSesionActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.authentication.RegistroActivity"
+            android:name=".RegistroActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.authentication.cambio_contrasenaActivity"
+            android:name=".cambio_contrasenaActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.authentication.codigo_recuperacionActivity"
+            android:name=".codigo_recuperacionActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.nutricion.comprobante_pago_nequiActivity"
+            android:name=".comprobante_pago_nequiActivity"
             android:exported="false" />
         <activity
-            android:name=".ui.authentication.correo_Recuperar_Contrasena_Activity"
+            android:name=".correo_Recuperar_Contrasena_Activity"
             android:exported="false" />
         <activity
-            android:name=".ui.nutricion.Metodo_de_pago_Activity"
+            android:name=".Metodo_de_pago_Activity"
             android:exported="false" />
         <activity
-            android:name=".ui.nutricion.Tarjeta_creditoActivity"
+            android:name=".Tarjeta_creditoActivity"
             android:exported="false" />
 
     </application>

@@ -24,6 +24,7 @@
 
     <!-- Estilos de overlays opcionales -->
     <style name="Theme.Cocinarte.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
     <style name="Theme.Cocinarte.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <!-- Estilo personalizado para campos de texto -->
@@ -32,6 +33,11 @@
         <item name="boxStrokeWidth">1dp</item>
         <item name="hintTextColor">@color/gris</item>
         <item name="boxBackgroundMode">outline</item>
+    </style>
+    <!-- Base application theme. -->
+    <style name="Base.Theme.Cocinarte" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
 </resources>
