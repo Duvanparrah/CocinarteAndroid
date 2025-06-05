@@ -5,133 +5,121 @@ import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.camilo.cocinarte.MainActivity;
 import com.camilo.cocinarte.R;
+import com.camilo.cocinarte.api.AuthService;
+import com.camilo.cocinarte.api.MyCookieJar;
+import com.camilo.cocinarte.models.LoginRequest;
+import com.camilo.cocinarte.models.LoginResponse;
+import com.camilo.cocinarte.session.SessionManager;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.util.List;
+
+import okhttp3.Cookie;
+import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
 public class InicioSesionActivity extends AppCompatActivity {
 
-    private CardView cardViewGoogle;
-    private TextInputLayout textInputLayoutEmail;
-    private TextInputLayout textInputLayoutPassword;
-    private TextInputEditText editTextEmail;
-    private TextInputEditText editTextPassword;
+    private TextInputLayout textInputLayoutEmail, textInputLayoutPassword;
+    private TextInputEditText editTextEmail, editTextPassword;
     private Button buttonLogin;
-    private TextView textViewForgotPassword;
-    private TextView textViewRegister;
+    private ProgressBar progressBar;
+
+    private AuthService authService;
+    private SessionManager sessionManager;
+    private MyCookieJar cookieJar;
+
+
+    private static final String BASE_URL = "http://10.0.2.2:5000/api/";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_inicio_sesion);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
 
-        // Inicializar vistas
-        cardViewGoogle = findViewById(R.id.cardViewGoogle);
         textInputLayoutEmail = findViewById(R.id.textInputLayoutEmail);
         textInputLayoutPassword = findViewById(R.id.textInputLayoutPassword);
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
         buttonLogin = findViewById(R.id.buttonLogin);
-        textViewForgotPassword = findViewById(R.id.textViewForgotPassword);
-        textViewRegister = findViewById(R.id.textViewRegister);
+        // progressBar = findViewById(R.id.progressBar); // Comentado porque no existe en el layout
 
-        // Asegurar que los TextInputLayout estén configurados correctamente
-        setupTextInputLayouts();
+        sessionManager = new SessionManager(this);
+        cookieJar = new MyCookieJar(this);
 
-        buttonLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Llamar al método iniciarSesion en lugar de la navegación directa
-                iniciarSesion();
-            }
+        OkHttpClient client = new OkHttpClient.Builder()
+                .cookieJar(cookieJar)
+                .build();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .client(client)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        authService = retrofit.create(AuthService.class);
+
+        buttonLogin.setOnClickListener(v -> iniciarSesion());
+
+        // Nuevo: Click en "Registrate"
+        findViewById(R.id.textViewRegister).setOnClickListener(v -> {
+            Intent intent = new Intent(InicioSesionActivity.this, RegistroActivity.class);
+            startActivity(intent);
         });
 
-        cardViewGoogle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Implementar inicio de sesión con Google
-                Toast.makeText(InicioSesionActivity.this, "Iniciando sesión con Google", Toast.LENGTH_SHORT).show();
-                // Después del inicio exitoso, navegar a MainActivity con el fragmento de inicio
-                Intent intent = new Intent(InicioSesionActivity.this, MainActivity.class);
-                intent.putExtra("fragment_to_show", "inicio");
-                startActivity(intent);
-                finish();
-            }
-        });
+        // ✅ OPCIONAL: Auto-completar con datos guardados si existen
+        cargarDatosGuardados();
 
-        textViewForgotPassword.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Navegar a la pantalla de recuperación de contraseña
-                Toast.makeText(InicioSesionActivity.this, "Recuperar contraseña", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(InicioSesionActivity.this, correo_Recuperar_Contrasena_Activity.class);
-                startActivity(intent);
-            }
-        });
+        // ✅ AGREGADO: Acción al hacer clic en "¿Olvidaste tu contraseña?"
+        findViewById(R.id.textViewForgotPassword).setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("message/rfc822");
+            intent.putExtra(Intent.EXTRA_EMAIL, new String[]{"soporte@cocinarte.com"});
+            intent.putExtra(Intent.EXTRA_SUBJECT, "Recuperación de contraseña");
+            intent.putExtra(Intent.EXTRA_TEXT, "Hola, olvidé mi contraseña. ¿Podrían ayudarme a recuperarla?");
 
-        textViewRegister.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Navegar a la pantalla de registro
-                Toast.makeText(InicioSesionActivity.this, "Registro", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(InicioSesionActivity.this, RegistroActivity.class);
-                startActivity(intent);
+            try {
+                startActivity(Intent.createChooser(intent, "Enviar correo con..."));
+            } catch (android.content.ActivityNotFoundException ex) {
+                Toast.makeText(this, "No hay clientes de correo instalados.", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void setupTextInputLayouts() {
-        // Asegurar que los hints siempre sean visibles
-        textInputLayoutEmail.setHintEnabled(true);
-        textInputLayoutPassword.setHintEnabled(true);
-    }
 
-    /**
-     * Valida que sea una dirección de email válida
-     * @param email Email a validar
-     * @return true si es un email válido, false en caso contrario
-     */
-    private boolean isValidEmail(String email) {
-        return Patterns.EMAIL_ADDRESS.matcher(email).matches();
-    }
-
-    /**
-     * Valida que la contraseña tenga al menos 6 caracteres
-     * @param password Contraseña a validar
-     * @return true si cumple con los requisitos, false en caso contrario
-     */
-    private boolean isValidPassword(String password) {
-        return password.length() >= 6;
+    private void cargarDatosGuardados() {
+        if (sessionManager.isUserExist()) {
+            String savedEmail = sessionManager.getEmail();
+            if (savedEmail != null) {
+                editTextEmail.setText(savedEmail);
+            }
+        }
     }
 
     private boolean validarCampos() {
-        String email = editTextEmail.getText() != null ? editTextEmail.getText().toString() : "";
+        String email = editTextEmail.getText() != null ? editTextEmail.getText().toString().trim() : "";
         String password = editTextPassword.getText() != null ? editTextPassword.getText().toString() : "";
 
         boolean isValid = true;
 
-        // Validar campos
         if (email.isEmpty()) {
             textInputLayoutEmail.setError("Por favor, ingrese su email");
             isValid = false;
-        } else if (!isValidEmail(email)) {
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             textInputLayoutEmail.setError("Por favor, ingrese un email válido");
             isValid = false;
         } else {
@@ -141,7 +129,7 @@ public class InicioSesionActivity extends AppCompatActivity {
         if (password.isEmpty()) {
             textInputLayoutPassword.setError("Por favor, ingrese su contraseña");
             isValid = false;
-        } else if (!isValidPassword(password)) {
+        } else if (password.length() < 6) {
             textInputLayoutPassword.setError("La contraseña debe tener al menos 6 caracteres");
             isValid = false;
         } else {
@@ -152,14 +140,121 @@ public class InicioSesionActivity extends AppCompatActivity {
     }
 
     private void iniciarSesion() {
-        // Validar los campos antes de proceder
-        if (validarCampos()) {
-            Toast.makeText(InicioSesionActivity.this, "Iniciando sesión...", Toast.LENGTH_SHORT).show();
-            Intent intent = new Intent(InicioSesionActivity.this, MainActivity.class);
-            // Esto asegura que se muestre el fragmento de inicio
-            intent.putExtra("fragment_to_show", "inicio");
-            startActivity(intent);
-            finish(); // Cierra la actividad actual para evitar volver atrás
-        }
+        if (!validarCampos()) return;
+
+        String email = editTextEmail.getText().toString().trim();
+        String password = editTextPassword.getText().toString();
+
+        // Deshabilitar botón y mostrar progreso
+        buttonLogin.setEnabled(false);
+        buttonLogin.setText("Ingresando...");
+        // if (progressBar != null) {
+        //     progressBar.setVisibility(View.VISIBLE);
+        // }
+
+        LoginRequest request = new LoginRequest(email, password);
+
+        authService.loginUser(request).enqueue(new Callback<LoginResponse>() {
+            @Override
+            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                // Restaurar botón
+                buttonLogin.setEnabled(true);
+                buttonLogin.setText("Iniciar sesión");
+                // if (progressBar != null) {
+                //     progressBar.setVisibility(View.GONE);
+                // }
+
+                if (response.isSuccessful() && response.body() != null) {
+                    LoginResponse loginResponse = response.body();
+
+                    // ✅ OPCIÓN 1: Si tu API retorna el token en el response body
+                    if (loginResponse.getToken() != null) {
+                        // Guardar datos de sesión
+                        sessionManager.saveUserSession(email, password, loginResponse.getToken());
+
+                        Toast.makeText(InicioSesionActivity.this,
+                                loginResponse.getMessage() != null ? loginResponse.getMessage() : "Bienvenido",
+                                Toast.LENGTH_SHORT).show();
+
+                        irAMainActivity();
+                        return;
+                    }
+
+
+                    HttpUrl url = HttpUrl.parse("http://10.0.2.2:5000");
+                    if (url != null) {
+                        List<Cookie> cookies = cookieJar.loadForRequest(url);
+                        String tokenFromCookie = null;
+
+                        for (Cookie cookie : cookies) {
+                            if (cookie.name().equalsIgnoreCase("token") ||
+                                    cookie.name().equalsIgnoreCase("jwt") ||
+                                    cookie.name().equalsIgnoreCase("auth_token")) {
+                                tokenFromCookie = cookie.value();
+                                break;
+                            }
+                        }
+
+                        if (tokenFromCookie != null) {
+                            // Guardar datos de sesión
+                            sessionManager.saveUserSession(email, password, tokenFromCookie);
+
+                            Toast.makeText(InicioSesionActivity.this, "Bienvenido", Toast.LENGTH_SHORT).show();
+                            irAMainActivity();
+                            return;
+                        }
+                    }
+
+                    // ✅ OPCIÓN 3: Login sin token (solo validación local)
+                    sessionManager.saveUser(email, password);
+                    Toast.makeText(InicioSesionActivity.this, "Bienvenido", Toast.LENGTH_SHORT).show();
+                    irAMainActivity();
+
+                } else {
+                    // Error en las credenciales
+                    String errorMessage = "Credenciales incorrectas";
+                    if (response.code() == 401) {
+                        errorMessage = "Email o contraseña incorrectos";
+                    } else if (response.code() == 404) {
+                        errorMessage = "Usuario no encontrado";
+                    } else if (response.code() >= 500) {
+                        errorMessage = "Error del servidor. Intenta más tarde.";
+                    }
+
+                    Toast.makeText(InicioSesionActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<LoginResponse> call, Throwable t) {
+                // Restaurar botón
+                buttonLogin.setEnabled(true);
+                buttonLogin.setText("Iniciar sesión");
+                // if (progressBar != null) {
+                //     progressBar.setVisibility(View.GONE);
+                // }
+
+                String errorMessage = "Error de conexión";
+                if (t.getMessage() != null) {
+                    if (t.getMessage().contains("Unable to resolve host")) {
+                        errorMessage = "No se puede conectar al servidor. Verifica que esté ejecutándose.";
+                    } else if (t.getMessage().contains("timeout")) {
+                        errorMessage = "Tiempo de espera agotado. Intenta de nuevo.";
+                    } else {
+                        errorMessage = "Error de conexión: " + t.getMessage();
+                    }
+                }
+
+                Toast.makeText(InicioSesionActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void irAMainActivity() {
+        Intent intent = new Intent(InicioSesionActivity.this, MainActivity.class);
+        intent.putExtra("fragment_to_show", "inicio");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 }

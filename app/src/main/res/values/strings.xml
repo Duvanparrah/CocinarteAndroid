@@ -28,29 +28,154 @@
     <string name="title_activity_menu_despliegue">menu_despliegue_Activity</string>
 
 
-        <!-- Títulos de la barra de navegación inferior -->
-        <string name="title_home">Inicio</string>
-        <string name="title_search">Buscar</string>
-        <string name="title_add">Agregar</string>
-        <string name="title_notifications">Alertas</string>
-        <string name="title_profile">Perfil</string>
+    <!-- Títulos de la barra de navegación inferior -->
+    <string name="title_home">Inicio</string>
+    <string name="title_search">Buscar</string>
+    <string name="title_add">Agregar</string>
+    <string name="title_notifications">Alertas</string>
+    <string name="title_profile">Perfil</string>
 
-        <!-- Títulos del drawer -->
-        <string name="title_favorites">Favoritos</string>
-        <string name="title_support">Soporte</string>
-        <string name="title_account_settings">Cuenta y configuración</string>
-        <string name="title_drawer_notifications">Notificaciones</string>
-        <string name="title_logout">Cerrar sesión</string>
+    <!-- Títulos del drawer -->
+    <string name="title_favorites">Favoritos</string>
+    <string name="title_support">Soporte</string>
+    <string name="title_account_settings">Cuenta y configuración</string>
+    <string name="title_drawer_notifications">Notificaciones</string>
+    <string name="title_logout">Cerrar sesión</string>
 
-        <!-- Perfil -->
-        <string name="edit_profile">Editar perfil</string>
-        <string name="change_profile_pic">Cambiar foto de perfil</string>
-        <string name="personal_info">Información Personal</string>
-        <string name="security">Seguridad</string>
-        <string name="notifications">Notificaciones</string>
-        <string name="privacy">Privacidad</string>
-        <string name="help">Ayuda</string>
-        <string name="about">Acerca de</string>
-        <string name="save">Guardar</string>
-        <string name="cancel">Cancelar</string>
+    <!-- Perfil -->
+    <string name="edit_profile">Editar perfil</string>
+    <string name="change_profile_pic">Cambiar foto de perfil</string>
+    <string name="personal_info">Información Personal</string>
+    <string name="security">Seguridad</string>
+    <string name="notifications">Notificaciones</string>
+    <string name="privacy">Privacidad</string>
+    <string name="help">Ayuda</string>
+    <string name="about">Acerca de</string>
+    <string name="save">Guardar</string>
+    <string name="cancel">Cancelar</string>
+
+
+    <!-- Arrays para los Spinners -->
+
+    <string-array name="sexo_array">
+        <item>Sexo</item>
+        <item>Masculino</item>
+        <item>Femenino</item>
+        <item>Otro</item>
+    </string-array>
+
+    <string-array name="edad_array">
+        <item>Edad</item>
+        <item>18-24</item>
+        <item>25-34</item>
+        <item>35-44</item>
+        <item>45-54</item>
+        <item>55 o más</item>
+    </string-array>
+
+    <string-array name="altura_array">
+        <item>Altura</item>
+        <item>150 cm</item>
+        <item>160 cm</item>
+        <item>170 cm</item>
+        <item>180 cm</item>
+        <item>190 cm</item>
+    </string-array>
+
+    <string-array name="peso_array">
+        <item>Peso</item>
+        <item>50 kg</item>
+        <item>60 kg</item>
+        <item>70 kg</item>
+        <item>80 kg</item>
+        <item>90 kg</item>
+    </string-array>
+
+
+    <!-- Estilo para los contenedores de Spinner -->
+    <style name="SpinnerLayout">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:background">@drawable/boton_fondo</item>
+        <item name="android:padding">12dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+
+    <!-- Estilo para los Spinners -->
+    <style name="CustomSpinner">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginStart">12dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:popupBackground">@android:color/white</item>
+    </style>
+
+
+    <!-- Textos generales -->
+
+    <string name="continuar">Continuar</string>
+    <string name="volver_atras">Atrás</string>
+    <string name="titulo_formulario">Ayúdanos a conocerte mejor</string>
+    <string name="descripcion_formulario">Con estos datos, determinaremos tu ingesta calórica ideal.</string>
+
+    <!-- Arrays para Spinners -->
+    <string-array name="sexo">
+        <item>Selecciona tu sexo</item>
+        <item>Masculino</item>
+        <item>Femenino</item>
+        <item>Otro</item>
+    </string-array>
+
+    <string-array name="edad">
+        <item>Selecciona tu edad</item>
+        <item>18-25</item>
+        <item>26-35</item>
+        <item>36-45</item>
+        <item>46-55</item>
+        <item>56 o más</item>
+    </string-array>
+
+    <string-array name="altura">
+        <item>Selecciona tu altura</item>
+        <item>&lt; 150 cm</item>
+        <item>150-160 cm</item>
+        <item>161-170 cm</item>
+        <item>171-180 cm</item>
+        <item>&gt; 180 cm</item>
+    </string-array>
+
+    <string-array name="peso">
+        <item>Selecciona tu peso</item>
+        <item>&lt; 50 kg</item>
+        <item>50-60 kg</item>
+        <item>61-70 kg</item>
+        <item>71-80 kg</item>
+        <item>81-90 kg</item>
+        <item>&gt; 90 kg</item>
+    </string-array>
+
+    <string name="back_arrow">Atrás</string>
+    <string name="logo">Logo CocinArte</string>
+    <string name="image_description">Imagen de entrenamiento</string>
+    <string name="entrenamiento_fuerza">Realizas entrenamiento de fuerza</string>
+
+    <string name="sedentario">Sedentario</string>
+    <string name="desc_sedentario">Actividad física mínima o nula.</string>
+
+    <string name="ligera_actividad">Ligera Actividad</string>
+    <string name="desc_ligera">Actividad física de 1 a 2 días por semana.</string>
+
+    <string name="moderadamente_activo">Moderadamente Activo</string>
+    <string name="desc_moderado">Actividad física de 3 a 4 días por semana.</string>
+
+    <string name="muy_activo">Muy Activo</string>
+    <string name="desc_muy_activo">Actividad física de 5 a 6 días por semana.</string>
+
+    <string name="nivel_actividad">Nivel de actividad</string>
+
+
 </resources>

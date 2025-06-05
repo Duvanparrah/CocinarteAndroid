@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    tools:context=".ui.nutricion.formulario_plan_nutricional">
+
+    <!-- Flecha de regreso -->
+    <ImageView
+        android:id="@+id/backArrow"
+        android:layout_width="100dp"
+        android:layout_height="85dp"
+        android:src="@drawable/atras"
+        android:contentDescription="Atrás"
+        android:padding="10dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp" />
+
+    <!-- Logo cocinArte -->
+    <ImageView
+        android:id="@+id/logoImage"
+        android:layout_width="200dp"
+        android:layout_height="58dp"
+        android:src="@drawable/cosinart"
+        android:contentDescription="Logo cocinArte"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp" />
+
+    <!-- Imagen central de nutrición -->
+    <ImageView
+        android:id="@+id/imagenNutricion"
+        android:layout_width="120dp"
+        android:layout_height="200dp"
+        android:src="@drawable/plan_nutricion"
+        android:contentDescription="Plan de nutrición"
+        app:layout_constraintTop_toBottomOf="@id/logoImage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp" />
+
+    <!-- Texto descriptivo -->
+    <TextView
+        android:id="@+id/descripcion"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="¡Descubre un plan de nutrición hecho a tu medida para alcanzar tus metas de forma saludable!"
+        android:textAlignment="center"
+        android:textSize="16sp"
+        android:lineSpacingExtra="4dp"
+        android:textColor="@android:color/black"
+        android:padding="16dp"
+        app:layout_constraintTop_toBottomOf="@id/imagenNutricion"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Botón Continuar -->
+    <Button
+        android:id="@+id/btnContinuar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Continuar"
+        android:backgroundTint="@color/verde"
+        android:textColor="@android:color/white"
+        android:layout_marginTop="200dp"
+        android:paddingLeft="32dp"
+        android:paddingRight="31dp"
+        app:layout_constraintTop_toBottomOf="@id/descripcion"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Menú inferior de navegación -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        app:menu="@menu/bottom_nav_menu"
+        app:itemIconTint="@color/black"
+        app:itemTextColor="@color/black"
+        app:labelVisibilityMode="labeled"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

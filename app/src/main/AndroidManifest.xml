@@ -3,7 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.camilo.cocinarte">
 
-    <!-- Permisos... -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
@@ -14,11 +15,12 @@
         android:roundIcon="@drawable/logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.Cocinarte"
+        android:usesCleartextTraffic="true"
         tools:targetApi="31">
 
-        <!-- NavigationActivity como actividad principal -->
+        <!-- Actividad principal -->
         <activity
-            android:name=".NavigationActivity"
+            android:name=".ui.authentication.InicioSesionActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.Cocinarte.NoActionBar">
@@ -29,34 +31,22 @@
         </activity>
 
         <!-- Otras actividades -->
-        <activity
-            android:name=".MainActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.authentication.InicioSesionActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.authentication.RegistroActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.authentication.cambio_contrasenaActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.authentication.codigo_recuperacionActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.nutricion.comprobante_pago_nequiActivity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.authentication.correo_Recuperar_Contrasena_Activity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.nutricion.Metodo_de_pago_Activity"
-            android:exported="false" />
-        <activity
-            android:name=".ui.nutricion.Tarjeta_creditoActivity"
-            android:exported="false" />
+        <activity android:name=".MainActivity" android:exported="false" />
+        <activity android:name=".ui.authentication.RegistroActivity" android:exported="false" />
+        <activity android:name=".ui.authentication.cambio_contrasenaActivity" android:exported="false" />
+        <activity android:name=".ui.nutricion.comprobante_pago_nequiActivity" android:exported="false" />
+        <activity android:name=".ui.authentication.correo_Recuperar_Contrasena_Activity" android:exported="false" />
+        <activity android:name=".ui.nutricion.Metodo_de_pago_Activity" android:exported="false" />
+        <activity android:name=".ui.nutricion.Tarjeta_creditoActivity" android:exported="false" />
 
+        <!-- Formularios nutricionales -->
+        <activity android:name=".ui.nutricion.formulario_plan_nutricional_9" android:exported="false" />
+        <activity android:name=".ui.nutricion.formulario_plan_nutricional_8" android:exported="false" />
+        <activity android:name=".ui.nutricion.formulario_plan_nutricional_7" android:exported="false" />
+        <activity android:name=".ui.nutricion.formulario_plan_nutricional_6" android:exported="false" />
+        <activity android:name=".ui.nutricion.formulario_plan_nutricional_4" android:exported="false" />
+        <activity android:name=".ui.nutricion.formulario_plan_nutricional_2" android:exported="false" />
+        <activity android:name=".ui.nutricion.formulario_plan_nutricional_3" android:exported="false" />
+        <activity android:name=".ui.nutricion.formulario_plan_nutricional" android:exported="false" />
     </application>
-
 </manifest>

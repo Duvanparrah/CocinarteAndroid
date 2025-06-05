@@ -3,19 +3,24 @@ package com.camilo.cocinarte.ui.authentication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.camilo.cocinarte.R;
+import com.camilo.cocinarte.api.AuthService;
+import com.camilo.cocinarte.models.ForgotPasswordRequest;
+import com.camilo.cocinarte.models.ApiResponse;
+
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class correo_Recuperar_Contrasena_Activity extends AppCompatActivity {
 
@@ -23,70 +28,89 @@ public class correo_Recuperar_Contrasena_Activity extends AppCompatActivity {
     private Button btnSend;
     private ImageButton btnBack;
 
+    private AuthService authService;
+
+    private static final String BASE_URL = "http://10.0.2.2:5000/api/";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_correo_recuperar_contrasena);
 
-        // Configurar insets para el sistema de navegación
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-
-        // Inicializar vistas
         etEmail = findViewById(R.id.etEmail);
         btnSend = findViewById(R.id.btnSend);
         btnBack = findViewById(R.id.btnBack);
 
-        // Configurar listeners
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish(); // Volver a la pantalla anterior
-            }
-        });
+        btnBack.setOnClickListener(v -> finish());
 
-        btnSend.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                enviarCorreoRecuperacion();
-            }
-        });
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .client(new OkHttpClient.Builder().build())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        authService = retrofit.create(AuthService.class);
+
+        btnSend.setOnClickListener(v -> enviarCorreoRecuperacion());
     }
 
     private void enviarCorreoRecuperacion() {
         String email = etEmail.getText().toString().trim();
 
-        // Validar que el campo de correo no esté vacío
         if (TextUtils.isEmpty(email)) {
             etEmail.setError("Por favor ingresa tu correo electrónico");
             return;
         }
 
-        // Validar formato de correo electrónico
         if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             etEmail.setError("Por favor ingresa un correo electrónico válido");
             return;
         }
 
-        // Aquí iría la lógica para enviar el correo de recuperación
-        // Por ejemplo, usando Firebase Auth u otro servicio
+        btnSend.setEnabled(false);
+        btnSend.setText("Enviando...");
 
-        // Mostrar mensaje de éxito
-        Toast.makeText(this, "Se ha enviado un correo a " + email + " para restablecer tu contraseña",
-                Toast.LENGTH_SHORT).show();
+        ForgotPasswordRequest request = new ForgotPasswordRequest(email);
 
-        // Navegar a la pantalla de verificación de código
-        Intent intent = new Intent(correo_Recuperar_Contrasena_Activity.this, codigo_recuperacionActivity.class);
-        // Si deseas pasar el correo electrónico a la siguiente actividad, puedes hacerlo así:
-        intent.putExtra("EMAIL", email);
-        startActivity(intent);
+        // ✅ CORREGIDO: Cambiar Callback<Void> por Callback<ApiResponse>
+        authService.forgotPassword(request).enqueue(new Callback<ApiResponse>() {
+            @Override
+            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                btnSend.setEnabled(true);
+                btnSend.setText("Enviar");
 
-        // Si no quieres volver a esta pantalla cuando presiones "Atrás" en la pantalla de verificación,
-        // descomenta la siguiente línea:
-        // finish();
+                if (response.isSuccessful() && response.body() != null) {
+                    // Usar el mensaje del servidor si está disponible
+                    ApiResponse apiResponse = response.body();
+                    String message = apiResponse.getMessage();
+
+                    if (message != null && !message.isEmpty()) {
+                        Toast.makeText(correo_Recuperar_Contrasena_Activity.this, message, Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(correo_Recuperar_Contrasena_Activity.this,
+                                "Se ha enviado un correo a " + email + " para restablecer tu contraseña",
+                                Toast.LENGTH_LONG).show();
+                    }
+
+                    Intent intent = new Intent(correo_Recuperar_Contrasena_Activity.this, codigo_recuperacionActivity.class);
+                    intent.putExtra("EMAIL", email);
+                    startActivity(intent);
+                    // finish(); // Descomenta si no quieres que el usuario vuelva atrás
+                } else {
+                    Toast.makeText(correo_Recuperar_Contrasena_Activity.this,
+                            "No se pudo enviar el correo. Intenta más tarde.",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse> call, Throwable t) {
+                btnSend.setEnabled(true);
+                btnSend.setText("Enviar");
+                Toast.makeText(correo_Recuperar_Contrasena_Activity.this,
+                        "Error de conexión: " + t.getMessage(),
+                        Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }
