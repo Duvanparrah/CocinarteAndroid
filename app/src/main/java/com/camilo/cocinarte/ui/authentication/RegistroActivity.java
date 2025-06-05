@@ -36,7 +36,7 @@ public class RegistroActivity extends AppCompatActivity {
     private SessionManager sessionManager;
     private AuthService authService;
 
-    private static final String BASE_URL = "http://10.0.2.2:5000/api/";
+    private static final String BASE_URL = "http://192.168.18.7:5000/api/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

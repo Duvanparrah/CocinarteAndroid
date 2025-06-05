@@ -2,6 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
+
+
+
 android {
     namespace = "com.camilo.cocinarte"
     compileSdk = 35
@@ -35,6 +38,7 @@ android {
 }
 
 dependencies {
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     // Core Android libraries
     implementation(libs.appcompat)
     implementation(libs.material)
@@ -75,4 +79,5 @@ dependencies {
     // OkHttp
     implementation ("com.squareup.okhttp3:okhttp:4.10.0")
     implementation ("com.squareup.okhttp3:logging-interceptor:4.10.0")
+
 }

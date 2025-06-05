@@ -1,8 +1,14 @@
 package com.camilo.cocinarte;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -15,14 +21,20 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.camilo.cocinarte.api.UsersRequest;
+import com.camilo.cocinarte.ui.authentication.InicioSesionActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
+
+import java.io.File;
 
 public class NavigationActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private DrawerLayout drawerLayout;
     private NavController navController;
     private AppBarConfiguration appBarConfiguration;
+    UsersRequest usersRequest = new UsersRequest();
+    NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +52,8 @@ public class NavigationActivity extends AppCompatActivity implements NavigationV
 
         // Inicializar el DrawerLayout y NavigationView
         drawerLayout = findViewById(R.id.drawer_layout);
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        this.navigationView = findViewById(R.id.nav_view);
+
 
         // Obtener el NavController correctamente desde el NavHostFragment
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager()
@@ -75,7 +88,42 @@ public class NavigationActivity extends AppCompatActivity implements NavigationV
             Toast.makeText(this, "Error: No se pudo encontrar el NavHostFragment",
                     Toast.LENGTH_LONG).show();
         }
+
+        this.actionsButtons();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // ====== Logica enviar datos al nav_header_perfil ======
+        this.usersRequest.UserPrefsManager(this.getApplicationContext());
+        // Recuperar datos guardados
+        String savedName = this.usersRequest.getSavedName();
+        // Si hay nombre guardado, lo mostramos
+        if (savedName != null && !savedName.isEmpty()) {
+            View headerView = navigationView.getHeaderView(0);
+            TextView userEmail = headerView.findViewById(R.id.user_name);
+            ImageView profile_image = headerView.findViewById(R.id.profile_image);
+            userEmail.setText(savedName);
+            Bitmap image = getAvatarImage();
+            if(image != null){
+                profile_image.setImageBitmap(image);
+            }
+        }
+
+        // ====== fin ======
+    }
+
+
+    private Bitmap getAvatarImage() {
+        File file = new File(getFilesDir(), "avatar.png");
+        Bitmap bitmap = null;
+        if (file.exists()) {
+            bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+        }
+        return bitmap;
+    }
+
 
     /**
      * Configura el botón de menú de cualquier fragmento para abrir el drawer
@@ -85,6 +133,17 @@ public class NavigationActivity extends AppCompatActivity implements NavigationV
             if (drawerLayout != null) {
                 drawerLayout.openDrawer(GravityCompat.START);
             }
+        });
+    }
+
+
+    public void actionsButtons() {
+        View signout = findViewById(R.id.nav_cerrar_sesion);
+        signout.setOnClickListener(v -> {
+            Intent intent = new Intent(this, InicioSesionActivity.class);
+            startActivity(intent);
+            Toast.makeText(this, "Sesión finalizada", Toast.LENGTH_SHORT).show();
+            this.finish();
         });
     }
 
@@ -100,19 +159,17 @@ public class NavigationActivity extends AppCompatActivity implements NavigationV
         int id = item.getItemId();
 
         if (id == R.id.nav_soporte) {
-            // Implementar navegación a soporte
             Toast.makeText(this, "Soporte", Toast.LENGTH_SHORT).show();
         } else if (id == R.id.nav_cuenta_configuracion) {
-            // Implementar navegación a cuenta y configuración
-            Toast.makeText(this, "Cuenta y configuración", Toast.LENGTH_SHORT).show();
+            // Iniciar actividad de configuración
+            Intent intent = new Intent(this, ConfiguracionActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nav_notificaciones) {
-            // Implementar navegación a notificaciones
             Toast.makeText(this, "Notificaciones", Toast.LENGTH_SHORT).show();
-        } else if (id == R.id.nav_cerrar_sesion) {
-            // Implementar lógica de cierre de sesión
-            Toast.makeText(this, "Cerrando sesión...", Toast.LENGTH_SHORT).show();
-            // Aquí irá la lógica para cerrar sesión
         }
+        /*else if (id == R.id.nav_cerrar_sesion) {
+            Toast.makeText(this, "Cerrando sesión...", Toast.LENGTH_SHORT).show();
+        }*/
 
         // Cerrar el drawer después de la selección
         drawerLayout.closeDrawer(GravityCompat.START);

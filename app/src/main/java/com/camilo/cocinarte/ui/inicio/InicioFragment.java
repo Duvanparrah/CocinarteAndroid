@@ -8,10 +8,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.view.GravityCompat;
 
-import com.camilo.cocinarte.NavigationActivity;
-import com.camilo.cocinarte.R;
 import com.camilo.cocinarte.databinding.FragmentInicioBinding;
 import com.camilo.cocinarte.ui.base.BaseFragment;
 
@@ -30,6 +27,13 @@ public class InicioFragment extends BaseFragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        /*TestRequest testRequest = new TestRequest();
+        Log.d("|||1", "1");
+        testRequest.login("pacmanexplendoroso@gmail.com","123456");
+        Log.d("|||1", "2");*/
+
+
 
         // Configurar listeners adicionales específicos de este fragmento
         setupClickListeners();

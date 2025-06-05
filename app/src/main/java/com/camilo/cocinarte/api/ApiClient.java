@@ -18,7 +18,12 @@ public class ApiClient {
                     .build();
 
             retrofit = new Retrofit.Builder()
-                    .baseUrl("http://10.0.2.2:3000/") // Cambia a tu IP si es necesario
+                    .baseUrl("http://192.168.18.7:5000/")
+
+
+
+
+                    //.baseUrl("http://10.0.2.2:3000/") // Cambia a tu IP si es necesario
                     .client(client)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
