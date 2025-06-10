@@ -35,6 +35,13 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".NavigationActivity"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.Cocinarte.NoActionBar">
+        </activity>
+
         <!-- Configuración -->
         <activity
             android:name=".ConfiguracionActivity"

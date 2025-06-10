@@ -18,7 +18,7 @@
         android:layout_width="162dp"
         android:layout_height="55dp"
         android:contentDescription="Título de la aplicación"
-        android:src="@drawable/logo_cocinarte"
+        android:src="@drawable/icono"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"

@@ -45,7 +45,7 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Search Bar and Filter Button Row -->
+    <!-- Search Bar Centered -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/search_row"
         android:layout_width="match_parent"
@@ -66,7 +66,7 @@
             app:cardCornerRadius="24dp"
             app:cardElevation="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/filter_button"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -89,7 +89,8 @@
                     android:imeOptions="actionSearch"
                     android:inputType="text"
                     android:textColorHint="@color/verde"
-                    android:textSize="17sp" />
+                    android:textSize="17sp"
+                    tools:ignore="TouchTargetSizeCheck" />
 
                 <ImageButton
                     android:id="@+id/search_button"
@@ -100,22 +101,10 @@
                     android:contentDescription="@string/barra_de_busqueda"
                     android:padding="8dp"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/logo" />
+                    android:src="@drawable/logo"
+                    tools:ignore="TouchTargetSizeCheck" />
             </LinearLayout>
         </androidx.cardview.widget.CardView>
-
-        <!-- Filter Button (Este es el botón del menú lateral) -->
-        <ImageButton
-            android:id="@+id/filter_button"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginEnd="16dp"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/menu"
-            android:src="@drawable/menu"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

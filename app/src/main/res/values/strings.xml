@@ -175,7 +175,11 @@
     <string name="muy_activo">Muy Activo</string>
     <string name="desc_muy_activo">Actividad física de 5 a 6 días por semana.</string>
 
+
     <string name="nivel_actividad">Nivel de actividad</string>
 
+    <!-- puerto local -->
+<!--    <string name="myhost">192.168.18.7</string>-->
+    <string name="myhost">192.168.18.7</string>
 
 </resources>
