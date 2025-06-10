@@ -157,6 +157,7 @@
         <item>81-90 kg</item>
         <item>&gt; 90 kg</item>
     </string-array>
+<!--    esta linea se puede boorar-->
 
     <string name="back_arrow">Atrás</string>
     <string name="logo">Logo CocinArte</string>
