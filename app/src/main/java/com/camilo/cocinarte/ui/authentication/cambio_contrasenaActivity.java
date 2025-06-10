@@ -52,42 +52,25 @@ public class cambio_contrasenaActivity extends AppCompatActivity {
             return insets;
         });
 
-        getIntentData();
-        initializeViews();
-        setupListeners();
-        setupPasswordValidation();
-    }
-
-    private void getIntentData() {
-        Intent intent = getIntent();
-        if (intent != null) {
-            email = intent.getStringExtra("EMAIL");
-            resetCode = intent.getStringExtra("RESET_CODE");
-
+        // Obtener email y resetCode del Intent
+        if (getIntent() != null) {
+            email = getIntent().getStringExtra("EMAIL");
+            resetCode = getIntent().getStringExtra("RESET_CODE");
             Log.d(TAG, "Email recibido: " + email);
             Log.d(TAG, "Código de reset recibido: " + (resetCode != null ? resetCode : "No"));
         }
-    }
 
-    private void initializeViews() {
+        // Inicializar vistas
         etNewPassword = findViewById(R.id.etNewPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
         passwordLayout = findViewById(R.id.passwordLayout);
         confirmPasswordLayout = findViewById(R.id.confirmPasswordLayout);
         btnSavePassword = findViewById(R.id.btnSavePassword);
         btnBack = findViewById(R.id.btnBack);
-    }
 
-    private void setupListeners() {
         btnBack.setOnClickListener(v -> onBackPressed());
-        btnSavePassword.setOnClickListener(v -> {
-            if (validatePasswords()) {
-                saveNewPassword();
-            }
-        });
-    }
 
-    private void setupPasswordValidation() {
+        // Validar contraseñas en tiempo real
         TextWatcher watcher = new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
@@ -97,6 +80,12 @@ public class cambio_contrasenaActivity extends AppCompatActivity {
         };
         etNewPassword.addTextChangedListener(watcher);
         etConfirmPassword.addTextChangedListener(watcher);
+
+        btnSavePassword.setOnClickListener(v -> {
+            if (validatePasswords()) {
+                saveNewPassword();
+            }
+        });
     }
 
     private boolean validatePasswordsInput() {
@@ -124,6 +113,8 @@ public class cambio_contrasenaActivity extends AppCompatActivity {
             } else {
                 confirmPasswordLayout.setError(null);
             }
+        } else {
+            confirmPasswordLayout.setError(null);
         }
 
         return isValid;
@@ -145,6 +136,7 @@ public class cambio_contrasenaActivity extends AppCompatActivity {
 
     private void saveNewPassword() {
         String newPassword = etNewPassword.getText().toString().trim();
+
         btnSavePassword.setEnabled(false);
         btnSavePassword.setText("Guardando...");
 
@@ -153,42 +145,32 @@ public class cambio_contrasenaActivity extends AppCompatActivity {
 
             AuthService authService = ApiClient.getClient(getApplicationContext()).create(AuthService.class);
 
-            // ✅ CORREGIDO: Cambiar Callback<Void> por Callback<ApiResponse>
             authService.resetPassword(request).enqueue(new Callback<ApiResponse>() {
                 @Override
                 public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                    btnSavePassword.setEnabled(true);
+                    btnSavePassword.setText("Guardar Contraseña");
+
                     if (response.isSuccessful() && response.body() != null) {
-                        // Opcionalmente usar el mensaje de la respuesta
-                        ApiResponse apiResponse = response.body();
-                        Log.d(TAG, "Respuesta del servidor: " + apiResponse.getMessage());
-                        showSuccessAndNavigate();
+                        Toast.makeText(cambio_contrasenaActivity.this, "¡Contraseña actualizada correctamente!", Toast.LENGTH_SHORT).show();
+                        navigateToLoginScreen();
                     } else {
                         Toast.makeText(cambio_contrasenaActivity.this, "Error al cambiar la contraseña", Toast.LENGTH_LONG).show();
-                        resetButton();
                     }
                 }
 
                 @Override
                 public void onFailure(Call<ApiResponse> call, Throwable t) {
-                    Log.e(TAG, "Error de red: " + t.getMessage());
+                    btnSavePassword.setEnabled(true);
+                    btnSavePassword.setText("Guardar Contraseña");
                     Toast.makeText(cambio_contrasenaActivity.this, "Error de red: " + t.getMessage(), Toast.LENGTH_LONG).show();
-                    resetButton();
                 }
             });
         } else {
             Toast.makeText(this, "Datos incompletos para cambiar la contraseña", Toast.LENGTH_LONG).show();
-            resetButton();
+            btnSavePassword.setEnabled(true);
+            btnSavePassword.setText("Guardar Contraseña");
         }
-    }
-
-    private void resetButton() {
-        btnSavePassword.setEnabled(true);
-        btnSavePassword.setText("Guardar Contraseña");
-    }
-
-    private void showSuccessAndNavigate() {
-        Toast.makeText(this, "¡Contraseña actualizada correctamente!", Toast.LENGTH_SHORT).show();
-        btnSavePassword.postDelayed(this::navigateToLoginScreen, 1500);
     }
 
     private void navigateToLoginScreen() {

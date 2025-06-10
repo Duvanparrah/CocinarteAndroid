@@ -30,7 +30,8 @@ public class correo_Recuperar_Contrasena_Activity extends AppCompatActivity {
 
     private AuthService authService;
 
-    private static final String BASE_URL = "http://10.0.2.2:5000/api/";
+
+    private static final String BASE_URL = "https://cocinarte-production.up.railway.app/api/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +73,6 @@ public class correo_Recuperar_Contrasena_Activity extends AppCompatActivity {
 
         ForgotPasswordRequest request = new ForgotPasswordRequest(email);
 
-        // ✅ CORREGIDO: Cambiar Callback<Void> por Callback<ApiResponse>
         authService.forgotPassword(request).enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
@@ -80,7 +80,6 @@ public class correo_Recuperar_Contrasena_Activity extends AppCompatActivity {
                 btnSend.setText("Enviar");
 
                 if (response.isSuccessful() && response.body() != null) {
-                    // Usar el mensaje del servidor si está disponible
                     ApiResponse apiResponse = response.body();
                     String message = apiResponse.getMessage();
 
@@ -95,7 +94,6 @@ public class correo_Recuperar_Contrasena_Activity extends AppCompatActivity {
                     Intent intent = new Intent(correo_Recuperar_Contrasena_Activity.this, codigo_recuperacionActivity.class);
                     intent.putExtra("EMAIL", email);
                     startActivity(intent);
-                    // finish(); // Descomenta si no quieres que el usuario vuelva atrás
                 } else {
                     Toast.makeText(correo_Recuperar_Contrasena_Activity.this,
                             "No se pudo enviar el correo. Intenta más tarde.",

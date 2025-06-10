@@ -3,10 +3,12 @@ package com.camilo.cocinarte.ui.authentication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -15,14 +17,27 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.camilo.cocinarte.R;
+import com.camilo.cocinarte.api.AuthService;
+import com.camilo.cocinarte.cambio_contrasenaActivity;
+import com.camilo.cocinarte.models.VerifyCodeRequest;
+import com.camilo.cocinarte.models.ApiResponse;
+
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class codigo_recuperacionActivity extends AppCompatActivity {
-
-    private static final int CODE_LENGTH = 6;
 
     private EditText etDigit1, etDigit2, etDigit3, etDigit4, etDigit5, etDigit6;
     private Button btnVerify;
     private ImageButton btnBack;
+
+    private AuthService authService;
+    private static final String BASE_URL = "https://cocinarte-production.up.railway.app/api/";
+
     private String email = "";
 
     @Override
@@ -45,15 +60,17 @@ public class codigo_recuperacionActivity extends AppCompatActivity {
         initializeViews();
         setupDigitFocusChangeListeners();
 
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .client(new OkHttpClient.Builder().build())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        authService = retrofit.create(AuthService.class);
+
         btnBack.setOnClickListener(v -> finish());
 
-        // Saltamos la verificación y vamos directamente a la pantalla de cambio de contraseña
-        btnVerify.setOnClickListener(v -> {
-            Intent intent = new Intent(codigo_recuperacionActivity.this, cambio_contrasenaActivity.class);
-            intent.putExtra("EMAIL", email);
-            startActivity(intent);
-            finish();
-        });
+        btnVerify.setOnClickListener(v -> verificarCodigo());
     }
 
     private void initializeViews() {
@@ -79,8 +96,8 @@ public class codigo_recuperacionActivity extends AppCompatActivity {
 
     private void setupWatcher(EditText current, EditText next, EditText prev) {
         current.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) { }
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
             @Override
             public void afterTextChanged(Editable s) {
                 String text = s.toString().trim();
@@ -95,6 +112,51 @@ public class codigo_recuperacionActivity extends AppCompatActivity {
                     current.setText(text.substring(0, 1));
                     current.setSelection(1);
                 }
+            }
+        });
+    }
+
+    private void verificarCodigo() {
+        String code = etDigit1.getText().toString().trim()
+                + etDigit2.getText().toString().trim()
+                + etDigit3.getText().toString().trim()
+                + etDigit4.getText().toString().trim()
+                + etDigit5.getText().toString().trim()
+                + etDigit6.getText().toString().trim();
+
+        if (code.length() < 6 || !TextUtils.isDigitsOnly(code)) {
+            Toast.makeText(this, "Ingresa el código completo de 6 dígitos", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        btnVerify.setEnabled(false);
+        btnVerify.setText("Verificando...");
+
+        VerifyCodeRequest request = new VerifyCodeRequest(email, code);
+
+        authService.verifyCode(request).enqueue(new Callback<ApiResponse>() {
+            @Override
+            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                btnVerify.setEnabled(true);
+                btnVerify.setText("Verificar");
+
+                if (response.isSuccessful() && response.body() != null) {
+                    Toast.makeText(codigo_recuperacionActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+
+                    Intent intent = new Intent(codigo_recuperacionActivity.this, cambio_contrasenaActivity.class);
+                    intent.putExtra("EMAIL", email);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Toast.makeText(codigo_recuperacionActivity.this, "Código inválido o expirado", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse> call, Throwable t) {
+                btnVerify.setEnabled(true);
+                btnVerify.setText("Verificar");
+                Toast.makeText(codigo_recuperacionActivity.this, "Error de conexión: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }

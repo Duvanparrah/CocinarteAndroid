@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -32,11 +31,11 @@ public class RegistroActivity extends AppCompatActivity {
 
     private TextInputEditText editTextEmail, editTextPassword, editTextConfirmPassword;
     private AppCompatButton buttonRegister;
-    private ProgressBar progressBar;
     private SessionManager sessionManager;
     private AuthService authService;
 
-    private static final String BASE_URL = "http://10.0.2.2:5000/api/";
+
+    private static final String BASE_URL = "https://cocinarte-production.up.railway.app/api/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,10 +47,8 @@ public class RegistroActivity extends AppCompatActivity {
         editTextConfirmPassword = findViewById(R.id.editTextConfirmPassword);
         buttonRegister = findViewById(R.id.buttonRegister);
 
-
         sessionManager = new SessionManager(this);
 
-        // Agrega logging para depuración
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -70,14 +67,11 @@ public class RegistroActivity extends AppCompatActivity {
 
         buttonRegister.setOnClickListener(v -> registrarUsuario());
 
-        // Nuevo: Click en "iniciar sesion"
-        // Click en "Iniciar sesión" para ir a la pantalla de login
         findViewById(R.id.textViewLogin).setOnClickListener(v -> {
             Intent intent = new Intent(RegistroActivity.this, InicioSesionActivity.class);
             startActivity(intent);
         });
     }
-
 
     private void registrarUsuario() {
         String email = editTextEmail.getText() != null ? editTextEmail.getText().toString().trim() : "";
@@ -101,7 +95,6 @@ public class RegistroActivity extends AppCompatActivity {
 
         buttonRegister.setEnabled(false);
         buttonRegister.setText("Registrando...");
-        progressBar.setVisibility(View.VISIBLE);
 
         RegisterRequest request = new RegisterRequest(email, password);
 
@@ -110,12 +103,9 @@ public class RegistroActivity extends AppCompatActivity {
             public void onResponse(Call<RegisterResponse> call, Response<RegisterResponse> response) {
                 buttonRegister.setEnabled(true);
                 buttonRegister.setText("Registrarse");
-                progressBar.setVisibility(View.GONE);
 
                 if (response.isSuccessful() && response.body() != null) {
                     RegisterResponse registerResponse = response.body();
-
-                    // Guarda el usuario Y el token
                     sessionManager.saveUser(email, password);
                     sessionManager.saveToken(registerResponse.getToken());
 
@@ -136,8 +126,6 @@ public class RegistroActivity extends AppCompatActivity {
             public void onFailure(Call<RegisterResponse> call, Throwable t) {
                 buttonRegister.setEnabled(true);
                 buttonRegister.setText("Registrarse");
-                progressBar.setVisibility(View.GONE);
-
                 Toast.makeText(RegistroActivity.this, "Error de conexión: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
