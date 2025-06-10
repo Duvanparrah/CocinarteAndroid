@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Contenido -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:background="@color/white"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/iVReceta"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/temp_plato"
+                android:adjustViewBounds="false"
+                />
+
+            <LinearLayout
+                android:id="@+id/lLUser"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="8dp"
+                >
+                <ImageView
+                    android:id="@+id/iVPhoto"
+                    android:layout_width="40dp"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/perfil_chef"
+                    android:adjustViewBounds="false"
+                    />
+
+                <TextView
+                    android:id="@+id/tVNameUser"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="DoñaReceta"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:padding="8dp"
+                    android:textStyle="bold"
+                    android:fontFamily="cursive"
+                    />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tVTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignEnd="@+id/lLUser"
+                android:layout_alignParentBottom="true"
+                android:text=""
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:padding="8dp"
+                android:textStyle="bold"
+                android:fontFamily="cursive"
+                />
+        </RelativeLayout>
+
+        <!-- Acciones -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:gravity="center_vertical"
+            android:padding="8dp"
+            >
+
+            <ImageView
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/love" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="150 mil"
+                android:textStyle="bold"
+                android:fontFamily="cursive"
+                android:layout_marginEnd="16dp"
+                />
+
+            <ImageView
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/chat_bot" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="105"
+                android:textStyle="bold"
+                android:fontFamily="cursive"
+                android:layout_marginEnd="16dp"
+                />
+
+
+            <ImageView
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/btn_com" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="105"
+                android:textStyle="bold"
+                android:fontFamily="cursive"
+                android:layout_marginEnd="16dp"
+                />
+
+            <ImageView
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:layout_gravity="right"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/favoritos" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+</androidx.cardview.widget.CardView>

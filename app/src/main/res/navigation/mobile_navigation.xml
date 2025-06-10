@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_inicio">
+
+    <fragment
+        android:id="@+id/navigation_inicio"
+        android:name="com.camilo.cocinarte.ui.inicio.InicioFragment"
+        android:label="@string/titulo_inicio"
+        tools:layout="@layout/fragment_inicio" />
+
+    <fragment
+        android:id="@+id/navigation_banquetes"
+        android:name="com.camilo.cocinarte.ui.banquetes.BanqueteFragment"
+        android:label="@string/titulo_banquetes"
+        tools:layout="@layout/fragment_banquete" />
+
+    <fragment
+        android:id="@+id/navigation_nutricion"
+        android:name="com.camilo.cocinarte.ui.nutricion.NutricionFragment"
+        android:label="@string/titulo_nutricion"
+        tools:layout="@layout/fragment_nutricion" />
+
+    <fragment
+        android:id="@+id/navegar_comunidad"
+        android:name="com.camilo.cocinarte.ui.comunidad.ComunidadFragment"
+        android:label="@string/titulo_comunidad"
+        tools:layout="@layout/fragment_comunidad">
+        <action
+            android:id="@+id/action_navegar_comunidad_to_navegar_comunidad_mis_recetas"
+            app:destination="@id/navegar_comunidad_mis_recetas" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navegar_comunidad_mis_recetas"
+        android:name="com.camilo.cocinarte.ui.comunidad.Comunidad_mis_recetasFragment"
+        android:label="mis_recetas"
+        tools:layout="@layout/fragment_comunidad_mis_recetas">
+        <action
+            android:id="@+id/action_navegar_comunidad_mis_recetas_to_navegar_comunidad"
+            app:destination="@id/navegar_comunidad" />
+        <action
+            android:id="@+id/action_navegar_comunidad_mis_recetas_to_crearRecetaFragment"
+            app:destination="@id/crearRecetaFragment" />
+        <action
+            android:id="@+id/action_navegar_comunidad_mis_recetas_to_detalleRecetaFragment"
+            app:destination="@id/detalleRecetaFragment" />
+    </fragment>
+
+
+    <fragment
+        android:id="@+id/detalleRecetaFragment"
+        android:name="com.camilo.cocinarte.ui.comunidad.DetalleRecetaFragment"
+        android:label="Detalle de receta" />
+
+
+    <fragment
+        android:id="@+id/crearRecetaFragment"
+        android:name="com.camilo.cocinarte.ui.comunidad.CrearRecetaFragment"
+        android:label="Crear Receta"
+        tools:layout="@layout/fragment_crear_receta">
+        <action
+            android:id="@+id/action_crearRecetaFragment_to_instruccionesFragmentReceta"
+            app:destination="@id/instruccionesFragmentReceta" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/instruccionesFragmentReceta"
+        android:name="com.camilo.cocinarte.ui.comunidad.InstruccionesFragmentReceta"
+        android:label="Instrucciones Receta"
+        tools:layout="@layout/fragment_instrucciones_receta">
+
+        <action
+            android:id="@+id/action_instruccionesFragmentReceta_to_navegar_comunidad_mis_recetas"
+            app:destination="@id/navegar_comunidad_mis_recetas" />
+
+</fragment>
+
+
+
+</navigation>
