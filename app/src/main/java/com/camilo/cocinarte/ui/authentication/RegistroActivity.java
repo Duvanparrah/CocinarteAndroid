@@ -3,7 +3,6 @@ package com.camilo.cocinarte.ui.authentication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -31,9 +30,9 @@ public class RegistroActivity extends AppCompatActivity {
 
     private TextInputEditText editTextEmail, editTextPassword, editTextConfirmPassword;
     private AppCompatButton buttonRegister;
-    private SessionManager sessionManager;
-    private AuthService authService;
 
+    private AuthService authService;
+    private SessionManager sessionManager;
 
     private static final String BASE_URL = "https://cocinarte-production.up.railway.app/api/";
 
@@ -42,6 +41,7 @@ public class RegistroActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registro);
 
+        // Vinculación de vistas
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
         editTextConfirmPassword = findViewById(R.id.editTextConfirmPassword);
@@ -49,6 +49,7 @@ public class RegistroActivity extends AppCompatActivity {
 
         sessionManager = new SessionManager(this);
 
+        // Interceptor para logs
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -68,16 +69,16 @@ public class RegistroActivity extends AppCompatActivity {
         buttonRegister.setOnClickListener(v -> registrarUsuario());
 
         findViewById(R.id.textViewLogin).setOnClickListener(v -> {
-            Intent intent = new Intent(RegistroActivity.this, InicioSesionActivity.class);
-            startActivity(intent);
+            startActivity(new Intent(RegistroActivity.this, InicioSesionActivity.class));
         });
     }
 
     private void registrarUsuario() {
-        String email = editTextEmail.getText() != null ? editTextEmail.getText().toString().trim() : "";
-        String password = editTextPassword.getText() != null ? editTextPassword.getText().toString().trim() : "";
-        String confirmPassword = editTextConfirmPassword.getText() != null ? editTextConfirmPassword.getText().toString().trim() : "";
+        String email = getValue(editTextEmail);
+        String password = getValue(editTextPassword);
+        String confirmPassword = getValue(editTextConfirmPassword);
 
+        // Validaciones
         if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
             Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show();
             return;
@@ -105,11 +106,12 @@ public class RegistroActivity extends AppCompatActivity {
                 buttonRegister.setText("Registrarse");
 
                 if (response.isSuccessful() && response.body() != null) {
-                    RegisterResponse registerResponse = response.body();
                     sessionManager.saveUser(email, password);
-                    sessionManager.saveToken(registerResponse.getToken());
+                    sessionManager.saveToken(response.body().getToken());
 
-                    Toast.makeText(RegistroActivity.this, registerResponse.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegistroActivity.this, "Registro exitoso", Toast.LENGTH_SHORT).show();
+
+                    // Puedes redirigir a otra pantalla aquí si lo deseas
                     startActivity(new Intent(RegistroActivity.this, InicioSesionActivity.class));
                     finish();
                 } else {
@@ -129,5 +131,9 @@ public class RegistroActivity extends AppCompatActivity {
                 Toast.makeText(RegistroActivity.this, "Error de conexión: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
+    }
+
+    private String getValue(TextInputEditText input) {
+        return input.getText() != null ? input.getText().toString().trim() : "";
     }
 }

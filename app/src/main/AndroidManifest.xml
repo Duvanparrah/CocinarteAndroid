@@ -41,7 +41,7 @@
         <activity android:name=".ui.authentication.correo_Recuperar_Contrasena_Activity" android:exported="false" />
         <activity android:name=".ui.nutricion.Metodo_de_pago_Activity" android:exported="false" />
         <activity android:name=".ui.nutricion.Tarjeta_creditoActivity" android:exported="false" />
-
+        <activity android:name=".ui.authentication.codigo_recuperacionActivity" android:exported="false" />
         <!-- Formularios nutricionales -->
         <activity android:name=".ui.nutricion.formulario_plan_nutricional_9" android:exported="false" />
         <activity android:name=".ui.nutricion.formulario_plan_nutricional_8" android:exported="false" />

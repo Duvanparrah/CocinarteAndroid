@@ -134,7 +134,7 @@ public class codigo_recuperacionActivity extends AppCompatActivity {
 
         VerifyCodeRequest request = new VerifyCodeRequest(email, code);
 
-        authService.verifyCode(request).enqueue(new Callback<ApiResponse>() {
+        authService.verifyRecoveryCode(request).enqueue(new Callback<ApiResponse>() {
             @Override
             public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
                 btnVerify.setEnabled(true);

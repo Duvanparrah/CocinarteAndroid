@@ -3,6 +3,7 @@ package com.camilo.cocinarte.ui.authentication;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Patterns;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -27,10 +28,9 @@ public class correo_Recuperar_Contrasena_Activity extends AppCompatActivity {
     private EditText etEmail;
     private Button btnSend;
     private ImageButton btnBack;
-
     private AuthService authService;
 
-
+    // URL local para emulador Android Studio (usa 10.0.2.2 en vez de localhost)
     private static final String BASE_URL = "https://cocinarte-production.up.railway.app/api/";
 
     @Override
@@ -42,8 +42,10 @@ public class correo_Recuperar_Contrasena_Activity extends AppCompatActivity {
         btnSend = findViewById(R.id.btnSend);
         btnBack = findViewById(R.id.btnBack);
 
+        // Botón de retroceso
         btnBack.setOnClickListener(v -> finish());
 
+        // Configurar Retrofit
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .client(new OkHttpClient.Builder().build())
@@ -52,18 +54,20 @@ public class correo_Recuperar_Contrasena_Activity extends AppCompatActivity {
 
         authService = retrofit.create(AuthService.class);
 
+        // Botón enviar correo
         btnSend.setOnClickListener(v -> enviarCorreoRecuperacion());
     }
 
     private void enviarCorreoRecuperacion() {
         String email = etEmail.getText().toString().trim();
 
+        // Validaciones
         if (TextUtils.isEmpty(email)) {
             etEmail.setError("Por favor ingresa tu correo electrónico");
             return;
         }
 
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             etEmail.setError("Por favor ingresa un correo electrónico válido");
             return;
         }
@@ -80,23 +84,22 @@ public class correo_Recuperar_Contrasena_Activity extends AppCompatActivity {
                 btnSend.setText("Enviar");
 
                 if (response.isSuccessful() && response.body() != null) {
-                    ApiResponse apiResponse = response.body();
-                    String message = apiResponse.getMessage();
+                    String message = response.body().getMessage();
 
-                    if (message != null && !message.isEmpty()) {
-                        Toast.makeText(correo_Recuperar_Contrasena_Activity.this, message, Toast.LENGTH_LONG).show();
-                    } else {
-                        Toast.makeText(correo_Recuperar_Contrasena_Activity.this,
-                                "Se ha enviado un correo a " + email + " para restablecer tu contraseña",
-                                Toast.LENGTH_LONG).show();
-                    }
+                    Toast.makeText(correo_Recuperar_Contrasena_Activity.this,
+                            message != null && !message.isEmpty() ? message :
+                                    "Correo enviado correctamente a " + email,
+                            Toast.LENGTH_LONG).show();
 
-                    Intent intent = new Intent(correo_Recuperar_Contrasena_Activity.this, codigo_recuperacionActivity.class);
+                    // Redirigir a la pantalla de verificación de código
+                    Intent intent = new Intent(correo_Recuperar_Contrasena_Activity.this,
+                            codigo_recuperacionActivity.class);
                     intent.putExtra("EMAIL", email);
                     startActivity(intent);
+                    finish(); // Opcional: cierra esta actividad para que no vuelva al presionar "Atrás"
                 } else {
                     Toast.makeText(correo_Recuperar_Contrasena_Activity.this,
-                            "No se pudo enviar el correo. Intenta más tarde.",
+                            "No se pudo enviar el correo. Verifica el correo o intenta más tarde.",
                             Toast.LENGTH_LONG).show();
                 }
             }

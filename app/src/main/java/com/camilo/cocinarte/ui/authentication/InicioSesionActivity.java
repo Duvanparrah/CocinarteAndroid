@@ -2,6 +2,7 @@ package com.camilo.cocinarte.ui.authentication;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Patterns;
 import android.widget.Button;
 import android.widget.Toast;
@@ -23,6 +24,7 @@ import java.util.List;
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -55,7 +57,11 @@ public class InicioSesionActivity extends AppCompatActivity {
         sessionManager = new SessionManager(this);
         cookieJar = new MyCookieJar(this);
 
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
+
         OkHttpClient client = new OkHttpClient.Builder()
+                .addInterceptor(logging)
                 .cookieJar(cookieJar)
                 .build();
 
@@ -92,7 +98,7 @@ public class InicioSesionActivity extends AppCompatActivity {
     }
 
     private boolean validarCampos() {
-        String email = editTextEmail.getText() != null ? editTextEmail.getText().toString().trim() : "";
+        String email = editTextEmail.getText() != null ? editTextEmail.getText().toString().trim().toLowerCase() : "";
         String password = editTextPassword.getText() != null ? editTextPassword.getText().toString() : "";
 
         boolean isValid = true;
@@ -123,7 +129,8 @@ public class InicioSesionActivity extends AppCompatActivity {
     private void iniciarSesion() {
         if (!validarCampos()) return;
 
-        String email = editTextEmail.getText().toString().trim();
+        // ✅ Sanitizar email
+        String email = editTextEmail.getText().toString().trim().toLowerCase();
         String password = editTextPassword.getText().toString();
 
         buttonLogin.setEnabled(false);
@@ -149,25 +156,16 @@ public class InicioSesionActivity extends AppCompatActivity {
                         return;
                     }
 
-                    HttpUrl url = HttpUrl.parse("https://cocinarte-production.up.railway.app");
+                    HttpUrl url = HttpUrl.parse(BASE_URL);
                     if (url != null) {
                         List<Cookie> cookies = cookieJar.loadForRequest(url);
-                        String tokenFromCookie = null;
-
                         for (Cookie cookie : cookies) {
-                            if (cookie.name().equalsIgnoreCase("token") ||
-                                    cookie.name().equalsIgnoreCase("jwt") ||
-                                    cookie.name().equalsIgnoreCase("auth_token")) {
-                                tokenFromCookie = cookie.value();
-                                break;
+                            if (cookie.name().equalsIgnoreCase("token")) {
+                                sessionManager.saveUserSession(email, password, cookie.value());
+                                Toast.makeText(InicioSesionActivity.this, "Bienvenido", Toast.LENGTH_SHORT).show();
+                                irAMainActivity();
+                                return;
                             }
-                        }
-
-                        if (tokenFromCookie != null) {
-                            sessionManager.saveUserSession(email, password, tokenFromCookie);
-                            Toast.makeText(InicioSesionActivity.this, "Bienvenido", Toast.LENGTH_SHORT).show();
-                            irAMainActivity();
-                            return;
                         }
                     }
 

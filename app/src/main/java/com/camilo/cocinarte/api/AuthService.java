@@ -46,7 +46,8 @@ public interface AuthService {
             "Accept: application/json"
     })
     @POST("auth/verify-code")
-    Call<ApiResponse> verifyCode(@Body VerifyCodeRequest request);
+    Call<ApiResponse> verifyRecoveryCode(@Body VerifyCodeRequest request);
+
 
     // Restablecer contraseña con código verificado
     @Headers({
@@ -55,4 +56,6 @@ public interface AuthService {
     })
     @POST("auth/reset-password")
     Call<ApiResponse> resetPassword(@Body ResetPasswordRequest request);
+
+
 }
