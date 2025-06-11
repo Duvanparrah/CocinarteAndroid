@@ -54,6 +54,7 @@ public class InicioSesionActivity extends AppCompatActivity {
 
         this.BASE_URL = "http://"+ this.getString(R.string.myhost) +":5000/api/";
 
+
         setContentView(R.layout.activity_inicio_sesion);
 
         textInputLayoutEmail = findViewById(R.id.textInputLayoutEmail);
