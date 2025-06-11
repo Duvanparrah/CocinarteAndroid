@@ -18,9 +18,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -38,9 +35,6 @@ import com.camilo.cocinarte.api.RecetaApi;
 import com.camilo.cocinarte.databinding.FragmentComunidadMisRecetasBinding;
 import com.camilo.cocinarte.models.Receta;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -176,12 +170,6 @@ public class Comunidad_mis_recetasFragment extends Fragment {
 
     private void guardarYMostrarImagen(Uri imageUri) {
         try {
-
-            SharedPreferences preferences = requireContext()
-                    .getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
-            preferences.edit().putString("profile_image_uri", imageUri.toString()).apply();
-
-
             cargarImagenPerfil(imageUri);
         } catch (Exception e) {
             Toast.makeText(requireContext(), "Error al guardar la imagen", Toast.LENGTH_SHORT).show();

@@ -23,11 +23,9 @@ import com.camilo.cocinarte.R;
 import com.camilo.cocinarte.api.ApiClient;
 import com.camilo.cocinarte.api.LoginManager;
 import com.camilo.cocinarte.api.RecetaApi;
+import com.camilo.cocinarte.models.Ingrediente;
 import com.camilo.cocinarte.models.Receta;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -115,7 +113,6 @@ public class DetalleRecetaFragment extends Fragment {
 
         ImageView imagenReceta = getView().findViewById(R.id.photoImageDetails);
         if (receta.getImagen() != null && !receta.getImagen().isEmpty()) {
-            Log.v(">> >>:imagen en detalles",     ""+receta.getImagen());
             Glide.with(requireContext())
                     .load(receta.getImagen())
                     .into(imagenReceta);
@@ -131,9 +128,12 @@ public class DetalleRecetaFragment extends Fragment {
         com.google.android.flexbox.FlexboxLayout contenedorIngredientes = getView().findViewById(R.id.lista_ingredientes);
         contenedorIngredientes.removeAllViews();
 
-        List<String> ingredientes = new ArrayList<>(); /* NO EXISTE receta.getIngredientes()*/;
-
-
+        List<String> ingredientes = new ArrayList<>();
+        if (receta.getIngredientes() != null) {
+            for (Ingrediente ingrediente : receta.getIngredientes()) {
+                ingredientes.add(ingrediente.getNombreIngrediente());
+            }
+        }
 
         if (ingredientes.size() == 1 && ingredientes.get(0).contains(",")) {
             String[] separados = ingredientes.get(0).split(",");
@@ -150,7 +150,8 @@ public class DetalleRecetaFragment extends Fragment {
         contenedorPasos.removeAllViews();
 
         int pasoNum = 1;
-        ArrayList<String> pasos = new ArrayList<>();
+        ArrayList<String> pasos = new ArrayList<>(receta.getPasos());
+
         for (String paso : pasos /*NO EXISTE receta.getPasos()*/) {
             TextView tvPaso = new TextView(getContext());
             tvPaso.setText(String.format("%d. %s", pasoNum++, paso));
@@ -211,25 +212,5 @@ public class DetalleRecetaFragment extends Fragment {
                 Log.e(">> >>failuere", "Error en conexión: " + t.getMessage());
             }
         });
-
-
-        /*SharedPreferences prefs = requireContext().getSharedPreferences("recetas", Context.MODE_PRIVATE);
-        String recetasJson = prefs.getString("lista_recetas", "[]");
-
-        Gson gson = new Gson();
-        Type listType = new TypeToken<List<Receta>>() {}.getType();
-        List<Receta> recetas = gson.fromJson(recetasJson, listType);
-
-        for (int i = 0; i < recetas.size(); i++) {
-            if (recetas.get(i).getTitulo().equals(recetaActual.getTitulo())) {
-                recetas.remove(i);
-                break;
-            }
-        }
-
-        String nuevasRecetasJson = gson.toJson(recetas);
-        prefs.edit().putString("lista_recetas", nuevasRecetasJson).apply();
-
-        requireActivity().getSupportFragmentManager().popBackStack();*/
     }
 }

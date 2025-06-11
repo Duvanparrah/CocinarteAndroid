@@ -2,31 +2,47 @@ package com.camilo.cocinarte.models;
 
 import com.google.gson.annotations.SerializedName;
 
-public class Receta {
+import java.util.List;
 
+public class Receta {
     @SerializedName("id_receta")
     private int idReceta;
 
     @SerializedName("id_usuario")
     private int idUsuario;
 
+    @SerializedName("titulo")
     private String titulo;
+
+    @SerializedName("descripcion")
     private String descripcion;
+
+    @SerializedName("imagen")
     private String imagen;
 
     @SerializedName("tiempo_preparacion")
     private String tiempoPreparacion;
 
+    @SerializedName("dificultad")
     private String dificultad;
-    private Integer calorias;
-    private Integer proteinas;
-    private Integer carbohidratos;
-    private Integer grasas;
-    private Integer azucar;
-    private String seccion;
 
-    @SerializedName("id_categoria")
-    private Integer idCategoria;
+    @SerializedName("calorias")
+    private int calorias;
+
+    @SerializedName("proteinas")
+    private int proteinas;
+
+    @SerializedName("carbohidratos")
+    private int carbohidratos;
+
+    @SerializedName("grasas")
+    private int grasas;
+
+    @SerializedName("azucar")
+    private Double azucar; // puede venir null
+
+    @SerializedName("seccion")
+    private String seccion;
 
     @SerializedName("fecha_creacion")
     private String fechaCreacion;
@@ -34,9 +50,29 @@ public class Receta {
     @SerializedName("fecha_edicion")
     private String fechaEdicion;
 
+    @SerializedName("editado")
     private Boolean editado;
 
+    @SerializedName("pasos")
+    private List<String> pasos;
+
+    @SerializedName("Usuario")
+    private Usuario usuario; // Clase que debes crear con los campos del usuario
+
+    @SerializedName("Ingredientes")
+    private List<Ingrediente> ingredientes;
+
+
     // Getters y setters...
+
+    public List<Ingrediente> getIngredientes() {
+        return ingredientes;
+    }
+
+    public void setIngredientes(List<Ingrediente> ingredientes) {
+        this.ingredientes = ingredientes;
+    }
+
 
     public int getIdReceta() {
         return idReceta;
@@ -126,11 +162,11 @@ public class Receta {
         this.grasas = grasas;
     }
 
-    public Integer getAzucar() {
+    public Double getAzucar() {
         return azucar;
     }
 
-    public void setAzucar(Integer azucar) {
+    public void setAzucar(Double azucar) {
         this.azucar = azucar;
     }
 
@@ -142,13 +178,13 @@ public class Receta {
         this.seccion = seccion;
     }
 
-    public Integer getIdCategoria() {
+    /*public Integer getIdCategoria() {
         return idCategoria;
     }
 
     public void setIdCategoria(Integer idCategoria) {
         this.idCategoria = idCategoria;
-    }
+    }*/
 
     public String getFechaCreacion() {
         return fechaCreacion;
@@ -172,5 +208,13 @@ public class Receta {
 
     public void setEditado(Boolean editado) {
         this.editado = editado;
+    }
+
+    public List<String> getPasos() {
+        return pasos;
+    }
+
+    public void setPasos(List<String> pasos) {
+        this.pasos = pasos;
     }
 }

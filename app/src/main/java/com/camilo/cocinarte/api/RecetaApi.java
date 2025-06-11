@@ -4,12 +4,16 @@ import com.camilo.cocinarte.models.LoginRequest;
 import com.camilo.cocinarte.models.Receta;
 
 import java.util.List;
+
+import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 
 public interface RecetaApi {
@@ -21,4 +25,13 @@ public interface RecetaApi {
 
     @DELETE("recetas/{id}")
     Call<Void> deleteReceta(@Path("id") int recetaId, @Header("Authorization") String token);
+
+    @Multipart
+    @POST("recetas/foto_receta")
+    Call<FotoResponse> subirFotoReceta(
+            @Part MultipartBody.Part foto,
+            // Si necesitas enviar otros datos, como un ID de receta, puedes hacerlo así:
+            // @Part("id_receta") RequestBody idReceta,
+            @Header("Authorization") String token
+    );
 }

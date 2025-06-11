@@ -85,7 +85,7 @@ public class CrearRecetaFragment extends Fragment {
             StringBuilder ingredientes = new StringBuilder();
             for (int i = 0; i < ingredientesCount; i++) {
                 TextView tv = (TextView) binding.listaIngredientes.getChildAt(i);
-                ingredientes.append(tv.getText().toString()).append(",");
+                ingredientes.append(tv.getText().toString()).append(";");
             }
             bundle.putString("ingredientes", ingredientes.toString());
 
@@ -99,10 +99,7 @@ public class CrearRecetaFragment extends Fragment {
 
         // Seleccionar imagen
         binding.frameSeleccionImagen.setOnClickListener(v -> {
-            pickMedia.launch(
-                    new PickVisualMediaRequest.Builder()
-                            .setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE)
-                            .build()
+            pickMedia.launch(new PickVisualMediaRequest.Builder().setMediaType(ActivityResultContracts.PickVisualMedia.ImageOnly.INSTANCE).build()
             );
         });
 

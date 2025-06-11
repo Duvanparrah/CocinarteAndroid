@@ -21,8 +21,6 @@ import com.camilo.cocinarte.api.RecetaApi;
 import com.camilo.cocinarte.databinding.FragmentComunidadBinding;
 import com.camilo.cocinarte.models.Receta;
 import com.google.gson.Gson;
-
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -59,10 +57,14 @@ public class ComunidadFragment extends Fragment {
             public void onResponse(Call<List<Receta>> call, Response<List<Receta>> response) {
                 if (response.isSuccessful()) {
                     List<Receta> recetas = response.body();
+
                     assert recetas != null;
+                    String _recetaGson = new Gson().toJson(recetas);
+
                     AdapterComunidad adapter = new AdapterComunidad(getContext(), recetas, receta -> {
                         Bundle bundle = new Bundle();
-                        bundle.putString("receta", new Gson().toJson(receta));
+                        String recetaGson = new Gson().toJson(receta);
+                        bundle.putString("receta", recetaGson);
                         bundle.putString("origen", "comunidad");
                         Navigation.findNavController(requireView()).navigate(R.id.detalleRecetaFragment, bundle);
                     });

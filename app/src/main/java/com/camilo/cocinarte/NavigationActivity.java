@@ -54,19 +54,22 @@ public class NavigationActivity extends AppCompatActivity implements NavigationV
                     Usuario usuario = loginResponse.getUsuario();
 
                     Log.d(">> >> LOGIN", "Token: " + token);
-                    Log.d(">> >> LOGIN", "IdUsuario: " + usuario.getIdUsuario());
                     LoginManager loginManager = new LoginManager(getApplicationContext());
 
                     loginManager.saveToken(token);
                     loginManager.saveUser(usuario);
                 } else {
                     Log.e(">> >> LOGIN", "Error: " + response.code());
+                    Toast.makeText(getApplicationContext(), "USUARIO NO ENCONTRADO", Toast.LENGTH_LONG).show();
+                    finish();
                 }
             }
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
                 Log.e(">> >> LOGIN", "Falló: " + t.getMessage());
+                Toast.makeText(getApplicationContext(), "USUARIO NO ENCONTRADO", Toast.LENGTH_LONG).show();
+                finish();
             }
         });
         /* ========== fin 1 ========== */
