@@ -69,7 +69,6 @@ public class codigo_recuperacionActivity extends AppCompatActivity {
         authService = retrofit.create(AuthService.class);
 
         btnBack.setOnClickListener(v -> finish());
-
         btnVerify.setOnClickListener(v -> verificarCodigo());
     }
 
@@ -80,7 +79,6 @@ public class codigo_recuperacionActivity extends AppCompatActivity {
         etDigit4 = findViewById(R.id.etDigit4);
         etDigit5 = findViewById(R.id.etDigit5);
         etDigit6 = findViewById(R.id.etDigit6);
-
         btnVerify = findViewById(R.id.btnVerify);
         btnBack = findViewById(R.id.btnBack);
     }
@@ -101,13 +99,11 @@ public class codigo_recuperacionActivity extends AppCompatActivity {
             @Override
             public void afterTextChanged(Editable s) {
                 String text = s.toString().trim();
-
                 if (text.length() == 1 && next != null) {
                     next.requestFocus();
                 } else if (text.length() == 0 && prev != null) {
                     prev.requestFocus();
                 }
-
                 if (text.length() > 1) {
                     current.setText(text.substring(0, 1));
                     current.setSelection(1);
@@ -142,13 +138,24 @@ public class codigo_recuperacionActivity extends AppCompatActivity {
 
                 if (response.isSuccessful() && response.body() != null) {
                     Toast.makeText(codigo_recuperacionActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
-
                     Intent intent = new Intent(codigo_recuperacionActivity.this, cambio_contrasenaActivity.class);
                     intent.putExtra("EMAIL", email);
                     startActivity(intent);
                     finish();
                 } else {
-                    Toast.makeText(codigo_recuperacionActivity.this, "Código inválido o expirado", Toast.LENGTH_LONG).show();
+                    String errorBody = "";
+                    try {
+                        if (response.errorBody() != null) {
+                            errorBody = response.errorBody().string();
+                        } else {
+                            errorBody = "Respuesta sin cuerpo de error";
+                        }
+                    } catch (Exception e) {
+                        errorBody = "Excepción al leer el cuerpo de error: " + e.getMessage();
+                    }
+
+                    android.util.Log.e("API_VERIFY_ERROR", "Código: " + response.code() + " - Error: " + errorBody);
+                    Toast.makeText(codigo_recuperacionActivity.this, "Error al verificar: " + errorBody, Toast.LENGTH_LONG).show();
                 }
             }
 
