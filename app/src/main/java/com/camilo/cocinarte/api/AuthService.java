@@ -45,7 +45,7 @@ public interface AuthService {
             "Content-Type: application/json",
             "Accept: application/json"
     })
-    @POST("auth/verify-recovery-code")
+    @POST("auth/verify-reset-code")
     Call<ApiResponse> verifyRecoveryCode(@Body VerifyCodeRequest request);
 
 
