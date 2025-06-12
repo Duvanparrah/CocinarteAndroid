@@ -54,9 +54,10 @@ public interface AuthService {
             "Content-Type: application/json",
             "Accept: application/json"
     })
-    @POST("auth/reset-password")
+    @POST("auth/set-new-password")
     Call<ApiResponse> resetPassword(@Body ResetPasswordRequest request);
-    
+
+
 
 
 

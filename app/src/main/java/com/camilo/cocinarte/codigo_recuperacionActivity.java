@@ -169,6 +169,8 @@ public class codigo_recuperacionActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
+
+
             @Override
             public void afterTextChanged(Editable s) {
                 if (s.length() == 0) {
@@ -207,16 +209,14 @@ public class codigo_recuperacionActivity extends AppCompatActivity {
                 etDigit5.getText().toString() +
                 etDigit6.getText().toString();
 
-        // Aquí iría la lógica para verificar el código
-        // Por ejemplo, comparar con un código enviado desde el servidor o
-        // enviar una solicitud a tu backend para validar el código
+
 
         // Para este ejemplo, mostraremos un mensaje de éxito y navegamos a la pantalla de cambio de contraseña
         Toast.makeText(this, "Código verificado correctamente", Toast.LENGTH_SHORT).show();
 
         // Navegar a la pantalla de cambio de contraseña
         Intent intent = new Intent(this, cambio_contrasenaActivity.class);
-        // Si necesitas pasar el email u otros datos a la siguiente pantalla:
+
         if (!email.isEmpty()) {
             intent.putExtra("EMAIL", email);
         }
