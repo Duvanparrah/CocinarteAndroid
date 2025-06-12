@@ -9,6 +9,8 @@ public class SessionManager {
     private static final String KEY_PASSWORD = "password";
     private static final String KEY_AUTH_TOKEN = "auth_token";
     private static final String KEY_IS_LOGGED_IN = "is_logged_in";
+    private static final String KEY_NOMBRE = "nombre";
+    private static final String KEY_FOTO = "foto";
 
     private final SharedPreferences prefs;
     private final SharedPreferences.Editor editor;
@@ -71,6 +73,13 @@ public class SessionManager {
         return prefs.getString(KEY_EMAIL, null);
     }
 
+    public String getNombre() {
+        return prefs.getString(KEY_NOMBRE, null);
+    }
+    public String getFoto() {
+        return prefs.getString(KEY_FOTO, null);
+    }
+
     // Obtener contraseña (no recomendado en producción)
     public String getPassword() {
         return prefs.getString(KEY_PASSWORD, null);
@@ -99,10 +108,12 @@ public class SessionManager {
     }
 
     // Guardar sesión completa (usuario + token)
-    public void saveUserSession(String email, String password, String token) {
+    public void saveUserSession(String email, String password, String nombre,String foto, String token) {
         editor.putString(KEY_EMAIL, email);
         editor.putString(KEY_PASSWORD, password);
         editor.putString(KEY_AUTH_TOKEN, token);
+        editor.putString(KEY_FOTO, foto);
+        editor.putString(KEY_NOMBRE, nombre);
         editor.putBoolean(KEY_IS_LOGGED_IN, true);
         editor.apply();
     }

@@ -3,6 +3,7 @@ package com.camilo.cocinarte;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.MenuItem;
@@ -21,7 +22,9 @@ import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
+import com.bumptech.glide.Glide;
 import com.camilo.cocinarte.api.UsersRequest;
+import com.camilo.cocinarte.session.SessionManager;
 import com.camilo.cocinarte.ui.authentication.InicioSesionActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
@@ -96,32 +99,32 @@ public class NavigationActivity extends AppCompatActivity implements NavigationV
     protected void onResume() {
         super.onResume();
         // ====== Logica enviar datos al nav_header_perfil ======
-        this.usersRequest.UserPrefsManager(this.getApplicationContext());
+        SessionManager sessionManager = new SessionManager(getApplicationContext());
+
+
+        //this.usersRequest.UserPrefsManager(this.getApplicationContext());
         // Recuperar datos guardados
-        String savedName = this.usersRequest.getSavedName();
+        //String savedName = this.usersRequest.getSavedName();
         // Si hay nombre guardado, lo mostramos
-        if (savedName != null && !savedName.isEmpty()) {
-            View headerView = navigationView.getHeaderView(0);
-            TextView userEmail = headerView.findViewById(R.id.user_name);
-            ImageView profile_image = headerView.findViewById(R.id.profile_image);
-            userEmail.setText(savedName);
-            Bitmap image = getAvatarImage();
-            if(image != null){
-                profile_image.setImageBitmap(image);
-            }
+
+        View headerView = navigationView.getHeaderView(0);
+        TextView userName = headerView.findViewById(R.id.user_name);
+        TextView userEmail = headerView.findViewById(R.id.user_email);
+        ImageView profile_image = headerView.findViewById(R.id.profile_image);
+
+        userEmail.setText(sessionManager.getEmail());
+        userName.setText(sessionManager.getNombre());
+
+        if(!sessionManager.getFoto().isBlank() || !sessionManager.getFoto().isEmpty()){
+            Glide.with(this)
+                    .load(Uri.parse(sessionManager.getFoto()))
+                    .circleCrop()
+                    .placeholder(R.drawable.ic_cuenta_configuracion)
+                    .error(R.drawable.ic_cuenta_configuracion)
+                    .into(profile_image);
         }
 
         // ====== fin ======
-    }
-
-
-    private Bitmap getAvatarImage() {
-        File file = new File(getFilesDir(), "avatar.png");
-        Bitmap bitmap = null;
-        if (file.exists()) {
-            bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
-        }
-        return bitmap;
     }
 
 

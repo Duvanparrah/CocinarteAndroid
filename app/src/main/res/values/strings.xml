@@ -157,7 +157,6 @@
         <item>81-90 kg</item>
         <item>&gt; 90 kg</item>
     </string-array>
-<!--    esta linea se puede boorar-->
 
     <string name="back_arrow">Atrás</string>
     <string name="logo">Logo CocinArte</string>
@@ -180,7 +179,6 @@
     <string name="nivel_actividad">Nivel de actividad</string>
 
     <!-- puerto local -->
-<!--    <string name="myhost">192.168.18.7</string>-->
-    <string name="myhost">192.168.18.7</string>
+    <string name="myhost">cocinarte-production.up.railway.app</string>
 
 </resources>

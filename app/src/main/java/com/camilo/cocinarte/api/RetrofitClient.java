@@ -2,8 +2,6 @@ package com.camilo.cocinarte.api;
 
 import android.content.Context;
 
-import com.camilo.cocinarte.R;
-
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
@@ -19,7 +17,7 @@ public class RetrofitClient {
                     .build();
 
             retrofit = new Retrofit.Builder()
-                    .baseUrl("http://"+ R.string.myhost+":5000/") // Reemplaza con tu URL real
+                    .baseUrl("http://TU_BACKEND_URL/") // Reemplaza con tu URL real
                     .client(client)
                     .addConverterFactory(ScalarsConverterFactory.create())
                     .build();

@@ -148,14 +148,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="35dp"
-                android:text="¿Olvidaste tu contraseña?"
-                android:textColor="@color/verde"
+                android:background="?attr/selectableItemBackground"
                 android:clickable="true"
                 android:focusable="true"
-                android:background="?attr/selectableItemBackground"
+                android:minHeight="48dp"
+                android:text="¿Olvidaste tu contraseña?"
+                android:textColor="@color/verde"
                 android:textSize="15sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/buttonLogin" />
 
             <LinearLayout
@@ -179,13 +179,14 @@
                     android:id="@+id/textViewRegister"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Registrate"
-                    android:textColor="@color/verde"
+                    android:background="?attr/selectableItemBackground"
                     android:clickable="true"
                     android:focusable="true"
-                    android:background="?attr/selectableItemBackground"
+                    android:text="Registrate"
+                    android:textColor="@color/verde"
                     android:textSize="13sp"
-                    android:textStyle="bold" />
+                    android:textStyle="bold"
+                    tools:ignore="TouchTargetSizeCheck" />
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
