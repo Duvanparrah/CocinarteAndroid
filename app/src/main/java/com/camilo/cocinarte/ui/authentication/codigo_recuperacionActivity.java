@@ -135,26 +135,65 @@ public class codigo_recuperacionActivity extends AppCompatActivity {
                 btnVerify.setEnabled(true);
                 btnVerify.setText("Verificar");
 
-                if (response.isSuccessful() && response.body() != null) {
-                    Toast.makeText(codigo_recuperacionActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
-                    Intent intent = new Intent(codigo_recuperacionActivity.this, cambio_contrasenaActivity.class);
-                    intent.putExtra("EMAIL", email);
-                    startActivity(intent);
-                    finish();
+                // Log para debugging
+                android.util.Log.d("API_VERIFY", "Response code: " + response.code());
+
+                if (response.isSuccessful()) {
+                    ApiResponse apiResponse = response.body();
+                    if (apiResponse != null) {
+                        android.util.Log.d("API_VERIFY", "Response message: " + apiResponse.getMessage());
+
+                        // Mostrar mensaje de éxito
+                        String successMessage = apiResponse.getMessage() != null ?
+                                apiResponse.getMessage() : "Código verificado correctamente";
+                        Toast.makeText(codigo_recuperacionActivity.this, successMessage, Toast.LENGTH_SHORT).show();
+
+                        // Navegar a cambio de contraseña
+                        Intent intent = new Intent(codigo_recuperacionActivity.this, cambio_contrasenaActivity.class);
+                        intent.putExtra("EMAIL", email);
+                        intent.putExtra("VERIFIED_CODE", code); // Opcional: pasar el código verificado
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        // Respuesta exitosa pero sin body - asumir éxito
+                        Toast.makeText(codigo_recuperacionActivity.this, "Código verificado correctamente", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(codigo_recuperacionActivity.this, cambio_contrasenaActivity.class);
+                        intent.putExtra("EMAIL", email);
+                        intent.putExtra("VERIFIED_CODE", code);
+                        startActivity(intent);
+                        finish();
+                    }
                 } else {
-                    String errorBody = "";
+                    // Manejar errores HTTP
+                    String errorMessage = "Error al verificar el código";
                     try {
                         if (response.errorBody() != null) {
-                            errorBody = response.errorBody().string();
-                        } else {
-                            errorBody = "Respuesta sin cuerpo de error";
+                            String errorBody = response.errorBody().string();
+                            android.util.Log.e("API_VERIFY_ERROR", "Código: " + response.code() + " - Error: " + errorBody);
+
+                            // Mensajes de error más específicos
+                            switch (response.code()) {
+                                case 400:
+                                    errorMessage = "Código incorrecto o expirado";
+                                    break;
+                                case 404:
+                                    errorMessage = "Email no encontrado";
+                                    break;
+                                case 422:
+                                    errorMessage = "Código inválido";
+                                    break;
+                                default:
+                                    if (response.code() >= 500) {
+                                        errorMessage = "Error del servidor. Intenta más tarde";
+                                    }
+                                    break;
+                            }
                         }
                     } catch (Exception e) {
-                        errorBody = "Excepción al leer el cuerpo de error: " + e.getMessage();
+                        android.util.Log.e("API_VERIFY_ERROR", "Error al leer respuesta: " + e.getMessage());
                     }
 
-                    android.util.Log.e("API_VERIFY_ERROR", "Código: " + response.code() + " - Error: " + errorBody);
-                    Toast.makeText(codigo_recuperacionActivity.this, "Error al verificar: " + errorBody, Toast.LENGTH_LONG).show();
+                    Toast.makeText(codigo_recuperacionActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                 }
             }
 
@@ -162,7 +201,8 @@ public class codigo_recuperacionActivity extends AppCompatActivity {
             public void onFailure(Call<ApiResponse> call, Throwable t) {
                 btnVerify.setEnabled(true);
                 btnVerify.setText("Verificar");
-                Toast.makeText(codigo_recuperacionActivity.this, "Error de conexión: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                android.util.Log.e("API_VERIFY_FAILURE", "Error de conexión: " + t.getMessage());
+                Toast.makeText(codigo_recuperacionActivity.this, "Error de conexión. Verifica tu internet", Toast.LENGTH_LONG).show();
             }
         });
     }
