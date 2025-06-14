@@ -17,8 +17,10 @@ import com.camilo.cocinarte.api.AuthService;
 import com.camilo.cocinarte.models.ResetPasswordRequest;
 import com.camilo.cocinarte.models.ApiResponse;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import org.json.JSONObject;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -28,6 +30,7 @@ public class cambio_contrasenaActivity extends AppCompatActivity {
     private static final String TAG = "CambioContrasena";
 
     private TextInputEditText etNewPassword, etConfirmPassword;
+    private TextInputLayout passwordLayout, confirmPasswordLayout;
     private Button btnSavePassword;
     private ImageButton btnBack;
 
@@ -39,7 +42,6 @@ public class cambio_contrasenaActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cambio_contrasena);
 
-        // Configurar padding para system bars
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             v.setPadding(
                     insets.getInsets(WindowInsetsCompat.Type.systemBars()).left,
@@ -58,6 +60,8 @@ public class cambio_contrasenaActivity extends AppCompatActivity {
     private void initializeViews() {
         etNewPassword = findViewById(R.id.etNewPassword);
         etConfirmPassword = findViewById(R.id.etConfirmPassword);
+        passwordLayout = findViewById(R.id.passwordLayout);
+        confirmPasswordLayout = findViewById(R.id.confirmPasswordLayout);
         btnSavePassword = findViewById(R.id.btnSavePassword);
         btnBack = findViewById(R.id.btnBack);
     }
@@ -68,7 +72,6 @@ public class cambio_contrasenaActivity extends AppCompatActivity {
             email = intent.getStringExtra("EMAIL");
             resetCode = intent.getStringExtra("VERIFIED_CODE");
 
-            // Verificar si no viene como VERIFIED_CODE, intentar con otros nombres
             if (resetCode == null || resetCode.isEmpty()) {
                 resetCode = intent.getStringExtra("RESET_CODE");
             }
@@ -76,19 +79,13 @@ public class cambio_contrasenaActivity extends AppCompatActivity {
                 resetCode = intent.getStringExtra("CODE");
             }
 
-            Log.d(TAG, "Email recibido: " + email);
-            Log.d(TAG, "Código recibido: " + resetCode);
-
-            // Validar que los datos no sean null
             if (email == null || email.isEmpty()) {
-                Log.e(TAG, "ERROR: Email es null o vacío");
                 Toast.makeText(this, "Error: No se recibió el email correctamente", Toast.LENGTH_LONG).show();
                 finish();
                 return;
             }
 
             if (resetCode == null || resetCode.isEmpty()) {
-                Log.e(TAG, "ERROR: Reset code es null o vacío");
                 Toast.makeText(this, "Error: No se recibió el código de verificación", Toast.LENGTH_LONG).show();
                 finish();
                 return;
@@ -102,16 +99,41 @@ public class cambio_contrasenaActivity extends AppCompatActivity {
     }
 
     private boolean validatePassword(String password) {
-        // Validar que la contraseña tenga al menos 6 caracteres
         if (password.length() < 6) {
-            Toast.makeText(this, "La contraseña debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show();
+            passwordLayout.setError("La contraseña debe tener al menos 6 caracteres");
             return false;
         }
+
+        if (!password.matches(".*[A-Z].*")) {
+            passwordLayout.setError("Debe contener al menos una letra mayúscula");
+            return false;
+        }
+
+        if (!password.matches(".*[a-z].*")) {
+            passwordLayout.setError("Debe contener al menos una letra minúscula");
+            return false;
+        }
+
+        if (!password.matches(".*\\d.*")) {
+            passwordLayout.setError("Debe contener al menos un número");
+            return false;
+        }
+
+        if (!password.matches(".*[!@#$%^&*()_+=\\-{}\\[\\]:;\"'<>,.?/~`].*")) {
+            passwordLayout.setError("Debe contener al menos un carácter especial");
+            return false;
+        }
+
+        if (password.contains(" ")) {
+            passwordLayout.setError("No debe contener espacios");
+            return false;
+        }
+
+        passwordLayout.setError(null); // Limpia errores si todo está bien
         return true;
     }
 
     private void saveNewPassword() {
-        // Obtener valores de los campos, asegurándonos de que no sean null
         String newPassword = "";
         String confirmPassword = "";
 
@@ -122,15 +144,23 @@ public class cambio_contrasenaActivity extends AppCompatActivity {
             confirmPassword = etConfirmPassword.getText().toString().trim();
         }
 
-        // Validaciones más estrictas
+        passwordLayout.setError(null);
+        confirmPasswordLayout.setError(null);
+
         if (newPassword.isEmpty()) {
-            Toast.makeText(this, "Por favor ingresa una contraseña", Toast.LENGTH_SHORT).show();
+            passwordLayout.setError("Por favor ingresa una contraseña");
             etNewPassword.requestFocus();
             return;
         }
 
         if (confirmPassword.isEmpty()) {
-            Toast.makeText(this, "Por favor confirma la contraseña", Toast.LENGTH_SHORT).show();
+            confirmPasswordLayout.setError("Por favor confirma la contraseña");
+            etConfirmPassword.requestFocus();
+            return;
+        }
+
+        if (confirmPassword.contains(" ")) {
+            confirmPasswordLayout.setError("La confirmación no debe contener espacios");
             etConfirmPassword.requestFocus();
             return;
         }
@@ -141,190 +171,101 @@ public class cambio_contrasenaActivity extends AppCompatActivity {
         }
 
         if (!newPassword.equals(confirmPassword)) {
-            Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
+            confirmPasswordLayout.setError("Las contraseñas no coinciden");
             etConfirmPassword.requestFocus();
             return;
         }
 
-        // Validar que tenemos email y código (doble verificación)
         if (email == null || email.trim().isEmpty()) {
-            Log.e(TAG, "Email es null o vacío al momento de guardar");
             Toast.makeText(this, "Error: Email no válido. Regresa e intenta nuevamente.", Toast.LENGTH_LONG).show();
             return;
         }
 
         if (resetCode == null || resetCode.trim().isEmpty()) {
-            Log.e(TAG, "Reset code es null o vacío al momento de guardar");
             Toast.makeText(this, "Error: Código de verificación no válido. Regresa e intenta nuevamente.", Toast.LENGTH_LONG).show();
             return;
         }
 
-        // Limpiar espacios en blanco de email y código
         String cleanEmail = email.trim();
         String cleanResetCode = resetCode.trim();
 
-        Log.d(TAG, "=== INICIANDO CAMBIO DE CONTRASEÑA ===");
-        Log.d(TAG, "Email (limpio): '" + cleanEmail + "'");
-        Log.d(TAG, "Código (limpio): '" + cleanResetCode + "'");
-        Log.d(TAG, "Longitud contraseña: " + newPassword.length());
-        Log.d(TAG, "Email vacío: " + cleanEmail.isEmpty());
-        Log.d(TAG, "Código vacío: " + cleanResetCode.isEmpty());
-
-        // Deshabilitar botón
         btnSavePassword.setEnabled(false);
         btnSavePassword.setText("Guardando...");
 
-        // CORRECCIÓN PRINCIPAL: Crear request solo con email y password
-        // El servidor espera {"email": "...", "password": "..."}
-        ResetPasswordRequest request;
-        try {
-            // Usar constructor de 2 parámetros (email, password)
-            request = new ResetPasswordRequest(cleanEmail, newPassword);
+        ResetPasswordRequest request = new ResetPasswordRequest(cleanEmail, newPassword);
 
-            Log.d(TAG, "Request creado exitosamente");
-            Log.d(TAG, "Datos del request - Email: " + cleanEmail + ", Password: [OCULTA]");
+        AuthService authService = ApiClient.getClient(getApplicationContext()).create(AuthService.class);
 
-            // Verificar que el request se creó correctamente
-            if (request == null) {
-                throw new Exception("Request es null después de crearlo");
-            }
+        Call<ApiResponse> call = authService.resetPassword(request);
+        call.enqueue(new Callback<ApiResponse>() {
+            @Override
+            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                resetButton();
 
-        } catch (Exception e) {
-            Log.e(TAG, "Error creando request", e);
-            resetButton();
-            Toast.makeText(this, "Error al crear la solicitud: " + e.getMessage(), Toast.LENGTH_LONG).show();
-            return;
-        }
+                if (response.isSuccessful()) {
+                    Toast.makeText(cambio_contrasenaActivity.this, "¡Contraseña actualizada correctamente!", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(cambio_contrasenaActivity.this, InicioSesionActivity.class);
+                    intent.putExtra("EMAIL", cleanEmail);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    String errorMsg = "Error al cambiar la contraseña (Código: " + response.code() + ")";
+                    try {
+                        if (response.errorBody() != null) {
+                            String errorBody = response.errorBody().string();
+                            JSONObject errorJson = new JSONObject(errorBody);
+                            String serverError = errorJson.optString("error", errorBody);
 
-        // Obtener servicio de autenticación
-        AuthService authService;
-        try {
-            authService = ApiClient.getClient(getApplicationContext()).create(AuthService.class);
-            if (authService == null) {
-                throw new Exception("AuthService es null");
-            }
-        } catch (Exception e) {
-            Log.e(TAG, "Error obteniendo AuthService", e);
-            resetButton();
-            Toast.makeText(this, "Error de configuración del servicio", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Realizar llamada al API
-        try {
-            Call<ApiResponse> call = authService.resetPassword(request);
-            Log.d(TAG, "Realizando llamada al servidor...");
-
-            call.enqueue(new Callback<ApiResponse>() {
-                @Override
-                public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-                    Log.d(TAG, "=== RESPUESTA RECIBIDA ===");
-                    Log.d(TAG, "Código de respuesta: " + response.code());
-                    Log.d(TAG, "Es exitosa: " + response.isSuccessful());
-                    Log.d(TAG, "Headers: " + response.headers().toString());
-
-                    resetButton();
-
-                    if (response.isSuccessful()) {
-                        ApiResponse apiResponse = response.body();
-                        Log.d(TAG, "Contraseña cambiada exitosamente");
-                        if (apiResponse != null) {
-                            Log.d(TAG, "Mensaje del servidor: " + apiResponse.getMessage());
-                        }
-
-                        Toast.makeText(cambio_contrasenaActivity.this, "¡Contraseña actualizada correctamente!", Toast.LENGTH_SHORT).show();
-
-                        // Navegar al login
-                        Intent intent = new Intent(cambio_contrasenaActivity.this, InicioSesionActivity.class);
-                        intent.putExtra("EMAIL", cleanEmail);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                        finish();
-
-                    } else {
-                        String errorMsg = "Error al cambiar la contraseña (Código: " + response.code() + ")";
-
-                        try {
-                            if (response.errorBody() != null) {
-                                String errorBody = response.errorBody().string();
-                                Log.e(TAG, "Error body completo: " + errorBody);
-
-                                // Intentar parsear el JSON de error
-                                try {
-                                    JSONObject errorJson = new JSONObject(errorBody);
-                                    String serverError = errorJson.optString("error", errorBody);
-
-                                    // Mensajes de error más específicos basados en el servidor
-                                    if (serverError.contains("Email y contraseña son requeridos")) {
-                                        errorMsg = "Error: Faltan datos requeridos. Verifica que todos los campos estén completos.";
-                                    } else if (serverError.contains("invalid") || serverError.contains("inválido")) {
-                                        errorMsg = "Error: El código de verificación es inválido o ha expirado.";
-                                    } else if (serverError.contains("expired") || serverError.contains("expirado")) {
-                                        errorMsg = "Error: El código de verificación ha expirado. Solicita uno nuevo.";
-                                    } else {
-                                        errorMsg = "Error del servidor: " + serverError;
-                                    }
-                                } catch (Exception parseEx) {
-                                    Log.e(TAG, "Error parseando JSON de error", parseEx);
-                                    errorMsg = "Error: " + errorBody;
-                                }
-
-                                // Mensajes adicionales por código HTTP
-                                if (response.code() == 400) {
-                                    // Ya manejado arriba
-                                } else if (response.code() == 401) {
-                                    errorMsg = "Error: No autorizado. El código puede haber expirado.";
-                                } else if (response.code() == 404) {
-                                    errorMsg = "Error: Usuario no encontrado.";
-                                } else if (response.code() == 500) {
-                                    errorMsg = "Error del servidor. Intenta nuevamente en unos minutos.";
-                                }
+                            if (serverError.contains("Email y contraseña son requeridos")) {
+                                errorMsg = "Faltan datos requeridos.";
+                            } else if (serverError.contains("invalid") || serverError.contains("inválido")) {
+                                errorMsg = "El código de verificación es inválido.";
+                            } else if (serverError.contains("expired") || serverError.contains("expirado")) {
+                                errorMsg = "El código ha expirado.";
                             }
-                        } catch (Exception e) {
-                            Log.e(TAG, "Error leyendo error body", e);
-                            errorMsg += " (No se pudo leer el detalle del error)";
-                        }
 
-                        Log.e(TAG, "Error final mostrado: " + errorMsg);
-                        Toast.makeText(cambio_contrasenaActivity.this, errorMsg, Toast.LENGTH_LONG).show();
+                            if (response.code() == 401) {
+                                errorMsg = "No autorizado. El código puede haber expirado.";
+                            } else if (response.code() == 404) {
+                                errorMsg = "Usuario no encontrado.";
+                            } else if (response.code() == 500) {
+                                errorMsg = "Error del servidor. Intenta nuevamente.";
+                            }
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error leyendo error body", e);
+                        errorMsg += " (Error desconocido)";
+                    }
+
+                    Toast.makeText(cambio_contrasenaActivity.this, errorMsg, Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse> call, Throwable t) {
+                resetButton();
+                String errorMessage = "Error de conexión";
+
+                if (t.getMessage() != null) {
+                    if (t.getMessage().contains("timeout")) {
+                        errorMessage = "Tiempo de espera agotado.";
+                    } else if (t.getMessage().contains("network")) {
+                        errorMessage = "Problemas de red.";
+                    } else {
+                        errorMessage += ": " + t.getMessage();
                     }
                 }
 
-                @Override
-                public void onFailure(Call<ApiResponse> call, Throwable t) {
-                    Log.e(TAG, "=== ERROR DE RED ===");
-                    Log.e(TAG, "Error de red al cambiar contraseña", t);
-                    Log.e(TAG, "Tipo de error: " + t.getClass().getSimpleName());
-                    Log.e(TAG, "Mensaje: " + t.getMessage());
-
-                    resetButton();
-
-                    String errorMessage = "Error de conexión";
-                    if (t.getMessage() != null) {
-                        if (t.getMessage().contains("timeout")) {
-                            errorMessage = "Error: Tiempo de espera agotado. Intenta nuevamente.";
-                        } else if (t.getMessage().contains("network")) {
-                            errorMessage = "Error: Problemas de red. Verifica tu conexión.";
-                        } else {
-                            errorMessage += ": " + t.getMessage();
-                        }
-                    }
-
-                    Toast.makeText(cambio_contrasenaActivity.this, errorMessage, Toast.LENGTH_LONG).show();
-                }
-            });
-
-        } catch (Exception e) {
-            Log.e(TAG, "Error al hacer la llamada al API", e);
-            resetButton();
-            Toast.makeText(this, "Error al conectar con el servidor", Toast.LENGTH_SHORT).show();
-        }
+                Toast.makeText(cambio_contrasenaActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     private void resetButton() {
         runOnUiThread(() -> {
             btnSavePassword.setEnabled(true);
-            btnSavePassword.setText("Guardar Contraseña");
+            btnSavePassword.setText("Guardar nueva contraseña");
         });
     }
 }

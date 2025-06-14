@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/beige"
-    tools:context=".RegistroActivity">
+    tools:context=".ui.authentication.RegistroActivity">
 
     <androidx.cardview.widget.CardView
         android:layout_width="0dp"
@@ -59,8 +59,7 @@
                 app:cardElevation="2dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textViewRegistrate">
-            </androidx.cardview.widget.CardView>
+                app:layout_constraintTop_toBottomOf="@+id/textViewRegistrate" />
 
             <TextView
                 android:id="@+id/textViewO"
@@ -124,6 +123,19 @@
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- 🔴 Mensaje de error para contraseña -->
+            <TextView
+                android:id="@+id/textViewPasswordError"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Error"
+                android:textColor="@android:color/holo_red_dark"
+                android:textSize="12sp"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayoutPassword"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/textInputLayoutConfirmPassword"
                 style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
@@ -138,7 +150,7 @@
                 app:hintTextColor="@color/verde"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textInputLayoutPassword"
+                app:layout_constraintTop_toBottomOf="@+id/textViewPasswordError"
                 app:passwordToggleEnabled="true"
                 app:passwordToggleTint="@color/gris"
                 app:startIconDrawable="@drawable/lock"
@@ -152,6 +164,19 @@
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <!-- 🔴 Mensaje de error para confirmar contraseña -->
+            <TextView
+                android:id="@+id/textViewConfirmPasswordError"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Error"
+                android:textColor="@android:color/holo_red_dark"
+                android:textSize="12sp"
+                android:visibility="gone"
+                app:layout_constraintTop_toBottomOf="@+id/textInputLayoutConfirmPassword"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/buttonRegister"
                 android:layout_width="wrap_content"
@@ -164,7 +189,7 @@
                 android:textColor="@color/blanco"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/textInputLayoutConfirmPassword" />
+                app:layout_constraintTop_toBottomOf="@+id/textViewConfirmPasswordError" />
 
             <LinearLayout
                 android:id="@+id/linearLayoutLogin"

@@ -9,6 +9,10 @@ public class SessionManager {
     private static final String KEY_PASSWORD = "password";
     private static final String KEY_AUTH_TOKEN = "auth_token";
     private static final String KEY_IS_LOGGED_IN = "is_logged_in";
+    private static final String KEY_SESSION_TIMESTAMP = "session_timestamp";
+
+    // ⏰ Duración de sesión en milisegundos (30 minutos)
+    private static final long SESSION_DURATION_MILLIS = 30 * 60 * 1000;
 
     private final SharedPreferences prefs;
     private final SharedPreferences.Editor editor;
@@ -18,96 +22,88 @@ public class SessionManager {
         editor = prefs.edit();
     }
 
-    // Método original - guardar usuario y contraseña
     public void saveUser(String email, String password) {
         editor.putString(KEY_EMAIL, email);
         editor.putString(KEY_PASSWORD, password);
         editor.putBoolean(KEY_IS_LOGGED_IN, true);
+        editor.putLong(KEY_SESSION_TIMESTAMP, System.currentTimeMillis());
         editor.apply();
     }
 
-    // Método original - verificar si el usuario está registrado
     public boolean isUserRegistered(String email, String password) {
         String savedEmail = prefs.getString(KEY_EMAIL, null);
         String savedPassword = prefs.getString(KEY_PASSWORD, null);
         return email.equals(savedEmail) && password.equals(savedPassword);
     }
 
-    // Método original - verificar si existe un usuario
     public boolean isUserExist() {
         return prefs.contains(KEY_EMAIL);
     }
 
-    // Método original - guardar token de autenticación
     public void saveAuthToken(String token) {
         editor.putString(KEY_AUTH_TOKEN, token);
         editor.apply();
     }
 
-    // Método original - obtener token de autenticación
     public String getAuthToken() {
         return prefs.getString(KEY_AUTH_TOKEN, null);
     }
 
-    // Método original - cerrar sesión
     public void logout() {
         editor.clear().apply();
     }
 
-    // ✅ MÉTODOS ADICIONALES ÚTILES
-
-    // Alias para compatibilidad con tu código de registro
     public void saveToken(String token) {
         saveAuthToken(token);
     }
 
-    // Alias para obtener token
     public String getToken() {
         return getAuthToken();
     }
 
-    // Obtener email del usuario actual
     public String getEmail() {
         return prefs.getString(KEY_EMAIL, null);
     }
 
-    // Obtener contraseña (no recomendado en producción)
     public String getPassword() {
         return prefs.getString(KEY_PASSWORD, null);
     }
 
-    // Verificar si el usuario está logueado
     public boolean isLoggedIn() {
         return prefs.getBoolean(KEY_IS_LOGGED_IN, false);
     }
 
-    // Verificar si hay un token válido
     public boolean hasValidToken() {
         String token = getAuthToken();
         return token != null && !token.isEmpty();
     }
 
-    // Limpiar solo el token (mantener usuario)
     public void clearToken() {
         editor.remove(KEY_AUTH_TOKEN);
         editor.apply();
     }
 
-    // Actualizar solo el token
     public void updateToken(String newToken) {
         saveAuthToken(newToken);
     }
 
-    // Guardar sesión completa (usuario + token)
     public void saveUserSession(String email, String password, String token) {
+        long timestamp = System.currentTimeMillis(); // ⏱ Guardar hora actual
+
         editor.putString(KEY_EMAIL, email);
         editor.putString(KEY_PASSWORD, password);
         editor.putString(KEY_AUTH_TOKEN, token);
         editor.putBoolean(KEY_IS_LOGGED_IN, true);
+        editor.putLong(KEY_SESSION_TIMESTAMP, timestamp);
         editor.apply();
     }
 
-    // Obtener todos los datos de la sesión
+    public boolean isSessionExpired() {
+        long loginTime = prefs.getLong(KEY_SESSION_TIMESTAMP, 0);
+        long currentTime = System.currentTimeMillis();
+        return (currentTime - loginTime) > SESSION_DURATION_MILLIS;
+    }
+
     public SessionData getSessionData() {
         return new SessionData(
                 getEmail(),
@@ -117,7 +113,6 @@ public class SessionManager {
         );
     }
 
-    // Clase interna para encapsular los datos de sesión
     public static class SessionData {
         public final String email;
         public final String password;

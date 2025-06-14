@@ -6,8 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFBE5"
-    tools:context=".cambio_contrasenaActivity">
-
+    tools:context=".ui.authentication.cambio_contrasenaActivity">
 
     <androidx.cardview.widget.CardView
         android:layout_width="0dp"
@@ -36,10 +35,8 @@
                 android:layout_marginTop="16dp"
                 android:background="@drawable/flecha_atras"
                 android:contentDescription="Botón atrás"
-
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
-
 
             <ImageView
                 android:id="@+id/logoImage"
@@ -63,7 +60,7 @@
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/logoImage" />
+                app:layout_constraintTop_toBottomOf="@id/logoImage" />
 
             <TextView
                 android:id="@+id/subtitleText"
@@ -78,7 +75,7 @@
                 android:textSize="16sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/titleText" />
+                app:layout_constraintTop_toBottomOf="@id/titleText" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/passwordLayout"
@@ -100,7 +97,7 @@
                 app:endIconTint="@color/gris"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/subtitleText"
+                app:layout_constraintTop_toBottomOf="@id/subtitleText"
                 app:startIconDrawable="@drawable/lock"
                 app:startIconTint="@color/gris">
 
@@ -132,7 +129,7 @@
                 app:endIconTint="@color/gris"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/passwordLayout"
+                app:layout_constraintTop_toBottomOf="@id/passwordLayout"
                 app:startIconDrawable="@drawable/lock"
                 app:startIconTint="@color/gris">
 
@@ -161,7 +158,7 @@
                 app:backgroundTint="#218C5B"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/confirmPasswordLayout" />
+                app:layout_constraintTop_toBottomOf="@id/confirmPasswordLayout" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

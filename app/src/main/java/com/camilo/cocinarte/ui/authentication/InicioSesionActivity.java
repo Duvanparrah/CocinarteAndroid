@@ -45,6 +45,14 @@ public class InicioSesionActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        sessionManager = new SessionManager(this);
+
+        // ✅ Si ya hay sesión iniciada, ir directamente al MainActivity
+        if (sessionManager.isLoggedIn() && sessionManager.hasValidToken()) {
+            irAMainActivity();
+            return;
+        }
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inicio_sesion);
 
@@ -129,7 +137,6 @@ public class InicioSesionActivity extends AppCompatActivity {
     private void iniciarSesion() {
         if (!validarCampos()) return;
 
-        // ✅ Sanitizar email
         String email = editTextEmail.getText().toString().trim().toLowerCase();
         String password = editTextPassword.getText().toString();
 
@@ -156,6 +163,7 @@ public class InicioSesionActivity extends AppCompatActivity {
                         return;
                     }
 
+                    // Fallback: Buscar token en cookies
                     HttpUrl url = HttpUrl.parse(BASE_URL);
                     if (url != null) {
                         List<Cookie> cookies = cookieJar.loadForRequest(url);

@@ -2,7 +2,11 @@ package com.camilo.cocinarte.ui.authentication;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Patterns;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,6 +33,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class RegistroActivity extends AppCompatActivity {
 
     private TextInputEditText editTextEmail, editTextPassword, editTextConfirmPassword;
+    private TextView textViewPasswordError, textViewConfirmPasswordError;
     private AppCompatButton buttonRegister;
 
     private AuthService authService;
@@ -41,15 +46,15 @@ public class RegistroActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registro);
 
-        // Vinculación de vistas
         editTextEmail = findViewById(R.id.editTextEmail);
         editTextPassword = findViewById(R.id.editTextPassword);
         editTextConfirmPassword = findViewById(R.id.editTextConfirmPassword);
+        textViewPasswordError = findViewById(R.id.textViewPasswordError);
+        textViewConfirmPasswordError = findViewById(R.id.textViewConfirmPasswordError);
         buttonRegister = findViewById(R.id.buttonRegister);
 
         sessionManager = new SessionManager(this);
 
-        // Interceptor para logs
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
@@ -71,14 +76,17 @@ public class RegistroActivity extends AppCompatActivity {
         findViewById(R.id.textViewLogin).setOnClickListener(v -> {
             startActivity(new Intent(RegistroActivity.this, InicioSesionActivity.class));
         });
+
+        agregarTextWatchers();
     }
 
     private void registrarUsuario() {
+        ocultarErrores();
+
         String email = getValue(editTextEmail);
         String password = getValue(editTextPassword);
         String confirmPassword = getValue(editTextConfirmPassword);
 
-        // Validaciones
         if (email.isEmpty() || password.isEmpty() || confirmPassword.isEmpty()) {
             Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show();
             return;
@@ -89,10 +97,33 @@ public class RegistroActivity extends AppCompatActivity {
             return;
         }
 
+        boolean valido = true;
+
         if (!password.equals(confirmPassword)) {
-            Toast.makeText(this, "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show();
-            return;
+            textViewConfirmPasswordError.setText("Las contraseñas no coinciden");
+            textViewConfirmPasswordError.setVisibility(View.VISIBLE);
+            valido = false;
         }
+
+        if (!password.matches(".*[A-Z].*")) {
+            textViewPasswordError.setText("Debe tener al menos una letra mayúscula");
+            textViewPasswordError.setVisibility(View.VISIBLE);
+            valido = false;
+        } else if (!password.matches(".*[a-z].*")) {
+            textViewPasswordError.setText("Debe tener al menos una letra minúscula");
+            textViewPasswordError.setVisibility(View.VISIBLE);
+            valido = false;
+        } else if (!password.matches(".*[!@#$%^&*()_+=\\[\\]{};:<>|./?,-].*")) {
+            textViewPasswordError.setText("Debe incluir al menos un carácter especial");
+            textViewPasswordError.setVisibility(View.VISIBLE);
+            valido = false;
+        }
+
+        if (!valido) return;
+
+        // Evaluar seguridad
+        String seguridad = evaluarSeguridad(password);
+        Toast.makeText(this, "Seguridad de la contraseña: " + seguridad, Toast.LENGTH_SHORT).show();
 
         buttonRegister.setEnabled(false);
         buttonRegister.setText("Registrando...");
@@ -110,8 +141,6 @@ public class RegistroActivity extends AppCompatActivity {
                     sessionManager.saveToken(response.body().getToken());
 
                     Toast.makeText(RegistroActivity.this, "Registro exitoso", Toast.LENGTH_SHORT).show();
-
-                    // Puedes redirigir a otra pantalla aquí si lo deseas
                     startActivity(new Intent(RegistroActivity.this, InicioSesionActivity.class));
                     finish();
                 } else {
@@ -133,7 +162,44 @@ public class RegistroActivity extends AppCompatActivity {
         });
     }
 
+    private void ocultarErrores() {
+        textViewPasswordError.setVisibility(View.GONE);
+        textViewConfirmPasswordError.setVisibility(View.GONE);
+    }
+
+    private void agregarTextWatchers() {
+        editTextPassword.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                textViewPasswordError.setVisibility(View.GONE);
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+
+        editTextConfirmPassword.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                textViewConfirmPasswordError.setVisibility(View.GONE);
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+    }
+
     private String getValue(TextInputEditText input) {
         return input.getText() != null ? input.getText().toString().trim() : "";
+    }
+
+    private String evaluarSeguridad(String password) {
+        int puntos = 0;
+
+        if (password.length() >= 8) puntos++;
+        if (password.matches(".*[A-Z].*")) puntos++;
+        if (password.matches(".*[a-z].*")) puntos++;
+        if (password.matches(".*\\d.*")) puntos++;
+        if (password.matches(".*[!@#$%^&*()_+=\\[\\]{};:<>|./?,-].*")) puntos++;
+
+        if (puntos <= 2) return "Débil";
+        else if (puntos <= 4) return "Media";
+        else return "Fuerte";
     }
 }
