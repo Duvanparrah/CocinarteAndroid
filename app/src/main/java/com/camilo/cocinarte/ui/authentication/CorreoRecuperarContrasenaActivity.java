@@ -22,7 +22,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class correo_Recuperar_Contrasena_Activity extends AppCompatActivity {
+public class CorreoRecuperarContrasenaActivity extends AppCompatActivity {
 
     private EditText etEmail;
     private Button btnSend;
@@ -30,11 +30,12 @@ public class correo_Recuperar_Contrasena_Activity extends AppCompatActivity {
 
     private AuthService authService;
 
-    private static final String BASE_URL = "http://192.168.18.7:5000/api/";
+    private String BASE_URL = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.BASE_URL = "https://"+ this.getString(R.string.myhost) +"/api/";
         setContentView(R.layout.activity_correo_recuperar_contrasena);
 
         etEmail = findViewById(R.id.etEmail);
@@ -85,19 +86,19 @@ public class correo_Recuperar_Contrasena_Activity extends AppCompatActivity {
                     String message = apiResponse.getMessage();
 
                     if (message != null && !message.isEmpty()) {
-                        Toast.makeText(correo_Recuperar_Contrasena_Activity.this, message, Toast.LENGTH_LONG).show();
+                        Toast.makeText(CorreoRecuperarContrasenaActivity.this, message, Toast.LENGTH_LONG).show();
                     } else {
-                        Toast.makeText(correo_Recuperar_Contrasena_Activity.this,
+                        Toast.makeText(CorreoRecuperarContrasenaActivity.this,
                                 "Se ha enviado un correo a " + email + " para restablecer tu contraseña",
                                 Toast.LENGTH_LONG).show();
                     }
 
-                    Intent intent = new Intent(correo_Recuperar_Contrasena_Activity.this, codigo_recuperacionActivity.class);
+                    Intent intent = new Intent(CorreoRecuperarContrasenaActivity.this, CodigoRecuperacionActivity.class);
                     intent.putExtra("EMAIL", email);
                     startActivity(intent);
                     // finish(); // Descomenta si no quieres que el usuario vuelva atrás
                 } else {
-                    Toast.makeText(correo_Recuperar_Contrasena_Activity.this,
+                    Toast.makeText(CorreoRecuperarContrasenaActivity.this,
                             "No se pudo enviar el correo. Intenta más tarde.",
                             Toast.LENGTH_LONG).show();
                 }
@@ -107,7 +108,7 @@ public class correo_Recuperar_Contrasena_Activity extends AppCompatActivity {
             public void onFailure(Call<ApiResponse> call, Throwable t) {
                 btnSend.setEnabled(true);
                 btnSend.setText("Enviar");
-                Toast.makeText(correo_Recuperar_Contrasena_Activity.this,
+                Toast.makeText(CorreoRecuperarContrasenaActivity.this,
                         "Error de conexión: " + t.getMessage(),
                         Toast.LENGTH_LONG).show();
             }

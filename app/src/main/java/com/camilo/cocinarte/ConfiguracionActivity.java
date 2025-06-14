@@ -19,10 +19,15 @@ import com.bumptech.glide.Glide;
 import com.camilo.cocinarte.api.AuthService;
 import com.camilo.cocinarte.api.UsersRequest;
 import com.camilo.cocinarte.api.UsuarioService;
+import com.camilo.cocinarte.models.ApiResponse;
 import com.camilo.cocinarte.models.LoginRequest;
 import com.camilo.cocinarte.models.LoginResponse;
+import com.camilo.cocinarte.models.ResetPasswordRequest;
+import com.camilo.cocinarte.models.UpdatePhotoResponse;
 import com.camilo.cocinarte.models.Usuario;
 import com.camilo.cocinarte.session.SessionManager;
+import com.camilo.cocinarte.ui.authentication.CambioContrasenaActivity;
+import com.camilo.cocinarte.ui.authentication.CorreoRecuperarContrasenaActivity;
 import com.camilo.cocinarte.ui.authentication.InicioSesionActivity;
 
 import org.json.JSONException;
@@ -30,10 +35,15 @@ import org.json.JSONException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 
 import okhttp3.Cookie;
 import okhttp3.HttpUrl;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -54,7 +64,7 @@ public class ConfiguracionActivity extends AppCompatActivity {
     private TextView text_username;
     private String BASE_URL =  "";
     SessionManager sessionManager;
-
+    AuthService authService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,21 +83,21 @@ public class ConfiguracionActivity extends AppCompatActivity {
 
         this.sessionManager = new SessionManager(getApplicationContext());
 
-        this.usersRequest.UserPrefsManager(this.getApplicationContext());
+        //this.usersRequest.UserPrefsManager(this.getApplicationContext());
+
+
+        Retrofit retrofit = new Retrofit.Builder().baseUrl(BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
+        authService = retrofit.create(AuthService.class);
 
         // Recuperar datos guardados
-        String savedName = this.usersRequest.getSavedName();
-
-        // Si hay nombre guardado, lo mostramos
-        if (savedName != null && !savedName.isEmpty()) {
-            this.text_username.setText(sessionManager.getNombre());
-        }
-
-
 
         // Configurar botón para seleccionar imagen
         changeProfilePicButton.setOnClickListener(v -> openGallery());
 
+        cargarDatosEnVista();
+    }
+
+    void cargarDatosEnVista(){
         //Obtener avatar
         if(!sessionManager.getFoto().isBlank() || !sessionManager.getFoto().isEmpty()){
             Glide.with(this)
@@ -97,7 +107,11 @@ public class ConfiguracionActivity extends AppCompatActivity {
                     .error(R.drawable.ic_cuenta_configuracion)
                     .into(profileImage);
         }
-        //loadAvatarImage();
+
+        // Si hay nombre guardado, lo mostramos
+        if (sessionManager.getNombre() != null && !sessionManager.getNombre().isEmpty()) {
+            this.text_username.setText(sessionManager.getNombre());
+        }
     }
 
     private void changeName() {
@@ -109,14 +123,38 @@ public class ConfiguracionActivity extends AppCompatActivity {
             return;
         }
 
-        this.usersRequest.changeName(name); // Suponiendo que este método existe
-        if (name != null && !name.isEmpty()) {
-            this.text_username.setText(name);
-        }
-        Toast.makeText(this, "Nombre de usuario actualizado", Toast.LENGTH_SHORT).show();
+        AuthService.Name _name = new AuthService.Name(name);
+
+        // Llamar a la API
+        Call<UpdatePhotoResponse> call = authService.updateNameProfile(_name, "Bearer " + sessionManager.getToken());
+        call.enqueue(new Callback<UpdatePhotoResponse>() {
+            @Override
+            public void onResponse(Call<UpdatePhotoResponse> call, Response<UpdatePhotoResponse> response) {
+                if (response.isSuccessful()) {
+                    Log.d("API", "✅ Nombre actualizado: " + response.body().getMessage());
+                    sessionManager.setNombre(response.body().getUser().getNombre());
+                    cargarDatosEnVista();
+                    text_username.setText(name);
+                    Toast.makeText(getApplicationContext(), "Nombre de usuario actualizado", Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.e("API", "❌ Error actulizar en nombre de perfil: " + response.code() + response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<UpdatePhotoResponse> call, Throwable t) {
+                Log.e("API", "⚠️ Falló la conexión", t);
+            }
+        });
     }
 
     private void changePassword() {
+        Intent intent = new Intent(getApplicationContext(), CorreoRecuperarContrasenaActivity.class);
+        startActivity(intent);
+
+
+        /*return;
+
         String password = user_password.getText().toString().trim();
         String confirm = confirm_password.getText().toString().trim();
 
@@ -130,10 +168,52 @@ public class ConfiguracionActivity extends AppCompatActivity {
             return;
         }
 
-        this.usersRequest.changePassword(password); // Suponiendo que este método existe
-        Toast.makeText(this, "Contraseña actualizada", Toast.LENGTH_SHORT).show();
+        ResetPasswordRequest request = new ResetPasswordRequest(sessionManager.getEmail(), "", password);
+
+        Call<ApiResponse> call = authService.resetPassword(request);
+        call.enqueue(new Callback<ApiResponse>() {
+            @Override
+            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                if (response.isSuccessful()) {
+                    Log.d("API", "✅ Contraseña actualizada: " + response.body().getMessage());
+                    Toast.makeText(getApplicationContext(), "Contraseña actualizada", Toast.LENGTH_SHORT).show();
+                } else {
+                    Log.e("API", "❌ Error al actualizar la contraseña: " + response.code() + response.message());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse> call, Throwable t) {
+                Log.e("API", "⚠️ Falló la conexión", t);
+            }
+        });*/
+
     }
 
+
+    private File createTempFileFromUri(Uri uri) {
+        try {
+            InputStream inputStream = getContentResolver().openInputStream(uri);
+            String fileName = "imagen_perfil_" + System.currentTimeMillis() + ".jpg";
+
+            File tempFile = new File(getCacheDir(), fileName);
+            OutputStream outputStream = new FileOutputStream(tempFile);
+
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
+            }
+
+            outputStream.close();
+            inputStream.close();
+
+            return tempFile;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     private void openGallery() {
         Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
@@ -147,65 +227,45 @@ public class ConfiguracionActivity extends AppCompatActivity {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null) {
             Uri imageUri = data.getData();
 
-                Retrofit retrofit = new Retrofit.Builder()
-                        .baseUrl(BASE_URL)
-                        .addConverterFactory(GsonConverterFactory.create())
-                        .build();
+            File file = createTempFileFromUri(imageUri);
+            if (file == null) return;
 
-                UsuarioService usuarioService = retrofit.create(UsuarioService.class);
+            // Crear RequestBody del archivo
+            RequestBody requestFile = RequestBody.create(
+                    MediaType.parse("image/*"),
+                    file
+            );
 
-                Usuario request = new Usuario();
+            // Crear MultipartBody.Part con el nombre esperado por el backend: "file"
+            MultipartBody.Part imagenPart = MultipartBody.Part.createFormData(
+                    "profileImage",              // este nombre debe coincidir con el que espera tu backend: req.file
+                    file.getName(),
+                    requestFile
+            );
 
-                request.setCorreo(sessionManager.getEmail());
-                request.setNombreUsuario(sessionManager.getNombre());
-                assert imageUri != null;
-                request.setFotoPerfil(imageUri.toString());
-                request.setContrasena(sessionManager.getPassword());
 
-                Call<Usuario> call = usuarioService.actualizarUsuario(request);
-                call.enqueue(new Callback<Usuario>() {
-                    @Override
-                    public void onResponse(Call<Usuario> call, Response<Usuario> response) {
-                        if (response.isSuccessful() && response.body() != null) {
-                            //Usuario loginResponse = response.body();
-                        } else {
-                            Toast.makeText(getApplicationContext(), "Error al actualizar usuario", Toast.LENGTH_LONG).show();
-                        }
+            // Llamar a la API
+            Call<UpdatePhotoResponse> call = authService.subirImagen(imagenPart, "Bearer " + sessionManager.getToken());
+            call.enqueue(new Callback<UpdatePhotoResponse>() {
+                @Override
+                public void onResponse(Call<UpdatePhotoResponse> call, Response<UpdatePhotoResponse> response) {
+                    if (response.isSuccessful()) {
+                        Log.d("API", "✅ Imagen subida: " + response.body().getMessage() + ""+response.body().getUser().getFoto_perfil());
+
+                        sessionManager.setFoto(response.body().getUser().getFoto_perfil());
+                        cargarDatosEnVista();
+
+                    } else {
+                        Log.e("API", "❌ Error al subir: " + response.code() + response.message());
                     }
+                }
 
-                    @Override
-                    public void onFailure(Call<Usuario> call, Throwable t) {
-                        Toast.makeText(getApplicationContext(), "Error en el servidor / actualizar usuario", Toast.LENGTH_LONG).show();
-                    }
-                });
-
-                //Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), imageUri);
-                //profileImage.setImageBitmap(bitmap);
-                //saveImageToInternalStorage(bitmap);  // Guardar en almacenamiento interno
-
+                @Override
+                public void onFailure(Call<UpdatePhotoResponse> call, Throwable t) {
+                    Log.e("API", "⚠️ Falló la conexión", t);
+                }
+            });
         }
     }
-
-
-    private void saveImageToInternalStorage(Bitmap bitmap) {
-        try {
-            File file = new File(getFilesDir(), "avatar.png");
-            FileOutputStream fos = new FileOutputStream(file);
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-            fos.close();
-            Toast.makeText(this, "Imagen guardada como avatar", Toast.LENGTH_SHORT).show();
-        } catch (IOException e) {
-            e.printStackTrace();
-            Toast.makeText(this, "Error al guardar la imagen", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    /*private void loadAvatarImage() {
-        File file = new File(getFilesDir(), "avatar.png");
-        if (file.exists()) {
-            Bitmap bitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
-            profileImage.setImageBitmap(bitmap);
-        }
-    }*/
 
 }

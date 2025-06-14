@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.camilo.cocinarte.NavigationActivity;
 import com.camilo.cocinarte.R;
 import com.camilo.cocinarte.api.ApiClient;
 import com.camilo.cocinarte.api.AuthService;
@@ -21,11 +22,14 @@ import com.camilo.cocinarte.models.ApiResponse;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
+import okhttp3.OkHttpClient;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
-public class cambio_contrasenaActivity extends AppCompatActivity {
+public class CambioContrasenaActivity extends AppCompatActivity {
 
     private static final String TAG = "CambioContrasena";
 
@@ -36,6 +40,9 @@ public class cambio_contrasenaActivity extends AppCompatActivity {
 
     private String email = "";
     private String resetCode = "";
+    private AuthService authService;
+
+    private String BASE_URL = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +59,16 @@ public class cambio_contrasenaActivity extends AppCompatActivity {
             return insets;
         });
 
+        this.BASE_URL = "https://"+ this.getString(R.string.myhost) +"/api/";
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .client(new OkHttpClient.Builder().build())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        authService = retrofit.create(AuthService.class);
+
         getIntentData();
         initializeViews();
         setupListeners();
@@ -60,6 +77,7 @@ public class cambio_contrasenaActivity extends AppCompatActivity {
 
     private void getIntentData() {
         Intent intent = getIntent();
+        Log.d(TAG, "Intent cambio contraseña " + (intent != null)+"" );
         if (intent != null) {
             email = intent.getStringExtra("EMAIL");
             resetCode = intent.getStringExtra("RESET_CODE");
@@ -148,22 +166,27 @@ public class cambio_contrasenaActivity extends AppCompatActivity {
         btnSavePassword.setEnabled(false);
         btnSavePassword.setText("Guardando...");
 
-        if (email != null && resetCode != null && !email.isEmpty() && !resetCode.isEmpty()) {
-            ResetPasswordRequest request = new ResetPasswordRequest(email, resetCode, newPassword);
-
-            AuthService authService = ApiClient.getClient(getApplicationContext()).create(AuthService.class);
+        if (email != null && !email.isEmpty()) {
+            ResetPasswordRequest request = new ResetPasswordRequest(email, newPassword);
 
             // ✅ CORREGIDO: Cambiar Callback<Void> por Callback<ApiResponse>
             authService.resetPassword(request).enqueue(new Callback<ApiResponse>() {
                 @Override
                 public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-                    if (response.isSuccessful() && response.body() != null) {
+                    if (response.isSuccessful()) {
                         // Opcionalmente usar el mensaje de la respuesta
                         ApiResponse apiResponse = response.body();
                         Log.d(TAG, "Respuesta del servidor: " + apiResponse.getMessage());
                         showSuccessAndNavigate();
+
+                        Intent intent = new Intent(getApplicationContext(), NavigationActivity.class);
+                        intent.putExtra("fragment_to_show", "inicio");
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+
+
                     } else {
-                        Toast.makeText(cambio_contrasenaActivity.this, "Error al cambiar la contraseña", Toast.LENGTH_LONG).show();
+                        Toast.makeText(CambioContrasenaActivity.this, "Error al cambiar la contraseña", Toast.LENGTH_LONG).show();
                         resetButton();
                     }
                 }
@@ -171,7 +194,7 @@ public class cambio_contrasenaActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<ApiResponse> call, Throwable t) {
                     Log.e(TAG, "Error de red: " + t.getMessage());
-                    Toast.makeText(cambio_contrasenaActivity.this, "Error de red: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(CambioContrasenaActivity.this, "Error de red: " + t.getMessage(), Toast.LENGTH_LONG).show();
                     resetButton();
                 }
             });

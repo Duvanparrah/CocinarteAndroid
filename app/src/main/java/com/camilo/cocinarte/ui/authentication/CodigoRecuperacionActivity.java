@@ -7,6 +7,7 @@ import android.text.TextWatcher;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -15,8 +16,19 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.camilo.cocinarte.R;
+import com.camilo.cocinarte.api.AuthService;
+import com.camilo.cocinarte.models.ApiResponse;
+import com.camilo.cocinarte.models.ForgotPasswordRequest;
+import com.camilo.cocinarte.models.VerifyCodeRequest;
 
-public class codigo_recuperacionActivity extends AppCompatActivity {
+import okhttp3.OkHttpClient;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
+
+public class CodigoRecuperacionActivity extends AppCompatActivity {
 
     private static final int CODE_LENGTH = 6;
 
@@ -24,6 +36,9 @@ public class codigo_recuperacionActivity extends AppCompatActivity {
     private Button btnVerify;
     private ImageButton btnBack;
     private String email = "";
+    private AuthService authService;
+
+    private String BASE_URL = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +53,17 @@ public class codigo_recuperacionActivity extends AppCompatActivity {
             return insets;
         });
 
+        this.BASE_URL = "https://"+ this.getString(R.string.myhost) +"/api/";
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(BASE_URL)
+                .client(new OkHttpClient.Builder().build())
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+
+        authService = retrofit.create(AuthService.class);
+
+
         if (getIntent().hasExtra("EMAIL")) {
             email = getIntent().getStringExtra("EMAIL");
         }
@@ -49,10 +75,34 @@ public class codigo_recuperacionActivity extends AppCompatActivity {
 
         // Saltamos la verificación y vamos directamente a la pantalla de cambio de contraseña
         btnVerify.setOnClickListener(v -> {
-            Intent intent = new Intent(codigo_recuperacionActivity.this, cambio_contrasenaActivity.class);
+            Intent intent = new Intent(CodigoRecuperacionActivity.this, CambioContrasenaActivity.class);
             intent.putExtra("EMAIL", email);
-            startActivity(intent);
-            finish();
+            String code = etDigit1.getText().toString()+""+etDigit2.getText().toString()+""+etDigit3.getText().toString()+""+etDigit4.getText().toString()+""+etDigit5.getText().toString()+""+etDigit6.getText().toString();
+            intent.putExtra("RESET_CODE", code);
+
+
+            VerifyCodeRequest request = new VerifyCodeRequest(email, code);
+
+            authService.verifyCode(request).enqueue(new Callback<ApiResponse>() {
+                @Override
+                public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                    if (response.isSuccessful()) {
+                        // Usar el mensaje del servidor si está disponible
+                        ApiResponse apiResponse = response.body();
+                        String message = apiResponse.getMessage();
+
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "No se pudo validar el codigo. Intenta más tarde.", Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ApiResponse> call, Throwable t) {
+                    Toast.makeText(getApplicationContext(), "Error de conexión: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
         });
     }
 

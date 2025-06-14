@@ -40,12 +40,12 @@
         <!-- Imagen de perfil a la izquierda -->
         <ImageView
             android:id="@+id/profile_image"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="64dp"
+            android:layout_height="64dp"
             android:layout_marginEnd="16dp"
             android:contentDescription="Imagen de perfil"
             android:src="@drawable/masculino"
-            android:layout_weight="1"
+            android:scaleType="centerCrop"
             />
 
         <!-- Contenedor de información a la derecha -->

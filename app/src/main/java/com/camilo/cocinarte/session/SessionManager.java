@@ -80,6 +80,14 @@ public class SessionManager {
         return prefs.getString(KEY_FOTO, null);
     }
 
+    public void setFoto(String foto) {
+        editor.putString(KEY_FOTO, foto);
+    }
+
+    public void setNombre(String nombre) {
+        editor.putString(KEY_NOMBRE, nombre);
+    }
+
     // Obtener contraseña (no recomendado en producción)
     public String getPassword() {
         return prefs.getString(KEY_PASSWORD, null);

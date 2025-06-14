@@ -52,10 +52,10 @@
         <!-- Otras actividades -->
         <activity android:name=".MainActivity" android:exported="false" />
         <activity android:name=".ui.authentication.RegistroActivity" android:exported="false" />
-        <activity android:name=".ui.authentication.cambio_contrasenaActivity" android:exported="false" />
-        <activity android:name=".ui.authentication.codigo_recuperacionActivity" android:exported="false" />
+        <activity android:name=".ui.authentication.CambioContrasenaActivity" android:exported="false" />
+        <activity android:name=".ui.authentication.CodigoRecuperacionActivity" android:exported="false" />
         <activity android:name=".ui.nutricion.comprobante_pago_nequiActivity" android:exported="false" />
-        <activity android:name=".ui.authentication.correo_Recuperar_Contrasena_Activity" android:exported="false" />
+        <activity android:name=".ui.authentication.CorreoRecuperarContrasenaActivity" android:exported="false" />
         <activity android:name=".ui.nutricion.Metodo_de_pago_Activity" android:exported="false" />
         <activity android:name=".ui.nutricion.Tarjeta_creditoActivity" android:exported="false" />
 

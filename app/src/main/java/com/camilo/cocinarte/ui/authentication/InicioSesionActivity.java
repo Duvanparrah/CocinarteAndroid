@@ -163,7 +163,6 @@ public class InicioSesionActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 // Restaurar botón
-                Log.d("|||1", "");
                 buttonLogin.setEnabled(true);
                 buttonLogin.setText("Iniciar sesión");
                 // if (progressBar != null) {
@@ -171,7 +170,6 @@ public class InicioSesionActivity extends AppCompatActivity {
                 // }
 
                 if (response.isSuccessful() && response.body() != null) {
-                    Log.d("|||2", "");
                     LoginResponse loginResponse = response.body();
 
                     // ✅ OPCIÓN 1: Si tu API retorna el token en el response body
@@ -218,7 +216,6 @@ public class InicioSesionActivity extends AppCompatActivity {
                     irAMainActivity();
 
                 } else {
-                    Log.d("|||3", "");
                     // Error en las credenciales
                     String errorMessage = "Credenciales incorrectas";
                     if (response.code() == 401) {
@@ -228,16 +225,12 @@ public class InicioSesionActivity extends AppCompatActivity {
                     } else if (response.code() >= 500) {
                         errorMessage = "Error del servidor. Intenta más tarde.";
                     }
-
-                    Log.e("|||4", response.message());
-                    Log.e("|||4 2", String.valueOf(response.errorBody()));
                     Toast.makeText(InicioSesionActivity.this, errorMessage, Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
             public void onFailure(Call<LoginResponse> call, Throwable t) {
-                Log.d("|||5", "");
                 // Restaurar botón
                 buttonLogin.setEnabled(true);
                 buttonLogin.setText("Iniciar sesión");
