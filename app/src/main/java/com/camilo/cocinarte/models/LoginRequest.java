@@ -1,19 +1,11 @@
 package com.camilo.cocinarte.models;
 
 public class LoginRequest {
-    private String correo;
-    private String contrasena;
+    private String email;
+    private String password;
 
-    public LoginRequest(String correo, String contrasena) {
-        this.correo = correo;
-        this.contrasena = contrasena;
-    }
-
-    public String getCorreo() {
-        return correo;
-    }
-
-    public String getContrasena() {
-        return contrasena;
+    public LoginRequest(String email, String password) {
+        this.email = email;
+        this.password = password;
     }
 }

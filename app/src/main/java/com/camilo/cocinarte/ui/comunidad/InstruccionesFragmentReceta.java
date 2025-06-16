@@ -33,13 +33,16 @@ import com.google.gson.Gson;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -53,6 +56,7 @@ public class InstruccionesFragmentReceta extends Fragment {
     private EditText etPaso;
     private ImageButton btnAgregarPaso;
     private LinearLayout listaPasos;
+    private String imagePath;
 
     public InstruccionesFragmentReceta() {}
 
@@ -104,7 +108,7 @@ public class InstruccionesFragmentReceta extends Fragment {
                 receta.setIdUsuario(loginManager.getUsuario().getIdUsuario());
                 receta.setTitulo(datos.getString("nombreReceta"));
                 receta.setDescripcion("-o-123456789");
-                receta.setImagen(datos.getString("imagenUri"));
+                imagePath = datos.getString("imagenUri");
                 receta.setTiempoPreparacion(datos.getString("tiempo"));
                 receta.setDificultad(datos.getString("dificultad"));
                 receta.setCalorias(Integer.parseInt(datos.getString("kcal", "0")));
@@ -116,7 +120,6 @@ public class InstruccionesFragmentReceta extends Fragment {
 
                 ArrayList<Ingrediente> _ingredientes = new ArrayList<Ingrediente>();
                 ingredientes.forEach(res ->{
-                    Log.v(">> >>:ingredientesString",     ""+res);
                     Ingrediente ingrediente = new Ingrediente();
                     ingrediente.setNombreIngrediente(res);
                     //ingrediente.setImagen(null);
@@ -193,98 +196,84 @@ public class InstruccionesFragmentReceta extends Fragment {
         LoginManager loginManager = new LoginManager(requireContext());
         String tokenGuardado = loginManager.getToken();
 
-        this.enviarFoto(receta.getImagen(), tokenGuardado).enqueue(new Callback<FotoResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<FotoResponse> call, @NonNull Response<FotoResponse> response) {
-                if (response.isSuccessful()) {
-                    FotoResponse fotoResponse = response.body();
-                    // Manejar la respuesta exitosa, ej. mostrar un mensaje, actualizar UI
-                    assert fotoResponse != null;
-                    Log.d("Upload", "Foto subida correctamente. Link: " + fotoResponse.getUrl() );
-                    RecetaApi recetaApi = ApiClient.getClient(getContext()).create(RecetaApi.class);
-                    receta.setImagen(fotoResponse.getUrl());
-                    recetaApi.createReceta(receta, "Bearer " + tokenGuardado).enqueue(new Callback<Receta>() {
-                        @Override
-                        public void onResponse(Call<Receta> call, Response<Receta> response) {
-                            if (response.isSuccessful()) {
-                                Toast.makeText(getContext(), "Receta publicada correctamente", Toast.LENGTH_SHORT).show();
-                                Navigation.findNavController(requireView()).navigate(R.id.action_instruccionesFragmentReceta_to_navegar_comunidad_mis_recetas);
-                            } else {
-                                Log.e(">> >>error regrofit", "Error en respuesta: " + response.code());
-                            }
-                        }
+        Uri imageUri = Uri.parse(imagePath);
 
-                        @Override
-                        public void onFailure(Call<Receta> call, Throwable t) {
-                            Log.e(">> >>failuere", "Error en conexión: " + t.getMessage());
-                        }
-                    });
+        File file = createTempFileFromUri(imageUri);
+        if (file == null) return;
+
+        // Crear RequestBody del archivo
+        RequestBody requestFile = RequestBody.create(
+                MediaType.parse("image/*"),
+                file
+        );
+
+        // Crear MultipartBody.Part con el nombre esperado por el backend: "file"
+        MultipartBody.Part imagenPart = MultipartBody.Part.createFormData(
+                "foto",              // este nombre debe coincidir con el que espera tu backend: req.file
+                file.getName(),
+                requestFile
+        );
+
+        // Manejar la respuesta exitosa, ej. mostrar un mensaje, actualizar UI
+        RecetaApi recetaApi = ApiClient.getClient(getContext()).create(RecetaApi.class);
+
+        // Convierte el objeto Receta en JSON usando Gson
+        Gson gson = new Gson();
+        receta.setCategoria("Comida Internacional");
+        receta.setIngredientes(null);
+        receta.setDificultad(receta.getDificultad().toLowerCase());
+        String preparacion = receta.getPasos().stream().collect(Collectors.joining("\n"));
+        receta.setPreparacion(preparacion);
+
+        String recetaJson = gson.toJson(receta);
+        RequestBody recetaRequestBody = RequestBody.create(
+                MediaType.parse("application/json"),
+                recetaJson
+        );
+
+        Log.d("|||gson receta", recetaJson);
+
+        recetaApi.createReceta(imagenPart, recetaRequestBody, "Bearer " + tokenGuardado).enqueue(new Callback<Receta>() {
+            @Override
+            public void onResponse(Call<Receta> call, Response<Receta> response) {
+                if (response.isSuccessful()) {
+                    Toast.makeText(getContext(), "Receta publicada correctamente", Toast.LENGTH_SHORT).show();
+                    Navigation.findNavController(requireView()).navigate(R.id.action_instruccionesFragmentReceta_to_navegar_comunidad_mis_recetas);
                 } else {
-                    // Manejar el error de la respuesta
-                    try {
-                        String errorBody = response.errorBody().string();
-                        Log.e("Upload", "Error al subir foto: " + response.code() + " - " + errorBody);
-                        // Mostrar mensaje de error al usuario
-                    } catch (Exception e) {
-                        Log.e("Upload", "Error al leer errorBody: " + e.getMessage());
-                    }
+                    Log.e("|||No successful", "Error creear receta: " + response.code());
                 }
+
             }
 
             @Override
-            public void onFailure(Call<FotoResponse> call, Throwable t) {
-                // Manejar errores de red o excepciones
-                Log.e("Upload", "Fallo al conectar con el servidor: " + t.getMessage(), t);
-                // Mostrar mensaje de error de conexión
+            public void onFailure(Call<Receta> call, Throwable t) {
+                Log.e("|||Failure", "Error en conexión: " + t.getMessage());
             }
         });
     }
 
+    private File createTempFileFromUri(Uri uri) {
+        try {
+            InputStream inputStream = getContext().getContentResolver().openInputStream(uri);
+            String fileName = "imagen_perfil_" + System.currentTimeMillis() + ".jpg";
 
-    private String getFileName(Context context, Uri uri) {
-        Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
-        String nombre = "archivo.jpg";
-        if (cursor != null && cursor.moveToFirst()) {
-            int index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
-            if (index != -1) nombre = cursor.getString(index);
-            cursor.close();
+            File tempFile = new File(getContext().getCacheDir(), fileName);
+            OutputStream outputStream = new FileOutputStream(tempFile);
+
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
+            }
+
+            outputStream.close();
+            inputStream.close();
+
+            return tempFile;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
         }
-        return nombre;
-    }
-    private byte[] getBytes(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
-        int bufferSize = 1024;
-        byte[] buffer = new byte[bufferSize];
-
-        int len;
-        while ((len = inputStream.read(buffer)) != -1) {
-            byteBuffer.write(buffer, 0, len);
-        }
-        return byteBuffer.toByteArray();
     }
 
-    private MultipartBody.Part prepararImagenParaSubir(Context context, Uri contentUri) throws IOException {
-        ContentResolver resolver = context.getContentResolver();
-
-        String mimeType = resolver.getType(contentUri);
-        String nombreArchivo = getFileName(context, contentUri);
-
-        InputStream inputStream = resolver.openInputStream(contentUri);
-        byte[] bytes = getBytes(inputStream);
-
-        RequestBody requestFile = RequestBody.create(MediaType.parse(mimeType), bytes);
-        return MultipartBody.Part.createFormData("foto", nombreArchivo, requestFile);
-    }
-
-
-    private Call<FotoResponse> enviarFoto(String imagePath, String token) throws IOException {
-        // 1. Crear MultipartBody.Part
-        MultipartBody.Part filePart = prepararImagenParaSubir(requireContext(), Uri.parse(imagePath));
-
-        // 2. Obtener tu instancia del api
-        RecetaApi recetaApi = ApiClient.getClient(getContext()).create(RecetaApi.class);
-
-        // 3. Realizar la llamada a la API
-        return recetaApi.subirFotoReceta(filePart, "Bearer " + token);
-    }
 }

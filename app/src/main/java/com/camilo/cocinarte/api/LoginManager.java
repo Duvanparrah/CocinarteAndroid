@@ -3,6 +3,7 @@ package com.camilo.cocinarte.api;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.camilo.cocinarte.models.LoginResponse;
 import com.camilo.cocinarte.models.Usuario;
 
 public class LoginManager {
@@ -16,13 +17,13 @@ public class LoginManager {
         prefs.edit().putString("token", token).apply();
     }
 
-    public void saveUser(Usuario usuario) {
+    public void saveUser(LoginResponse.User usuario) {
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("id_usuario", String.valueOf(usuario.getIdUsuario()));
-        editor.putString("correo", usuario.getCorreo());
-        editor.putString("tipo_usuario", usuario.getTipoUsuario());
-        editor.putString("nombre_usuario", usuario.getNombreUsuario());
-        editor.putString("foto_perfil", usuario.getFotoPerfil());
+        editor.putString("id_usuario", String.valueOf(usuario.getId()));
+        editor.putString("correo", usuario.getEmail());
+        editor.putString("tipo_usuario", usuario.getTipo_usuario());
+        editor.putString("nombre_usuario", usuario.getNombre());
+        editor.putString("foto_perfil", usuario.getFoto());
         editor.apply();
     }
 

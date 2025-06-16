@@ -3,9 +3,12 @@ package com.camilo.cocinarte.ui.comunidad;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,7 +21,25 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.camilo.cocinarte.R;
+import com.camilo.cocinarte.api.ApiClient;
+import com.camilo.cocinarte.api.IngredientesService;
+import com.camilo.cocinarte.api.LoginManager;
+import com.camilo.cocinarte.api.RecetaApi;
 import com.camilo.cocinarte.databinding.FragmentCrearRecetaBinding;
+import com.camilo.cocinarte.models.Ingrediente;
+import com.camilo.cocinarte.models.IngredientesByCategoriaResponse;
+import com.camilo.cocinarte.models.Receta;
+import com.google.gson.Gson;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CrearRecetaFragment extends Fragment {
 
@@ -55,6 +76,38 @@ public class CrearRecetaFragment extends Fragment {
             }
         });
 
+        LoginManager loginManager = new LoginManager(requireContext());
+        String tokenGuardado = loginManager.getToken();
+
+        binding.spinnerDificultad.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                String categoria = parentView.getItemAtPosition(position).toString();
+
+                // Manejar la respuesta exitosa, ej. mostrar un mensaje, actualizar UI
+                IngredientesService ingredientesService = ApiClient.getClient(getContext()).create(IngredientesService.class);
+                ingredientesService.obtenerIngredientesPorCategoria(categoria, "Bearer " + tokenGuardado).enqueue(new Callback<IngredientesByCategoriaResponse>() {
+                    @Override
+                    public void onResponse(Call<IngredientesByCategoriaResponse> call, Response<IngredientesByCategoriaResponse> response) {
+                        if (response.isSuccessful()) {
+                            actualizarSpinner(response.body().getIngredientes());
+                        } else {
+                            Log.e("|||No successful", "Error al obtener ingredientes: " + response.code());
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<IngredientesByCategoriaResponse> call, Throwable t) {
+                        Log.e("|||Failure", "Error en conexión: " + t.getMessage());
+                    }
+                });
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+            }
+        });
 
         binding.btnInstrucciones.setOnClickListener(v -> {
 
@@ -103,6 +156,31 @@ public class CrearRecetaFragment extends Fragment {
             );
         });
 
+    }
+
+    private void actualizarSpinner(List<Ingrediente> _ingredientes) {
+        List<String> ingredientes = new ArrayList<>();
+
+        // Iterar sobre la lista de Ingrediente y extraer los nombres
+        for (Ingrediente ingrediente : _ingredientes) {
+            ingredientes.add(ingrediente.getNombreIngrediente());
+        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, ingredientes);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        binding.spinnerIngredientes.setAdapter(adapter);
+
+        // Opcional: si quieres manejar la selección de un ítem
+        binding.spinnerIngredientes.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                String categoriaSeleccionada = parentView.getItemAtPosition(position).toString();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // Manejar el caso en que no se selecciona nada
+            }
+        });
     }
 
     private void agregarIngrediente(String ingrediente) {

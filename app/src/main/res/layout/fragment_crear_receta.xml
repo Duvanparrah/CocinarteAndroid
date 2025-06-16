@@ -390,6 +390,41 @@
                 android:entries="@array/dificultades"/>
         </LinearLayout>
 
+        <!-- Categoria -->
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Categoría:"
+            android:textSize="16sp"
+            android:textColor="@android:color/black"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="8dp">
+
+
+            <ImageView
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_chart"
+                app:tint="@color/black" />
+
+            <!-- Spinner dificultad -->
+            <Spinner
+                android:id="@+id/spinner_categoria"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:entries="@array/categorias"/>
+        </LinearLayout>
+
+
         <!-- CONTENEDOR PRINCIPAL -->
         <LinearLayout
             android:layout_width="match_parent"
@@ -397,7 +432,6 @@
             android:orientation="vertical"
             android:padding="16dp"
             android:background="@android:color/white">
-
 
             <LinearLayout
                 android:id="@+id/ingredientes_section"
@@ -456,6 +490,14 @@
                         android:contentDescription="Agregar ingrediente"
                         app:tint="@color/verde" />
                 </LinearLayout>
+
+                <Spinner
+                    android:id="@+id/spinner_ingredientes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    />
 
                 <com.google.android.flexbox.FlexboxLayout
                     android:id="@+id/listaIngredientes"

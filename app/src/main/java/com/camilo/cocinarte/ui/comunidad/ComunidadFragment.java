@@ -28,7 +28,6 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ComunidadFragment extends Fragment {
-
     private FragmentComunidadBinding binding;
     ListView listView;
 
@@ -49,7 +48,7 @@ public class ComunidadFragment extends Fragment {
 
     private void getDataRecetas(){
         RecetaApi recetaApi = ApiClient.getClient(getContext()).create(RecetaApi.class);
-        LoginManager loginManager = new LoginManager(getContext());
+        LoginManager loginManager = new LoginManager(requireContext());
         String tokenGuardado = loginManager.getToken();
 
         recetaApi.getRecetas("Bearer " + tokenGuardado).enqueue(new Callback<List<Receta>>() {
@@ -59,7 +58,6 @@ public class ComunidadFragment extends Fragment {
                     List<Receta> recetas = response.body();
 
                     assert recetas != null;
-                    String _recetaGson = new Gson().toJson(recetas);
 
                     AdapterComunidad adapter = new AdapterComunidad(getContext(), recetas, receta -> {
                         Bundle bundle = new Bundle();

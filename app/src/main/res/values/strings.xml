@@ -64,6 +64,18 @@
         <item>Horas</item>
     </string-array>
 
+    <string-array name="categorias">
+        <item>Comida Internacional</item>
+        <item>Sopas y Cremas</item>
+        <item>Ensaladas y verduras</item>
+        <item>Bebidas</item>
+        <item>Panadería y Repostería</item>
+        <item>Pastas y Arroces</item>
+        <item>Pescados y Mariscos</item>
+        <item>Carnes y aves</item>
+        <item>Comida Rápida y Callejer</item>
+    </string-array>
+
     <string-array name="dificultades">
         <item>Fácil</item>
         <item>Media</item>

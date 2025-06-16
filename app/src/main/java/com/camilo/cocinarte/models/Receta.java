@@ -11,7 +11,7 @@ public class Receta {
     @SerializedName("id_usuario")
     private int idUsuario;
 
-    @SerializedName("titulo")
+    @SerializedName("nombre")
     private String titulo;
 
     @SerializedName("descripcion")
@@ -20,7 +20,7 @@ public class Receta {
     @SerializedName("imagen")
     private String imagen;
 
-    @SerializedName("tiempo_preparacion")
+    @SerializedName("tiempo")
     private String tiempoPreparacion;
 
     @SerializedName("dificultad")
@@ -44,6 +44,9 @@ public class Receta {
     @SerializedName("seccion")
     private String seccion;
 
+    @SerializedName("categoria")
+    private String categoria;
+
     @SerializedName("fecha_creacion")
     private String fechaCreacion;
 
@@ -56,10 +59,13 @@ public class Receta {
     @SerializedName("pasos")
     private List<String> pasos;
 
+    @SerializedName("preparacion")
+    private String preparacion;
+
     @SerializedName("Usuario")
     private Usuario usuario; // Clase que debes crear con los campos del usuario
 
-    @SerializedName("Ingredientes")
+    @SerializedName("ingredientes")
     private List<Ingrediente> ingredientes;
 
 
@@ -216,5 +222,21 @@ public class Receta {
 
     public void setPasos(List<String> pasos) {
         this.pasos = pasos;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
+    }
+
+    public String getPreparacion() {
+        return preparacion;
+    }
+
+    public void setPreparacion(String preparacion) {
+        this.preparacion = preparacion;
     }
 }

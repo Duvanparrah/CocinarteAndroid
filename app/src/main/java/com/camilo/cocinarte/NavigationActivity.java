@@ -17,11 +17,10 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.camilo.cocinarte.api.ApiClient;
-import com.camilo.cocinarte.api.LoginApi;
+import com.camilo.cocinarte.api.AuthService;
 import com.camilo.cocinarte.api.LoginManager;
 import com.camilo.cocinarte.models.LoginRequest;
 import com.camilo.cocinarte.models.LoginResponse;
-import com.camilo.cocinarte.models.Usuario;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
@@ -41,17 +40,18 @@ public class NavigationActivity extends AppCompatActivity implements NavigationV
         setContentView(R.layout.activity_navigation);
 
         /* ========== 1: codigo temporal: token a sharedprefereces ========== */
-        LoginApi loginApi = ApiClient.getClient(getApplicationContext()).create(LoginApi.class);
-        LoginRequest request = new LoginRequest("juan@gmail.com", "123456");
+        AuthService authService = ApiClient.getClient(getApplicationContext()).create(AuthService.class);
+        LoginRequest request = new LoginRequest("nitolas020@gmail.com", "Cc123456");
 
-        Call<LoginResponse> call = loginApi.login(request);
+        Call<LoginResponse> call = authService.loginUser(request);
+        Log.d("||| request", call.request().toString());
         call.enqueue(new Callback<LoginResponse>() {
             @Override
             public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                 if (response.isSuccessful()) {
                     LoginResponse loginResponse = response.body();
                     String token = loginResponse.getToken();
-                    Usuario usuario = loginResponse.getUsuario();
+                    LoginResponse.User usuario = loginResponse.getUser();
 
                     Log.d(">> >> LOGIN", "Token: " + token);
                     LoginManager loginManager = new LoginManager(getApplicationContext());
@@ -59,7 +59,7 @@ public class NavigationActivity extends AppCompatActivity implements NavigationV
                     loginManager.saveToken(token);
                     loginManager.saveUser(usuario);
                 } else {
-                    Log.e(">> >> LOGIN", "Error: " + response.code());
+                    Log.e(">> >> LOGIN", "Error: " + response.message());
                     Toast.makeText(getApplicationContext(), "USUARIO NO ENCONTRADO", Toast.LENGTH_LONG).show();
                     finish();
                 }
