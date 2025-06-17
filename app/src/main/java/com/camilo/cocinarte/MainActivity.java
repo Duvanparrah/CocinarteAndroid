@@ -80,61 +80,37 @@ public class MainActivity extends AppCompatActivity {
             int id = menuItem.getItemId();
 
             if (id == R.id.nav_profile) {
-                // Acción para Mi Perfil
                 Log.d(TAG, "Navegando a Mi Perfil");
             } else if (id == R.id.nav_favorites) {
-                // Acción para Favoritos
                 Log.d(TAG, "Navegando a Favoritos");
             } else if (id == R.id.nav_recipes) {
-                // Acción para Mis Recetas
                 Log.d(TAG, "Navegando a Mis Recetas");
             } else if (id == R.id.nav_notifications) {
-                // Acción para Notificaciones
                 Log.d(TAG, "Navegando a Notificaciones");
             } else if (id == R.id.nav_account) {
-                // Acción para Cuenta y configuración
                 Log.d(TAG, "Navegando a Cuenta y configuración");
                 Intent intent = new Intent(this, com.camilo.cocinarte.ui.authentication.CuentaConfiguracionActivity.class);
                 startActivity(intent);
             } else if (id == R.id.nav_support) {
-                // Acción para Soporte
                 Log.d(TAG, "Navegando a Soporte");
             } else if (id == R.id.nav_sign_out) {
-                // Cerrar sesión
                 Log.d(TAG, "Cerrando sesión...");
                 sessionManager.logout();
                 Intent intent = new Intent(this, com.camilo.cocinarte.ui.authentication.InicioSesionActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 startActivity(intent);
                 finish();
+            } else {
+                Log.d(TAG, "Elemento desconocido seleccionado");
             }
 
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
-        });d == R.id.nav_notifications) {
-            // Acción para Notificaciones
-            Log.d(TAG, "Navegando a Notificaciones");
-        } else if (id == R.id.nav_account) {
-            // Acción para Cuenta y configuración
-            Log.d(TAG, "Navegando a Cuenta y configuración");
-        } else if (id == R.id.nav_support) {
-            // Acción para Soporte
-            Log.d(TAG, "Navegando a Soporte");
-        } else if (id == R.id.nav_sign_out) {
-            // Cerrar sesión
-            Log.d(TAG, "Cerrando sesión...");
-            sessionManager.logout();
-            Intent intent = new Intent(this, com.camilo.cocinarte.ui.authentication.InicioSesionActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
-        }
+        });
 
-        drawerLayout.closeDrawer(GravityCompat.START);
-        return true;
-    });
 
-    // Configurar Bottom Navigation
+
+        // Configurar Bottom Navigation
     BottomNavigationView navView = binding.navView;
 
     // Configuración simplificada sin AppBarConfiguration para toolbar

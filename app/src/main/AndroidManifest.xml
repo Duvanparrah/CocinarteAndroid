@@ -34,6 +34,8 @@
         <!-- Otras actividades -->
         <activity android:name=".MainActivity" android:exported="false" />
         <activity android:name=".NavigationActivity" android:exported="false" />
+        <activity android:name=".ui.authentication.CuentaConfiguracionActivity"
+            android:exported="false" />
 
         <!-- Autenticación -->
         <activity android:name=".ui.authentication.RegistroActivity" android:exported="false" />
