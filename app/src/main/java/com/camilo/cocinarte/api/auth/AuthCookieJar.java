@@ -1,4 +1,4 @@
-package com.camilo.cocinarte.api;
+package com.camilo.cocinarte.api.auth;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -12,7 +12,7 @@ import okhttp3.Cookie;
 import okhttp3.CookieJar;
 import okhttp3.HttpUrl;
 
-public class MyCookieJar implements CookieJar {
+public class AuthCookieJar implements CookieJar {
 
     private static final String PREFS_NAME = "cookie_prefs";
     private static final String COOKIE_KEY = "cookie_token";
@@ -23,7 +23,7 @@ public class MyCookieJar implements CookieJar {
     // Usa la URL base de tu servidor para parsear las cookies guardadas
     private static final String BASE_URL = "https://tuservidor.com";
 
-    public MyCookieJar(Context context) {
+    public AuthCookieJar(Context context) {
         sharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         cookies = new ArrayList<>();
 

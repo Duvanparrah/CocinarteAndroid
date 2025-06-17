@@ -35,7 +35,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        sessionManager = new SessionManager(this);
+        sessionManager = SessionManager.getInstance(this);
+
 
         // 🔒 Redirigir si no hay sesión válida o si ha expirado
         if (!sessionManager.isLoggedIn() || !sessionManager.hasValidToken() || sessionManager.isSessionExpired()) {

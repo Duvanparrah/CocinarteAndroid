@@ -2,6 +2,8 @@ package com.camilo.cocinarte.api;
 
 import android.content.Context;
 
+import com.camilo.cocinarte.api.auth.AuthCookieJar;
+
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
@@ -13,7 +15,7 @@ public class RetrofitClient {
     public static Retrofit getClient(Context context) {
         if (retrofit == null) {
             OkHttpClient client = new OkHttpClient.Builder()
-                    .cookieJar(new MyCookieJar(context))
+                    .cookieJar(new AuthCookieJar(context))
                     .build();
 
             retrofit = new Retrofit.Builder()

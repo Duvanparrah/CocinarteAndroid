@@ -2,225 +2,193 @@ package com.camilo.cocinarte.ui.authentication;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.util.Patterns;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.camilo.cocinarte.MainActivity;
 import com.camilo.cocinarte.R;
-import com.camilo.cocinarte.api.AuthService;
-import com.camilo.cocinarte.api.MyCookieJar;
-import com.camilo.cocinarte.models.LoginRequest;
-import com.camilo.cocinarte.models.LoginResponse;
-import com.camilo.cocinarte.session.SessionManager;
+import com.camilo.cocinarte.databinding.ActivityInicioSesionBinding;
+import com.camilo.cocinarte.utils.Resource;
+import com.camilo.cocinarte.viewmodels.AuthViewModel;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 
-import java.util.List;
-
-import okhttp3.Cookie;
-import okhttp3.HttpUrl;
-import okhttp3.OkHttpClient;
-import okhttp3.logging.HttpLoggingInterceptor;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-
 public class InicioSesionActivity extends AppCompatActivity {
 
-    private TextInputLayout textInputLayoutEmail, textInputLayoutPassword;
-    private TextInputEditText editTextEmail, editTextPassword;
-    private Button buttonLogin;
-
-    private AuthService authService;
-    private SessionManager sessionManager;
-    private MyCookieJar cookieJar;
-
-    private static final String BASE_URL = "https://cocinarte-production.up.railway.app/api/";
+    private ActivityInicioSesionBinding binding;
+    private AuthViewModel authViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        sessionManager = new SessionManager(this);
+        super.onCreate(savedInstanceState);
 
-        // ✅ Si ya hay sesión iniciada, ir directamente al MainActivity
-        if (sessionManager.isLoggedIn() && sessionManager.hasValidToken()) {
-            irAMainActivity();
+        // Inicializar ViewModel
+        authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
+
+        // Verificar si ya hay sesión activa
+        if (authViewModel.isUserLoggedIn()) {
+            navigateToMain();
             return;
         }
 
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_inicio_sesion);
+        // Inicializar View Binding
+        binding = ActivityInicioSesionBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
-        textInputLayoutEmail = findViewById(R.id.textInputLayoutEmail);
-        textInputLayoutPassword = findViewById(R.id.textInputLayoutPassword);
-        editTextEmail = findViewById(R.id.editTextEmail);
-        editTextPassword = findViewById(R.id.editTextPassword);
-        buttonLogin = findViewById(R.id.buttonLogin);
-
-        sessionManager = new SessionManager(this);
-        cookieJar = new MyCookieJar(this);
-
-        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
-
-        OkHttpClient client = new OkHttpClient.Builder()
-                .addInterceptor(logging)
-                .cookieJar(cookieJar)
-                .build();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .client(client)
-                .addConverterFactory(GsonConverterFactory.create())
-                .build();
-
-        authService = retrofit.create(AuthService.class);
-
-        buttonLogin.setOnClickListener(v -> iniciarSesion());
-
-        findViewById(R.id.textViewRegister).setOnClickListener(v -> {
-            Intent intent = new Intent(InicioSesionActivity.this, RegistroActivity.class);
-            startActivity(intent);
-        });
-
-        findViewById(R.id.textViewForgotPassword).setOnClickListener(v -> {
-            Intent intent = new Intent(InicioSesionActivity.this, correo_Recuperar_Contrasena_Activity.class);
-            startActivity(intent);
-        });
-
-        cargarDatosGuardados();
+        setupViews();
+        observeViewModel();
+        setupTextWatchers();
     }
 
-    private void cargarDatosGuardados() {
-        if (sessionManager.isUserExist()) {
-            String savedEmail = sessionManager.getEmail();
-            if (savedEmail != null) {
-                editTextEmail.setText(savedEmail);
+    private void setupViews() {
+        // Botón de login
+        binding.buttonLogin.setOnClickListener(v -> performLogin());
+
+        // Link de registro
+        binding.textViewRegister.setOnClickListener(v -> {
+            startActivity(new Intent(this, RegistroActivity.class));
+        });
+
+        // Link de olvidé mi contraseña
+        binding.textViewForgotPassword.setOnClickListener(v -> {
+            startActivity(new Intent(this, correo_Recuperar_Contrasena_Activity.class));
+        });
+
+        // Verificar si viene del registro o cambio de contraseña
+        handleIntent();
+    }
+
+    private void observeViewModel() {
+        // Observar errores de email
+        authViewModel.emailError.observe(this, error -> {
+            binding.textInputLayoutEmail.setError(error);
+        });
+
+        // Observar errores de contraseña
+        authViewModel.passwordError.observe(this, error -> {
+            binding.textInputLayoutPassword.setError(error);
+        });
+
+        // Observar mensajes de error generales
+        authViewModel.errorMessage.observe(this, message -> {
+            if (message != null && !message.isEmpty()) {
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
             }
-        }
+        });
+
+        // Observar eventos de navegación
+        authViewModel.navigationEvent.observe(this, destination -> {
+            if ("main".equals(destination)) {
+                navigateToMain();
+            }
+        });
     }
 
-    private boolean validarCampos() {
-        String email = editTextEmail.getText() != null ? editTextEmail.getText().toString().trim().toLowerCase() : "";
-        String password = editTextPassword.getText() != null ? editTextPassword.getText().toString() : "";
-
-        boolean isValid = true;
-
-        if (email.isEmpty()) {
-            textInputLayoutEmail.setError("Por favor, ingrese su email");
-            isValid = false;
-        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            textInputLayoutEmail.setError("Por favor, ingrese un email válido");
-            isValid = false;
-        } else {
-            textInputLayoutEmail.setError(null);
-        }
-
-        if (password.isEmpty()) {
-            textInputLayoutPassword.setError("Por favor, ingrese su contraseña");
-            isValid = false;
-        } else if (password.length() < 6) {
-            textInputLayoutPassword.setError("La contraseña debe tener al menos 6 caracteres");
-            isValid = false;
-        } else {
-            textInputLayoutPassword.setError(null);
-        }
-
-        return isValid;
-    }
-
-    private void iniciarSesion() {
-        if (!validarCampos()) return;
-
-        String email = editTextEmail.getText().toString().trim().toLowerCase();
-        String password = editTextPassword.getText().toString();
-
-        buttonLogin.setEnabled(false);
-        buttonLogin.setText("Ingresando...");
-
-        LoginRequest request = new LoginRequest(email, password);
-
-        authService.loginUser(request).enqueue(new Callback<LoginResponse>() {
+    private void setupTextWatchers() {
+        // Limpiar error al escribir en el campo de email
+        binding.editTextEmail.addTextChangedListener(new TextWatcher() {
             @Override
-            public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                buttonLogin.setEnabled(true);
-                buttonLogin.setText("Iniciar sesión");
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
-                if (response.isSuccessful() && response.body() != null) {
-                    LoginResponse loginResponse = response.body();
-
-                    if (loginResponse.getToken() != null) {
-                        sessionManager.saveUserSession(email, password, loginResponse.getToken());
-                        Toast.makeText(InicioSesionActivity.this,
-                                loginResponse.getMessage() != null ? loginResponse.getMessage() : "Bienvenido",
-                                Toast.LENGTH_SHORT).show();
-                        irAMainActivity();
-                        return;
-                    }
-
-                    // Fallback: Buscar token en cookies
-                    HttpUrl url = HttpUrl.parse(BASE_URL);
-                    if (url != null) {
-                        List<Cookie> cookies = cookieJar.loadForRequest(url);
-                        for (Cookie cookie : cookies) {
-                            if (cookie.name().equalsIgnoreCase("token")) {
-                                sessionManager.saveUserSession(email, password, cookie.value());
-                                Toast.makeText(InicioSesionActivity.this, "Bienvenido", Toast.LENGTH_SHORT).show();
-                                irAMainActivity();
-                                return;
-                            }
-                        }
-                    }
-
-                    sessionManager.saveUser(email, password);
-                    Toast.makeText(InicioSesionActivity.this, "Bienvenido", Toast.LENGTH_SHORT).show();
-                    irAMainActivity();
-
-                } else {
-                    String errorMessage = "Credenciales incorrectas";
-                    if (response.code() == 401) {
-                        errorMessage = "Email o contraseña incorrectos";
-                    } else if (response.code() == 404) {
-                        errorMessage = "Usuario no encontrado";
-                    } else if (response.code() >= 500) {
-                        errorMessage = "Error del servidor. Intenta más tarde.";
-                    }
-
-                    Toast.makeText(InicioSesionActivity.this, errorMessage, Toast.LENGTH_LONG).show();
-                }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                binding.textInputLayoutEmail.setError(null);
             }
 
             @Override
-            public void onFailure(Call<LoginResponse> call, Throwable t) {
-                buttonLogin.setEnabled(true);
-                buttonLogin.setText("Iniciar sesión");
+            public void afterTextChanged(Editable s) {}
+        });
 
-                String errorMessage = "Error de conexión";
-                if (t.getMessage() != null) {
-                    if (t.getMessage().contains("Unable to resolve host")) {
-                        errorMessage = "No se puede conectar al servidor. Verifica que esté ejecutándose.";
-                    } else if (t.getMessage().contains("timeout")) {
-                        errorMessage = "Tiempo de espera agotado. Intenta de nuevo.";
-                    } else {
-                        errorMessage = "Error de conexión: " + t.getMessage();
+        // Limpiar error al escribir en el campo de contraseña
+        binding.editTextPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                binding.textInputLayoutPassword.setError(null);
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    private void performLogin() {
+        // Obtener valores de los campos
+        String email = binding.editTextEmail.getText() != null ?
+                binding.editTextEmail.getText().toString().trim() : "";
+        String password = binding.editTextPassword.getText() != null ?
+                binding.editTextPassword.getText().toString() : "";
+
+        // Limpiar errores previos
+        authViewModel.clearErrors();
+
+        // Realizar login
+        authViewModel.login(email, password).observe(this, resource -> {
+            switch (resource.status) {
+                case LOADING:
+                    showLoading(true);
+                    break;
+
+                case SUCCESS:
+                    showLoading(false);
+                    if (resource.data != null) {
+                        String message = resource.data.getMessage() != null ?
+                                resource.data.getMessage() : "Bienvenido";
+                        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+                        navigateToMain();
                     }
-                }
+                    break;
 
-                Toast.makeText(InicioSesionActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                case ERROR:
+                    showLoading(false);
+                    String errorMessage = resource.message != null ?
+                            resource.message : "Error al iniciar sesión";
+                    Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+                    break;
             }
         });
     }
 
-    private void irAMainActivity() {
-        Intent intent = new Intent(InicioSesionActivity.this, MainActivity.class);
+    private void showLoading(boolean show) {
+        binding.buttonLogin.setEnabled(!show);
+        binding.buttonLogin.setText(show ? "Ingresando..." : "Iniciar sesión");
+
+        // Si tienes un ProgressBar en tu layout
+        if (binding.progressBar != null) {
+            binding.progressBar.setVisibility(show ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    private void handleIntent() {
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra("EMAIL")) {
+            String email = intent.getStringExtra("EMAIL");
+            if (email != null) {
+                binding.editTextEmail.setText(email);
+            }
+        }
+    }
+
+    private void navigateToMain() {
+        Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("fragment_to_show", "inicio");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        binding = null;
     }
 }

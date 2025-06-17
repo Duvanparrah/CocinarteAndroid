@@ -1,4 +1,4 @@
-package com.camilo.cocinarte.api;
+package com.camilo.cocinarte.api.auth;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;

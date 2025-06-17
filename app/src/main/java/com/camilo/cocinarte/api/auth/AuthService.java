@@ -1,4 +1,4 @@
-package com.camilo.cocinarte.api;
+package com.camilo.cocinarte.api.auth;
 
 import com.camilo.cocinarte.models.RegisterRequest;
 import com.camilo.cocinarte.models.RegisterResponse;

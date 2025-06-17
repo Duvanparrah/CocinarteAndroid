@@ -13,8 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 
 import com.camilo.cocinarte.R;
-import com.camilo.cocinarte.api.AuthService;
-import com.camilo.cocinarte.api.MyCookieJar;
+import com.camilo.cocinarte.api.auth.AuthCookieJar;
+import com.camilo.cocinarte.api.auth.AuthService;
 import com.camilo.cocinarte.models.RegisterRequest;
 import com.camilo.cocinarte.models.RegisterResponse;
 import com.camilo.cocinarte.session.SessionManager;
@@ -53,14 +53,15 @@ public class RegistroActivity extends AppCompatActivity {
         textViewConfirmPasswordError = findViewById(R.id.textViewConfirmPasswordError);
         buttonRegister = findViewById(R.id.buttonRegister);
 
-        sessionManager = new SessionManager(this);
+        sessionManager = SessionManager.getInstance(this);
+
 
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(logging)
-                .cookieJar(new MyCookieJar(this))
+                .cookieJar(new AuthCookieJar(this))
                 .build();
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -138,7 +139,8 @@ public class RegistroActivity extends AppCompatActivity {
 
                 if (response.isSuccessful() && response.body() != null) {
                     sessionManager.saveUser(email, password);
-                    sessionManager.saveToken(response.body().getToken());
+                    sessionManager.saveAuthToken(response.body().getToken());
+
 
                     Toast.makeText(RegistroActivity.this, "Registro exitoso", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(RegistroActivity.this, InicioSesionActivity.class));
