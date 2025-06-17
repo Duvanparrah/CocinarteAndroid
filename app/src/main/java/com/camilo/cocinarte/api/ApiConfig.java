@@ -8,7 +8,7 @@ import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-public class RetrofitClient {
+public class ApiConfig {
 
     private static Retrofit retrofit = null;
 
