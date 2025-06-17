@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+
+        <!-- Perfil -->
+        <item
+            android:id="@+id/nav_profile"
+            android:icon="@drawable/ic_cuenta_configuracion"
+            android:title="Mi Perfil" />
+
+        <!-- Favoritos -->
+        <item
+            android:id="@+id/nav_favorites"
+            android:icon="@drawable/ic_favoritos"
+            android:title="Favoritos" />
+
+        <!-- Mis Recetas -->
+        <item
+            android:id="@+id/nav_recipes"
+            android:icon="@drawable/recetas_mias"
+            android:title="Mis Recetas" />
+
+    </group>
+
+    <!-- Sección de configuración -->
+    <item android:title="Configuración">
+        <menu>
+            <!-- Notificaciones -->
+            <item
+                android:id="@+id/nav_notifications"
+                android:icon="@drawable/ic_notificaciones"
+                android:title="Notificaciones" />
+
+            <!-- Cuenta y configuración -->
+            <item
+                android:id="@+id/nav_account"
+                android:icon="@drawable/ic_cuenta_configuracion"
+                android:title="Cuenta y configuración" />
+
+            <!-- Soporte -->
+            <item
+                android:id="@+id/nav_support"
+                android:icon="@drawable/ic_soporte"
+                android:title="Soporte" />
+        </menu>
+    </item>
+
+    <!-- Cerrar sesión -->
+    <group>
+        <item
+            android:id="@+id/nav_sign_out"
+            android:icon="@drawable/ic_cerrar_sesion"
+            android:title="Cerrar sesión" />
+    </group>
+
+</menu>

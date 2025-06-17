@@ -266,6 +266,8 @@ public class SessionManager {
         return new String(Base64.decode(encoded, Base64.NO_WRAP));
     }
 
+//    añadidos para traer informaciondel llogin al panel:
+
     /**
      * Clase para encapsular los datos de sesión
      */
