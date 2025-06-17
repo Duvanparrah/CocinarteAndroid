@@ -65,15 +65,23 @@
     </string-array>
 
     <string-array name="categorias">
-        <item>Comida Internacional</item>
-        <item>Sopas y Cremas</item>
-        <item>Ensaladas y verduras</item>
-        <item>Bebidas</item>
-        <item>Panadería y Repostería</item>
-        <item>Pastas y Arroces</item>
+        <item></item>
+        <item>Verduras</item>
+        <item>Frutas</item>
+        <item>Carnes</item>
         <item>Pescados y Mariscos</item>
-        <item>Carnes y aves</item>
-        <item>Comida Rápida y Callejer</item>
+        <item>Lácteos</item>
+        <item>Granos y Legumbres</item>
+        <item>Cereales</item>
+        <item>Huevos</item>
+        <item>Hierbas y Especias</item>
+        <item>Frutos secos y Semillas</item>
+        <item>Aceites y Grasas</item>
+        <item>Endulzantes</item>
+        <item>Productos Procesados</item>
+        <item>Bebidas</item>
+        <item>Harinas y Derivados</item>
+        <item>Salsas y Condimentos</item>
     </string-array>
 
     <string-array name="dificultades">

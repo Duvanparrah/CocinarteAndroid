@@ -27,6 +27,7 @@ import com.camilo.cocinarte.models.Ingrediente;
 import com.camilo.cocinarte.models.Receta;
 import com.google.gson.Gson;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import retrofit2.Call;
@@ -150,7 +151,7 @@ public class DetalleRecetaFragment extends Fragment {
         contenedorPasos.removeAllViews();
 
         int pasoNum = 1;
-        ArrayList<String> pasos = new ArrayList<>(receta.getPasos());
+        ArrayList<String> pasos = new ArrayList<>(Arrays.asList(receta.getPreparacion().split("\n")));
 
         for (String paso : pasos /*NO EXISTE receta.getPasos()*/) {
             TextView tvPaso = new TextView(getContext());
@@ -197,7 +198,7 @@ public class DetalleRecetaFragment extends Fragment {
     private void eliminarReceta() {
         RecetaApi recetaApi = ApiClient.getClient(getContext()).create(RecetaApi.class);
 
-        LoginManager loginManager = new LoginManager(getContext());
+        LoginManager loginManager = new LoginManager(requireContext());
         String tokenGuardado = loginManager.getToken();
         recetaApi.deleteReceta(recetaActual.getIdReceta(),"Bearer " + tokenGuardado).enqueue(new Callback<Void>() {
             @Override

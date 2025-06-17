@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
-public class Receta {
+public class RecetaRequest {
     @SerializedName("id_receta")
     private int idReceta;
 
@@ -56,26 +56,39 @@ public class Receta {
     @SerializedName("editado")
     private Boolean editado;
 
+    @SerializedName("pasos")
+    private List<String> pasos;
+
     @SerializedName("preparacion")
     private String preparacion;
 
     @SerializedName("Usuario")
     private Usuario usuario; // Clase que debes crear con los campos del usuario
 
-    @SerializedName("Ingredientes")
-    private List<Ingrediente> ingredientes;
+    /*@SerializedName("ingredientes")
+    private List<Ingrediente> ingredientes;*/
+
+    @SerializedName("ingredientes")
+    private String ingredientes;
 
 
     // Getters y setters...
 
-    public List<Ingrediente> getIngredientes() {
+    /*public List<Ingrediente> getIngredientes() {
         return ingredientes;
     }
 
     public void setIngredientes(List<Ingrediente> ingredientes) {
         this.ingredientes = ingredientes;
+    }*/
+
+    public String getIngredientes() {
+        return ingredientes;
     }
 
+    public void setIngredientes(String ingredientes) {
+        this.ingredientes = ingredientes;
+    }
 
     public int getIdReceta() {
         return idReceta;
@@ -93,11 +106,11 @@ public class Receta {
         this.idUsuario = idUsuario;
     }
 
-    public String getTitulo() {
+    public String getNombre() {
         return titulo;
     }
 
-    public void setTitulo(String titulo) {
+    public void setNombre(String titulo) {
         this.titulo = titulo;
     }
 
@@ -211,6 +224,14 @@ public class Receta {
 
     public void setEditado(Boolean editado) {
         this.editado = editado;
+    }
+
+    public List<String> getPasos() {
+        return pasos;
+    }
+
+    public void setPasos(List<String> pasos) {
+        this.pasos = pasos;
     }
 
     public String getCategoria() {

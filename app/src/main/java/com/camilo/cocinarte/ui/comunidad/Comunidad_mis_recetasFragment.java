@@ -227,7 +227,9 @@ public class Comunidad_mis_recetasFragment extends Fragment {
 
         LoginManager loginManager = new LoginManager(getContext());
         String tokenGuardado = loginManager.getToken();
-        recetaApi.getRecetas("Bearer " + tokenGuardado).enqueue(new Callback<List<Receta>>() {
+        Call<List<Receta>> call = recetaApi.getRecetas("Bearer " + tokenGuardado);
+
+        call.enqueue(new Callback<List<Receta>>() {
             @Override
             public void onResponse(Call<List<Receta>> call, Response<List<Receta>> response) {
 

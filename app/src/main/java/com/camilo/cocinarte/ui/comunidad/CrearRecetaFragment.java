@@ -33,6 +33,7 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import okhttp3.MediaType;
@@ -45,7 +46,7 @@ public class CrearRecetaFragment extends Fragment {
 
     private FragmentCrearRecetaBinding binding;
     private Uri imagenUriSeleccionada;
-
+    List<Ingrediente> _ingredientes = new ArrayList<>();
     private final ActivityResultLauncher<PickVisualMediaRequest> pickMedia =
             registerForActivityResult(new ActivityResultContracts.PickVisualMedia(), uri -> {
                 if (uri != null) {
@@ -66,35 +67,35 @@ public class CrearRecetaFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        LoginManager loginManager = new LoginManager(requireContext());
+        String tokenGuardado = loginManager.getToken();
 
 
-        binding.btnAgregarIngrediente.setOnClickListener(v -> {
+        /*binding.btnAgregarIngrediente.setOnClickListener(v -> {
             String ingrediente = binding.etIngrediente.getText().toString().trim();
             if (!TextUtils.isEmpty(ingrediente)) {
                 agregarIngrediente(ingrediente);
                 binding.etIngrediente.setText("");
             }
-        });
+        }); */
 
-        LoginManager loginManager = new LoginManager(requireContext());
-        String tokenGuardado = loginManager.getToken();
-
-        binding.spinnerDificultad.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        //Al seleccionar la categoría hace una petición a ingredientes por categoría
+        binding.spinnerCategoria.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
                 String categoria = parentView.getItemAtPosition(position).toString();
-
-                // Manejar la respuesta exitosa, ej. mostrar un mensaje, actualizar UI
                 IngredientesService ingredientesService = ApiClient.getClient(getContext()).create(IngredientesService.class);
-                ingredientesService.obtenerIngredientesPorCategoria(categoria, "Bearer " + tokenGuardado).enqueue(new Callback<IngredientesByCategoriaResponse>() {
+                Call<IngredientesByCategoriaResponse> call = ingredientesService.obtenerIngredientesPorCategoria(categoria, "Bearer " + tokenGuardado);
+                call.enqueue(new Callback<>() {
                     @Override
                     public void onResponse(Call<IngredientesByCategoriaResponse> call, Response<IngredientesByCategoriaResponse> response) {
                         if (response.isSuccessful()) {
+                            assert response.body() != null;
+                            _ingredientes = response.body().getIngredientes();
                             actualizarSpinner(response.body().getIngredientes());
                         } else {
                             Log.e("|||No successful", "Error al obtener ingredientes: " + response.code());
                         }
-
                     }
 
                     @Override
@@ -134,13 +135,30 @@ public class CrearRecetaFragment extends Fragment {
             bundle.putString("tiempo", tiempo);
             bundle.putString("unidad", binding.spinnerUnidadTiempo.getSelectedItem().toString());
             bundle.putString("dificultad", binding.spinnerDificultad.getSelectedItem().toString());
+            bundle.putString("categoria", binding.spinnerCategoria.getSelectedItem().toString());
 
             StringBuilder ingredientes = new StringBuilder();
+            ingredientes.append("[");
             for (int i = 0; i < ingredientesCount; i++) {
                 TextView tv = (TextView) binding.listaIngredientes.getChildAt(i);
-                ingredientes.append(tv.getText().toString()).append(";");
+
+                Ingrediente ingredienteBuscado  = null;
+                for (Ingrediente ingrediente : _ingredientes) {
+                    if (ingrediente.getNombreIngrediente().equals(tv.getText().toString())) {
+                        ingredienteBuscado  = ingrediente;
+                        break; // Si encuentras el ingrediente, puedes salir del bucle
+                    }
+                }
+                ingredientes.append("{\"id\":"+ingredienteBuscado.getIdIngrediente()+",  \"cantidad\":"+  1).append("},");
             }
+            // Elimina la última coma si es necesario
+            if (ingredientes.length() > 1) {
+                ingredientes.deleteCharAt(ingredientes.length() - 1); // Elimina la última coma
+            }
+            ingredientes.append("]");
             bundle.putString("ingredientes", ingredientes.toString());
+
+            //ingredientes.append(tv.getText().toString()).append(";");
 
             if (imagenUriSeleccionada != null) {
                 bundle.putString("imagenUri", imagenUriSeleccionada.toString());
@@ -158,6 +176,8 @@ public class CrearRecetaFragment extends Fragment {
 
     }
 
+
+
     private void actualizarSpinner(List<Ingrediente> _ingredientes) {
         List<String> ingredientes = new ArrayList<>();
 
@@ -165,7 +185,7 @@ public class CrearRecetaFragment extends Fragment {
         for (Ingrediente ingrediente : _ingredientes) {
             ingredientes.add(ingrediente.getNombreIngrediente());
         }
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_spinner_item, ingredientes);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, ingredientes);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         binding.spinnerIngredientes.setAdapter(adapter);
 
@@ -173,7 +193,10 @@ public class CrearRecetaFragment extends Fragment {
         binding.spinnerIngredientes.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                String categoriaSeleccionada = parentView.getItemAtPosition(position).toString();
+                String ingrediente = parentView.getItemAtPosition(position).toString();
+                if (!TextUtils.isEmpty(ingrediente)) {
+                    agregarIngrediente(ingrediente);
+                }
             }
 
             @Override

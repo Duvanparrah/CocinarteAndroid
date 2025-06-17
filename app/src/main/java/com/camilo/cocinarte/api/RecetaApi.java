@@ -24,8 +24,13 @@ public interface RecetaApi {
     @Multipart
     @POST("recetas")
     Call<Receta> createReceta(
-            @Part MultipartBody.Part image,
-            @Part("receta") RequestBody receta,
+            @Part MultipartBody.Part foto,
+            @Part("nombre") RequestBody nombre,
+            @Part("categoria") RequestBody categoria,
+            @Part("ingredientes") RequestBody ingredientes,
+            @Part("preparacion") RequestBody preparacion,
+            @Part("tiempo") RequestBody tiempo,
+            @Part("dificultad") RequestBody dificultad,
             @Header("Authorization") String token
     );
 

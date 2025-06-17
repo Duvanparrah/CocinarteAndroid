@@ -29,6 +29,7 @@ import com.camilo.cocinarte.api.LoginManager;
 import com.camilo.cocinarte.api.RecetaApi;
 import com.camilo.cocinarte.models.Ingrediente;
 import com.camilo.cocinarte.models.Receta;
+import com.camilo.cocinarte.models.RecetaRequest;
 import com.google.gson.Gson;
 
 import java.io.ByteArrayOutputStream;
@@ -46,6 +47,8 @@ import java.util.stream.Collectors;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -100,29 +103,32 @@ public class InstruccionesFragmentReceta extends Fragment {
 
                 String ingredientesString = datos.getString("ingredientes", "");
 
-                List<String> ingredientes = Arrays.asList(ingredientesString.split(";"));
+                //List<String> ingredientes = Arrays.asList(ingredientesString.split(";"));
 
-                Receta receta = new Receta();
-                LoginManager loginManager = new LoginManager(getContext());
+                RecetaRequest receta = new RecetaRequest();
+                LoginManager loginManager = new LoginManager(requireContext());
 
                 receta.setIdUsuario(loginManager.getUsuario().getIdUsuario());
-                receta.setTitulo(datos.getString("nombreReceta"));
+                receta.setNombre(datos.getString("nombreReceta"));
                 receta.setDescripcion("-o-123456789");
                 imagePath = datos.getString("imagenUri");
                 receta.setTiempoPreparacion(datos.getString("tiempo"));
                 receta.setDificultad(datos.getString("dificultad"));
+                receta.setCategoria(datos.getString("categoria"));
                 receta.setCalorias(Integer.parseInt(datos.getString("kcal", "0")));
                 receta.setProteinas(Integer.parseInt(datos.getString("proteinas", "0")));
                 receta.setCarbohidratos(Integer.parseInt(datos.getString("carbohidratos", "0")));
                 receta.setGrasas(Integer.parseInt(datos.getString("grasas", "0")));
-                //receta.setAzucar(Integer azucar);
+                receta.setIngredientes(ingredientesString);
+                receta.setPasos(pasos);
+                receta.setSeccion("comunidad");
+                receta.setFechaCreacion(String.valueOf(new Date()));
 
-
-                ArrayList<Ingrediente> _ingredientes = new ArrayList<Ingrediente>();
+                /*ArrayList<Ingrediente> _ingredientes = new ArrayList<Ingrediente>();
                 ingredientes.forEach(res ->{
                     Ingrediente ingrediente = new Ingrediente();
                     ingrediente.setNombreIngrediente(res);
-                    //ingrediente.setImagen(null);
+                    ingrediente.setImagen(null);
                     ingrediente.setCategoria("Verduras");
                     ingrediente.setCaloriasPor100g(0);
                     ingrediente.setProteinasPor100g(0);
@@ -131,19 +137,8 @@ public class InstruccionesFragmentReceta extends Fragment {
                     ingrediente.setAzucarPor100g(0);
                     ingrediente.setUnidad("gramos");
                     _ingredientes.add(ingrediente);
-                });
-
-                receta.setIngredientes(_ingredientes);
-
-                receta.setPasos(pasos);
-                receta.setSeccion("comunidad");
-                //receta.setIdCategoria(Integer idCategoria);
-                receta.setFechaCreacion(String.valueOf(new Date()));
+                });*/
                 //receta.setFechaEdicion(String.valueOf(new Date()));
-                //receta.setEditado(Boolean editado);
-                //TODO: falta en app azucar, idCategoria, editado
-                //TODO: falta en db ingredientes, pasos, datos.getString("unidad")
-
                 try {
                     guardarReceta(receta);
                 } catch (IOException e) {
@@ -192,57 +187,71 @@ public class InstruccionesFragmentReceta extends Fragment {
         etPaso.setHint(siguientePaso + ". Agrega los pasos de tu receta");
     }
 
-    private void guardarReceta(Receta receta) throws IOException {
+
+    private void guardarReceta(RecetaRequest receta) throws IOException {
         LoginManager loginManager = new LoginManager(requireContext());
         String tokenGuardado = loginManager.getToken();
 
+        // Obtén la imagen y conviértela en archivo
         Uri imageUri = Uri.parse(imagePath);
-
         File file = createTempFileFromUri(imageUri);
         if (file == null) return;
 
-        // Crear RequestBody del archivo
-        RequestBody requestFile = RequestBody.create(
-                MediaType.parse("image/*"),
-                file
-        );
+        // Crear RequestBody para el archivo de la imagen
+        RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), file);
 
-        // Crear MultipartBody.Part con el nombre esperado por el backend: "file"
+        // Crear MultipartBody.Part para la imagen (debe coincidir con lo que espera el backend, "foto")
         MultipartBody.Part imagenPart = MultipartBody.Part.createFormData(
-                "foto",              // este nombre debe coincidir con el que espera tu backend: req.file
+                "foto",              // Nombre del campo para el archivo (backend espera "foto")
                 file.getName(),
                 requestFile
         );
 
-        // Manejar la respuesta exitosa, ej. mostrar un mensaje, actualizar UI
-        RecetaApi recetaApi = ApiClient.getClient(getContext()).create(RecetaApi.class);
-
-        // Convierte el objeto Receta en JSON usando Gson
+        // Convertir el objeto RecetaRequest a JSON
         Gson gson = new Gson();
-        receta.setCategoria("Comida Internacional");
-        receta.setIngredientes(null);
-        receta.setDificultad(receta.getDificultad().toLowerCase());
         String preparacion = receta.getPasos().stream().collect(Collectors.joining("\n"));
-        receta.setPreparacion(preparacion);
+        receta.setPreparacion(preparacion); // Unir los pasos de preparación en una cadena de texto
 
+        // Convertir el objeto receta a JSON
         String recetaJson = gson.toJson(receta);
         RequestBody recetaRequestBody = RequestBody.create(
                 MediaType.parse("application/json"),
                 recetaJson
         );
 
-        Log.d("|||gson receta", recetaJson);
+        // Llamar al API con Retrofit
+        RecetaApi recetaApi = ApiClient.getClient(getContext()).create(RecetaApi.class);
 
-        recetaApi.createReceta(imagenPart, recetaRequestBody, "Bearer " + tokenGuardado).enqueue(new Callback<Receta>() {
+        RequestBody _nombre = RequestBody.create(MediaType.parse("text/plain"), receta.getNombre());
+        RequestBody _categoria = RequestBody.create(MediaType.parse("text/plain"), receta.getCategoria());
+        RequestBody _ingredientes = RequestBody.create(MediaType.parse("text/plain"), receta.getIngredientes());
+        RequestBody _preparacion = RequestBody.create(MediaType.parse("text/plain"), receta.getPreparacion());
+        RequestBody _tiempoPreparacion = RequestBody.create(MediaType.parse("text/plain"), receta.getTiempoPreparacion());
+        RequestBody _dificultad = RequestBody.create(MediaType.parse("text/plain"), receta.getDificultad());
+
+        recetaApi.createReceta(
+                imagenPart,
+                _nombre,
+                _categoria,
+                _ingredientes,
+                _preparacion,
+                _tiempoPreparacion,
+                _dificultad,
+                "Bearer " + tokenGuardado).enqueue(new Callback<>() {
             @Override
             public void onResponse(Call<Receta> call, Response<Receta> response) {
                 if (response.isSuccessful()) {
                     Toast.makeText(getContext(), "Receta publicada correctamente", Toast.LENGTH_SHORT).show();
                     Navigation.findNavController(requireView()).navigate(R.id.action_instruccionesFragmentReceta_to_navegar_comunidad_mis_recetas);
                 } else {
-                    Log.e("|||No successful", "Error creear receta: " + response.code());
+                    try {
+                        String errorResponse = response.errorBody() != null ? response.errorBody().string() : "No se pudo leer el cuerpo del error";
+                        Log.e("|||No successful", "Error al crear receta: " + response.code());
+                        Log.d("|||Error Response", "Respuesta del servidor: " + errorResponse);
+                    } catch (IOException e) {
+                        Log.e("|||IOException", "Error al leer el cuerpo del error", e);
+                    }
                 }
-
             }
 
             @Override
@@ -252,10 +261,11 @@ public class InstruccionesFragmentReceta extends Fragment {
         });
     }
 
+
     private File createTempFileFromUri(Uri uri) {
         try {
             InputStream inputStream = getContext().getContentResolver().openInputStream(uri);
-            String fileName = "imagen_perfil_" + System.currentTimeMillis() + ".jpg";
+            String fileName = "imagen_" + System.currentTimeMillis() + ".jpg";
 
             File tempFile = new File(getContext().getCacheDir(), fileName);
             OutputStream outputStream = new FileOutputStream(tempFile);
