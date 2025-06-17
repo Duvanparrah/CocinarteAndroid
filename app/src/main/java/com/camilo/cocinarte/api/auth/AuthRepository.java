@@ -28,7 +28,6 @@ public class AuthRepository {
         this.application = application;
         this.authService = com.camilo.cocinarte.api.auth.AuthApiClient.getClient(application).create(AuthService.class);
         this.sessionManager = SessionManager.getInstance(application);
-
     }
 
     public static synchronized AuthRepository getInstance(Application application) {
@@ -60,9 +59,9 @@ public class AuthRepository {
                 if (response.isSuccessful() && response.body() != null) {
                     LoginResponse loginResponse = response.body();
 
-                    // Guardar datos de sesión
+                    // Guardar datos de sesión con información completa del usuario
                     if (loginResponse.getToken() != null) {
-                        sessionManager.saveUserSession(email, password, loginResponse.getToken());
+                        saveUserSessionData(loginResponse, email, password);
                         result.setValue(Resource.success(loginResponse));
                     } else {
                         result.setValue(Resource.error("No se recibió token de autenticación", null));
@@ -81,6 +80,77 @@ public class AuthRepository {
         });
 
         return result;
+    }
+
+    /**
+     * Guarda los datos del usuario después del login exitoso
+     */
+    private void saveUserSessionData(LoginResponse loginResponse, String email, String password) {
+        try {
+            // Verificar si la respuesta incluye datos del usuario
+            if (loginResponse.getUser() != null) {
+                LoginResponse.UserData userData = loginResponse.getUser();
+
+                // Guardar sesión completa con todos los datos del usuario
+                sessionManager.saveCompleteUserSession(
+                        email,
+                        password,
+                        loginResponse.getToken(),
+                        String.valueOf(userData.getId()),
+                        userData.getNombre(),
+                        userData.getFoto(),
+                        userData.getTipo_usuario(),
+                        userData.isVerified()
+                );
+
+                android.util.Log.d(TAG, "Datos completos del usuario guardados: " + userData.getNombre());
+                android.util.Log.d(TAG, "Foto del usuario: " + userData.getFoto());
+
+            } else {
+                // Si no hay datos del usuario en la respuesta, guardar sesión básica
+                sessionManager.saveUserSession(email, password, loginResponse.getToken());
+                android.util.Log.w(TAG, "Solo se guardó sesión básica, falta información del usuario");
+
+                // Opcionalmente, hacer una llamada adicional para obtener datos del usuario
+                fetchUserProfile();
+            }
+
+        } catch (Exception e) {
+            android.util.Log.e(TAG, "Error al guardar datos de sesión: " + e.getMessage());
+            // En caso de error, al menos guardar la sesión básica
+            sessionManager.saveUserSession(email, password, loginResponse.getToken());
+        }
+    }
+
+    /**
+     * Obtiene los datos del perfil del usuario (llamada adicional si es necesario)
+     */
+    private void fetchUserProfile() {
+        // Implementar solo si tu API tiene un endpoint separado para obtener el perfil
+        // Por ejemplo: GET /api/user/profile
+        /*
+        authService.getUserProfile().enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    User user = response.body();
+                    sessionManager.saveUserInfo(
+                        String.valueOf(user.getId_usuario()),
+                        user.getNombre_usuario(),
+                        user.getFoto_perfil(),
+                        user.getTipo_usuario(),
+                        user.isVerified()
+                    );
+                    android.util.Log.d(TAG, "Perfil del usuario obtenido: " + user.getNombre_usuario());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                android.util.Log.e(TAG, "Error al obtener perfil del usuario: " + t.getMessage());
+            }
+        });
+        */
     }
 
     /**
@@ -107,7 +177,7 @@ public class AuthRepository {
                     // Guardar datos después del registro exitoso
                     sessionManager.saveUser(email, password);
                     if (registerResponse.getToken() != null) {
-                        sessionManager.saveAuthToken(registerResponse.getToken()); // Método correcto
+                        sessionManager.saveAuthToken(registerResponse.getToken());
                     }
 
                     result.setValue(Resource.success(registerResponse));
@@ -263,9 +333,15 @@ public class AuthRepository {
      * Obtener el token actual
      */
     public String getCurrentToken() {
-        return sessionManager.getAuthToken(); // Método existente
+        return sessionManager.getAuthToken();
     }
 
+    /**
+     * Obtener datos del usuario actual
+     */
+    public SessionManager.SessionData getCurrentUserData() {
+        return sessionManager.getSessionData();
+    }
 
     /**
      * Parser de errores de respuesta HTTP

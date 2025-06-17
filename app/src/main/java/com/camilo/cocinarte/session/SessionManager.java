@@ -26,6 +26,11 @@ public class SessionManager {
     private static final String KEY_USER_ID = "user_id";
     private static final String KEY_USER_NAME = "user_name";
 
+    // Nuevas keys para información adicional del usuario
+    private static final String KEY_USER_PHOTO = "user_photo";
+    private static final String KEY_USER_TYPE = "user_type";
+    private static final String KEY_IS_VERIFIED = "is_verified";
+
     private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
     private Context context;
@@ -73,11 +78,30 @@ public class SessionManager {
     }
 
     /**
+     * Guarda la sesión completa del usuario con toda la información
+     */
+    public void saveCompleteUserSession(String email, String password, String token,
+                                        String userId, String userName, String userPhoto,
+                                        String userType, boolean isVerified) {
+        editor.putString(KEY_EMAIL, email);
+        editor.putString(KEY_PASSWORD, encodePassword(password));
+        editor.putString(KEY_AUTH_TOKEN, token);
+        editor.putString(KEY_USER_ID, userId);
+        editor.putString(KEY_USER_NAME, userName);
+        editor.putString(KEY_USER_PHOTO, userPhoto);
+        editor.putString(KEY_USER_TYPE, userType);
+        editor.putBoolean(KEY_IS_VERIFIED, isVerified);
+        editor.putBoolean(KEY_IS_LOGGED_IN, true);
+        editor.putLong(KEY_SESSION_TIMESTAMP, System.currentTimeMillis());
+        editor.apply();
+    }
+
+    /**
      * Guarda la sesión completa del usuario
      */
     public void saveUserSession(String email, String password, String token) {
         editor.putString(KEY_EMAIL, email);
-        editor.putString(KEY_PASSWORD, encodePassword(password)); // Codificar contraseña
+        editor.putString(KEY_PASSWORD, encodePassword(password));
         editor.putString(KEY_AUTH_TOKEN, token);
         editor.putBoolean(KEY_IS_LOGGED_IN, true);
         editor.putLong(KEY_SESSION_TIMESTAMP, System.currentTimeMillis());
@@ -94,30 +118,23 @@ public class SessionManager {
     }
 
     /**
-     * Guarda solo email y contraseña (para registro)
+     * Guarda información completa del usuario
      */
-    public void saveUser(String email, String password) {
-        editor.putString(KEY_EMAIL, email);
-        editor.putString(KEY_PASSWORD, encodePassword(password));
+    public void saveUserInfo(String userId, String userName, String userPhoto, String userType, boolean isVerified) {
+        editor.putString(KEY_USER_ID, userId);
+        editor.putString(KEY_USER_NAME, userName);
+        editor.putString(KEY_USER_PHOTO, userPhoto);
+        editor.putString(KEY_USER_TYPE, userType);
+        editor.putBoolean(KEY_IS_VERIFIED, isVerified);
         editor.apply();
     }
 
     /**
-     * Guarda el token de autenticación
+     * Actualiza solo la foto de perfil
      */
-    public void saveAuthToken(String token) {
-        editor.putString(KEY_AUTH_TOKEN, token);
-        editor.putLong(KEY_SESSION_TIMESTAMP, System.currentTimeMillis());
-        editor.apply();
-    }
 
-    /**
-     * Guarda el refresh token
-     */
-    public void saveRefreshToken(String refreshToken) {
-        editor.putString(KEY_REFRESH_TOKEN, refreshToken);
-        editor.apply();
-    }
+
+    // ... métodos existentes ...
 
     /**
      * Obtiene el token de autenticación
@@ -163,6 +180,27 @@ public class SessionManager {
     }
 
     /**
+     * Obtiene la foto de perfil del usuario
+     */
+    public String getUserPhoto() {
+        return prefs.getString(KEY_USER_PHOTO, null);
+    }
+
+    /**
+     * Obtiene el tipo de usuario
+     */
+    public String getUserType() {
+        return prefs.getString(KEY_USER_TYPE, "usuario");
+    }
+
+    /**
+     * Verifica si el usuario está verificado
+     */
+    public boolean isUserVerified() {
+        return prefs.getBoolean(KEY_IS_VERIFIED, false);
+    }
+
+    /**
      * Verifica si el usuario está logueado
      */
     public boolean isLoggedIn() {
@@ -199,6 +237,23 @@ public class SessionManager {
      */
     public void updateToken(String newToken) {
         saveAuthToken(newToken);
+    }
+
+    /**
+     * Guarda el token de autenticación
+     */
+    public void saveAuthToken(String token) {
+        editor.putString(KEY_AUTH_TOKEN, token);
+        editor.putLong(KEY_SESSION_TIMESTAMP, System.currentTimeMillis());
+        editor.apply();
+    }
+
+    /**
+     * Guarda el refresh token
+     */
+    public void saveRefreshToken(String refreshToken) {
+        editor.putString(KEY_REFRESH_TOKEN, refreshToken);
+        editor.apply();
     }
 
     /**
@@ -245,6 +300,9 @@ public class SessionManager {
                 getRefreshToken(),
                 getUserId(),
                 getUserName(),
+                getUserPhoto(),
+                getUserType(),
+                isUserVerified(),
                 isLoggedIn(),
                 !isSessionExpired()
         );
@@ -266,7 +324,14 @@ public class SessionManager {
         return new String(Base64.decode(encoded, Base64.NO_WRAP));
     }
 
-//    añadidos para traer informaciondel llogin al panel:
+    /**
+     * Guarda solo email y contraseña (para registro)
+     */
+    public void saveUser(String email, String password) {
+        editor.putString(KEY_EMAIL, email);
+        editor.putString(KEY_PASSWORD, encodePassword(password));
+        editor.apply();
+    }
 
     /**
      * Clase para encapsular los datos de sesión
@@ -278,19 +343,52 @@ public class SessionManager {
         public final String refreshToken;
         public final String userId;
         public final String userName;
+        public final String userPhoto;
+        public final String userType;
+        public final boolean isVerified;
         public final boolean isLoggedIn;
         public final boolean isSessionValid;
 
         public SessionData(String email, String password, String token, String refreshToken,
-                           String userId, String userName, boolean isLoggedIn, boolean isSessionValid) {
+                           String userId, String userName, String userPhoto, String userType,
+                           boolean isVerified, boolean isLoggedIn, boolean isSessionValid) {
             this.email = email;
             this.password = password;
             this.token = token;
             this.refreshToken = refreshToken;
             this.userId = userId;
             this.userName = userName;
+            this.userPhoto = userPhoto;
+            this.userType = userType;
+            this.isVerified = isVerified;
             this.isLoggedIn = isLoggedIn;
             this.isSessionValid = isSessionValid;
         }
     }
+
+    /**
+     * Actualiza solo el nombre del usuario
+     */
+    public void updateUserName(String newName) {
+        editor.putString(KEY_USER_NAME, newName);
+        editor.apply();
+        android.util.Log.d(TAG, "Nombre actualizado: " + newName);
+    }
+
+    public void updateUserPhoto(String newPhotoUrl) {
+        editor.putString(KEY_USER_PHOTO, newPhotoUrl);
+        editor.apply();
+        android.util.Log.d(TAG, "Foto actualizada: " + newPhotoUrl);
+    }
+
+    public void updateUserInfo(String userId, String userName, String userPhoto, String userType, boolean isVerified) {
+        editor.putString(KEY_USER_ID, userId);
+        editor.putString(KEY_USER_NAME, userName);
+        editor.putString(KEY_USER_PHOTO, userPhoto);
+        editor.putString(KEY_USER_TYPE, userType);
+        editor.putBoolean(KEY_IS_VERIFIED, isVerified);
+        editor.apply();
+        android.util.Log.d(TAG, "Información del usuario actualizada completamente");
+    }
+
 }

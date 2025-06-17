@@ -77,5 +77,8 @@ dependencies {
     //authentication
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
+//    cargar imagenes perfil
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
 
 }

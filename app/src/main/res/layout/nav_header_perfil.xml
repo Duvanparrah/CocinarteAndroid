@@ -9,21 +9,41 @@
     android:padding="16dp"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <!-- Foto de perfil circular -->
-    <androidx.cardview.widget.CardView
+    <!-- Contenedor de la foto de perfil -->
+    <FrameLayout
         android:layout_width="80dp"
-        android:layout_height="80dp"
-        app:cardCornerRadius="40dp"
-        app:cardElevation="4dp">
+        android:layout_height="80dp">
 
-        <ImageView
-            android:id="@+id/imageViewProfile"
+        <!-- Foto de perfil circular -->
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scaleType="centerCrop"
-            android:src="@drawable/perfil_chef" />
+            app:cardCornerRadius="40dp"
+            app:cardElevation="4dp">
 
-    </androidx.cardview.widget.CardView>
+            <ImageView
+                android:id="@+id/imageViewProfile"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="centerCrop"
+                android:src="@drawable/perfil_chef" />
+
+        </androidx.cardview.widget.CardView>
+
+        <!-- TextView para mostrar iniciales cuando no hay foto -->
+        <TextView
+            android:id="@+id/textViewInitials"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/circle_background"
+            android:gravity="center"
+            android:text="UN"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
+
+    </FrameLayout>
 
     <!-- Nombre de usuario -->
     <TextView
@@ -31,7 +51,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:text="CristianO15"
+        android:text="Cargando..."
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         android:textColor="@android:color/white"
         android:textSize="16sp"
@@ -42,7 +62,7 @@
         android:id="@+id/textViewUserEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="cristianc17@gmail.com"
+        android:text="cargando@email.com"
         android:textColor="@android:color/white"
         android:textSize="14sp" />
 

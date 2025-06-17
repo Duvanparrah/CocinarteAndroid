@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -15,19 +13,23 @@ import androidx.lifecycle.ViewModelProvider;
 import com.camilo.cocinarte.MainActivity;
 import com.camilo.cocinarte.R;
 import com.camilo.cocinarte.databinding.ActivityInicioSesionBinding;
+import com.camilo.cocinarte.models.LoginResponse;
+import com.camilo.cocinarte.session.SessionManager;
 import com.camilo.cocinarte.utils.Resource;
 import com.camilo.cocinarte.viewmodels.AuthViewModel;
-import com.google.android.material.textfield.TextInputEditText;
-import com.google.android.material.textfield.TextInputLayout;
 
 public class InicioSesionActivity extends AppCompatActivity {
 
     private ActivityInicioSesionBinding binding;
     private AuthViewModel authViewModel;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Inicializar SessionManager
+        sessionManager = SessionManager.getInstance(this);
 
         // Inicializar ViewModel
         authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
@@ -141,10 +143,7 @@ public class InicioSesionActivity extends AppCompatActivity {
                 case SUCCESS:
                     showLoading(false);
                     if (resource.data != null) {
-                        String message = resource.data.getMessage() != null ?
-                                resource.data.getMessage() : "Bienvenido";
-                        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-                        navigateToMain();
+                        handleLoginSuccess(resource.data, email, password);
                     }
                     break;
 
@@ -156,6 +155,49 @@ public class InicioSesionActivity extends AppCompatActivity {
                     break;
             }
         });
+    }
+
+    /**
+     * Maneja el login exitoso guardando todos los datos del usuario
+     */
+    private void handleLoginSuccess(LoginResponse loginResponse, String email, String password) {
+        try {
+            // Verificar si la respuesta incluye datos del usuario
+            if (loginResponse.getUser() != null) {
+                LoginResponse.UserData userData = loginResponse.getUser();
+
+                // Guardar sesión completa con todos los datos del usuario
+                sessionManager.saveCompleteUserSession(
+                        email,
+                        password,
+                        loginResponse.getToken(),
+                        String.valueOf(userData.getId()),
+                        userData.getNombre(),
+                        userData.getFoto(),
+                        userData.getTipo_usuario(),
+                        userData.isVerified()
+                );
+
+                android.util.Log.d("Login", "Datos del usuario guardados: " + userData.getNombre());
+
+            } else {
+                // Si solo hay token, guardar sesión básica
+                sessionManager.saveUserSession(email, password, loginResponse.getToken());
+                android.util.Log.d("Login", "Sesión básica guardada, falta información del usuario");
+            }
+
+            // Mostrar mensaje de bienvenida
+            String welcomeMessage = loginResponse.getMessage() != null ?
+                    loginResponse.getMessage() : "¡Bienvenido!";
+            Toast.makeText(this, welcomeMessage, Toast.LENGTH_SHORT).show();
+
+            // Navegar a MainActivity
+            navigateToMain();
+
+        } catch (Exception e) {
+            android.util.Log.e("Login", "Error al guardar sesión: " + e.getMessage());
+            Toast.makeText(this, "Error al guardar sesión", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void showLoading(boolean show) {
