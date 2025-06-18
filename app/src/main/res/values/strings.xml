@@ -176,7 +176,7 @@
     <string name="desc_muy_activo">Actividad física de 5 a 6 días por semana.</string>
 
     <string name="nivel_actividad">Nivel de actividad</string>
-
+    <string name="title_activity_mis_recetas">MisRecetasActivity</string>
 
 
 </resources>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- Encabezado con botón atrás y título -->
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical">
+
+        <ImageButton
+            android:id="@+id/btnBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:src="@android:drawable/ic_menu_revert"
+            android:contentDescription="Atrás" />
+
+        <TextView
+            android:id="@+id/tvTitulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Soporte"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+
+    <!-- Subtítulo -->
+    <TextView
+        android:id="@+id/tvPreguntasFrecuentes"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Preguntas Frecuentes"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"/>
+
+    <!-- Lista Expandible -->
+    <ExpandableListView
+        android:id="@+id/expandableListView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:dividerHeight="2dp"
+        android:layout_marginTop="8dp"/>
+</LinearLayout>

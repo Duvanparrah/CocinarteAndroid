@@ -1,5 +1,6 @@
 package com.camilo.cocinarte;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ImageButton;
 
@@ -24,32 +25,43 @@ public class NavigationActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(menuItem -> {
             int id = menuItem.getItemId();
 
+            Intent intent = null;
             if (id == R.id.nav_favorites) {
                 // Acción para Favoritos
+                //intent = new Intent(this, Favoritos.class);
             } else if (id == R.id.nav_recipes) {
                 // Acción para Mis Recetas
+                //intent = new Intent(this, M.class);
             } else if (id == R.id.nav_notifications) {
                 // Acción para Notificaciones
+                //intent = new Intent(this, NotificacionesActivity.class);
             } else if (id == R.id.nav_account) {
                 // Acción para Cuenta y configuración
+                //intent = new Intent(this, NotificacionesActivity.class);
             } else if (id == R.id.nav_support) {
                 // Acción para Soporte
+                //intent = new Intent(this, NotificacionesActivity.class);
             } else if (id == R.id.nav_sign_out) {
                 // Acción para Cerrar sesión
+                //intent = new Intent(this, NotificacionesActivity.class);
+            }
+            if(intent != null){
+                startActivity(intent);
+                finish();
             }
 
             drawerLayout.closeDrawer(GravityCompat.START);
             return true;
         });
 
-        ImageButton menuButton = findViewById(R.id.menu_button);
+        /*ImageButton menuButton = findViewById(R.id.menu_button);
         menuButton.setOnClickListener(v -> {
             if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
                 drawerLayout.closeDrawer(GravityCompat.START);
             } else {
                 drawerLayout.openDrawer(GravityCompat.START);
             }
-        });
+        });*/
     }
 
     @Override

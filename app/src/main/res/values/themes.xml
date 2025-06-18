@@ -24,6 +24,7 @@
 
     <!-- Estilos de overlays opcionales -->
     <style name="Theme.Cocinarte.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
     <style name="Theme.Cocinarte.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
     <!-- Estilo personalizado para campos de texto -->

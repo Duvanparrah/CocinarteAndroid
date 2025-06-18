@@ -2,6 +2,7 @@ package com.camilo.cocinarte.utils;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 
 import java.io.InputStream;
@@ -46,7 +47,10 @@ public class CloudinaryUploader {
                     return;
                 }
 
-                byte[] imageBytes = inputStream.readAllBytes();
+                byte[] imageBytes = null;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    imageBytes = inputStream.readAllBytes();
+                }
                 inputStream.close();
 
                 // Crear request body para Cloudinary

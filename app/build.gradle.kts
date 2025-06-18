@@ -37,6 +37,7 @@ android {
 
     buildFeatures {
         viewBinding = true
+        compose = true
     }
 }
 
@@ -68,6 +69,13 @@ dependencies {
 
     // Firebase (usa BOM)
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+    implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.activity.compose)
+    implementation(platform(libs.compose.bom))
+    implementation(libs.ui)
+    implementation(libs.ui.graphics)
+    implementation(libs.ui.tooling.preview)
+    implementation(libs.material3)
 
     // Testing
     testImplementation(libs.junit)
@@ -79,6 +87,10 @@ dependencies {
 
 //    cargar imagenes perfil
     implementation ("com.github.bumptech.glide:glide:4.16.0")
+    androidTestImplementation(platform(libs.compose.bom))
+    androidTestImplementation(libs.ui.test.junit4)
     annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
+    debugImplementation(libs.ui.tooling)
+    debugImplementation(libs.ui.test.manifest)
 
 }

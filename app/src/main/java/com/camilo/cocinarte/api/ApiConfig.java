@@ -6,10 +6,13 @@ import com.camilo.cocinarte.api.auth.AuthCookieJar;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
+
 
 public class ApiConfig {
 
+    private static final String BASE_URL = "https://cocinarte-production.up.railway.app/api/";
     private static Retrofit retrofit = null;
 
     public static Retrofit getClient(Context context) {
@@ -19,9 +22,10 @@ public class ApiConfig {
                     .build();
 
             retrofit = new Retrofit.Builder()
-                    .baseUrl("http://TU_BACKEND_URL/") // Reemplaza con tu URL real
+                    .baseUrl(BASE_URL)
                     .client(client)
-                    .addConverterFactory(ScalarsConverterFactory.create())
+                    .addConverterFactory(ScalarsConverterFactory.create()) // Para strings simples
+                    .addConverterFactory(GsonConverterFactory.create())    // Para objetos como ResetPasswordRequest
                     .build();
         }
         return retrofit;

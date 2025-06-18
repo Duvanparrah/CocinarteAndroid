@@ -25,13 +25,35 @@ import com.bumptech.glide.load.resource.bitmap.CircleCrop;
 import com.bumptech.glide.request.RequestOptions;
 import com.camilo.cocinarte.MainActivity;
 import com.camilo.cocinarte.R;
+import com.camilo.cocinarte.api.ApiConfig;
+import com.camilo.cocinarte.api.auth.AuthService;
+import com.camilo.cocinarte.api.auth.UsuarioService;
 import com.camilo.cocinarte.databinding.ActivityCuentaConfiguracionBinding;
+import com.camilo.cocinarte.models.ApiResponse;
+import com.camilo.cocinarte.models.LoginResponse;
+import com.camilo.cocinarte.models.ProfileImageResponse;
+import com.camilo.cocinarte.models.ResetPasswordRequest;
+import com.camilo.cocinarte.models.Usuario;
+import com.camilo.cocinarte.models.UsuarioUpdateRequest;
 import com.camilo.cocinarte.session.SessionManager;
 import com.camilo.cocinarte.utils.CloudinaryUploader;
 import com.camilo.cocinarte.utils.NavigationHeaderHelper;
+import com.camilo.cocinarte.utils.Resource;
 import com.camilo.cocinarte.utils.ValidationUtils;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Objects;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class CuentaConfiguracionActivity extends AppCompatActivity {
 
@@ -78,7 +100,7 @@ public class CuentaConfiguracionActivity extends AppCompatActivity {
         // Listeners para botones
         binding.imageViewEditPhoto.setOnClickListener(v -> showImageSelectionDialog());
         binding.buttonSaveChanges.setOnClickListener(v -> saveChanges());
-        binding.buttonChangePassword.setOnClickListener(v -> changePassword());
+        binding.buttonChangePass.setOnClickListener(v -> changePassword());
 
         // Listener para toolbar back button
         binding.toolbar.setNavigationOnClickListener(v -> finish());
@@ -276,10 +298,55 @@ public class CuentaConfiguracionActivity extends AppCompatActivity {
 
         // Si hay imagen nueva, subirla primero
         if (isImageChanged && selectedImageUri != null) {
-            uploadImageAndSaveChanges(newName);
+            //TODO: OBSOLETO? uploadImageAndSaveChanges(newName);
+
+            AuthService authService = ApiConfig.getClient(getApplicationContext()).create(AuthService.class);
+            String token = "Bearer " + sessionManager.getAuthToken();
+
+            Uri imageUri = selectedImageUri;
+            File file = createTempFileFromUri(imageUri);
+            if (file == null) return;
+
+            // Crear RequestBody para el archivo de la imagen
+            RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), file);
+
+            // Crear MultipartBody.Part para la imagen (debe coincidir con lo que espera el backend, "foto")
+            MultipartBody.Part imagenPart = MultipartBody.Part.createFormData(
+                    "profileImage",              // Nombre del campo para el archivo (backend espera "foto")
+                    file.getName(),
+                    requestFile
+            );
+
+
+            authService.updateProfileImage(imagenPart, token).enqueue(new Callback<>() {
+                @Override
+                public void onResponse(Call<ProfileImageResponse> call, Response<ProfileImageResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        Log.d(TAG, "Imagen subida exitosamente: " + response.body().getProfileImageUrl());
+                        saveUserChanges(newName, response.body().getProfileImageUrl());
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Error al actualizar el usuario", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                @Override
+                public void onFailure(Call<ProfileImageResponse> call, Throwable t) {
+                    t.printStackTrace();
+                }
+            });
+
+
+
+
         } else {
             // Solo actualizar nombre
-            saveUserChanges(newName, currentPhotoUrl);
+            Log.d("|||actulizar nombre", newName+" ----   "+sessionManager.getUserName());
+
+            if(newName.equals(sessionManager.getUserName())){
+                Toast.makeText(CuentaConfiguracionActivity.this, "Sin cambios", Toast.LENGTH_LONG).show();
+                showLoading(false);
+            }else{
+                saveUserChanges(newName, currentPhotoUrl);
+            }
         }
     }
 
@@ -303,23 +370,50 @@ public class CuentaConfiguracionActivity extends AppCompatActivity {
 
     private void saveUserChanges(String newName, String photoUrl) {
         try {
-            // Actualizar SessionManager
-            sessionManager.updateUserName(newName);
-            if (photoUrl != null) {
-                sessionManager.updateUserPhoto(photoUrl);
-            }
+            UsuarioService usuarioService = ApiConfig.getClient(getApplicationContext()).create(UsuarioService.class);
+            String token = "Bearer " + sessionManager.getAuthToken();
+            UsuarioUpdateRequest usuarioRequest = new UsuarioUpdateRequest(
+                    sessionManager.getEmail(),
+                    newName,
+                    "usuario", // o "admin"
+                    true,
+                    photoUrl
+            );
 
-            // Aquí puedes hacer llamada a API para actualizar en el servidor
-            // updateUserProfileOnServer(newName, photoUrl);
+            usuarioService.actualizarUsuario(sessionManager.getUserId(), usuarioRequest, token).enqueue(new Callback<>() {
+                @Override
+                public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        //Usuario loginResponse = response.body();
 
-            showLoading(false);
-            Toast.makeText(this, "Cambios guardados exitosamente", Toast.LENGTH_SHORT).show();
+                        // Actualizar SessionManager
+                        sessionManager.updateUserName(newName);
+                        if (photoUrl != null) {
+                            sessionManager.updateUserPhoto(photoUrl);
+                        }
 
-            // Regresar a MainActivity y actualizar header
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.putExtra("refresh_user_info", true);
-            startActivity(intent);
-            finish();
+                        // Aquí puedes hacer llamada a API para actualizar en el servidor
+                        // updateUserProfileOnServer(newName, photoUrl);
+
+                        showLoading(false);
+                        Toast.makeText(getApplicationContext(), "Cambios guardados exitosamente", Toast.LENGTH_SHORT).show();
+
+                        // Regresar a MainActivity y actualizar header
+                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                        intent.putExtra("refresh_user_info", true);
+                        startActivity(intent);
+                        finish();
+
+                        Toast.makeText(getApplicationContext(), "Usuario actualizada", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Error al actualizar el usuario", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                @Override
+                public void onFailure(Call<ApiResponse> call, Throwable t) {
+                    t.printStackTrace();
+                }
+            });
 
         } catch (Exception e) {
             Log.e(TAG, "Error al guardar cambios: " + e.getMessage());
@@ -329,9 +423,24 @@ public class CuentaConfiguracionActivity extends AppCompatActivity {
     }
 
     private void changePassword() {
-        // Navegar a pantalla de cambio de contraseña
-        Intent intent = new Intent(this, cambio_contrasenaActivity.class);
-        startActivity(intent);
+        String newPassword = Objects.requireNonNull(binding.eTChangePassword.getText()).toString();
+        AuthService authService = ApiConfig.getClient(getApplicationContext()).create(AuthService.class);
+        ResetPasswordRequest request = new ResetPasswordRequest(sessionManager.getEmail(), newPassword);
+        authService.resetPassword(request).enqueue(new Callback<>() {
+            @Override
+            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    ApiResponse loginResponse = response.body();
+                    Toast.makeText(getApplicationContext(), "Contraseña actualizada", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Error al actualizar la contraseña", Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onFailure(Call<ApiResponse> call, Throwable t) {
+                t.printStackTrace();
+            }
+        });
     }
 
     private void showLoading(boolean show) {
@@ -360,5 +469,30 @@ public class CuentaConfiguracionActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         binding = null;
+    }
+
+
+    private File createTempFileFromUri(Uri uri) {
+        try {
+            InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(uri);
+            String fileName = "imagen_" + System.currentTimeMillis() + ".jpg";
+
+            File tempFile = new File(getApplicationContext().getCacheDir(), fileName);
+            OutputStream outputStream = new FileOutputStream(tempFile);
+
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
+            }
+
+            outputStream.close();
+            inputStream.close();
+
+            return tempFile;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }

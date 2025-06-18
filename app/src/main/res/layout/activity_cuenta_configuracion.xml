@@ -86,8 +86,7 @@
                         android:layout_width="32dp"
                         android:layout_height="32dp"
                         android:layout_gravity="bottom|end"
-                        android:background="@drawable/circle_background"
-                        android:src="@drawable/ic_edit"
+                        android:background="@drawable/ic_upload"
                         android:padding="6dp"
                         android:elevation="2dp"
                         android:clickable="true"
@@ -176,13 +175,31 @@
                 android:layout_marginBottom="16dp" />
 
             <!-- Botón para cambiar contraseña -->
-            <Button
-                android:id="@+id/buttonChangePassword"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/containerChangePassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Cambiar contraseña"
-                android:textColor="@color/black"
-                android:background="@drawable/edit_text"
+                android:layout_marginBottom="16dp"
+                app:boxStrokeColor="@color/text_input_box_stroke"
+                app:hintTextColor="@color/blanco"
+                android:hint="Cambiar contraseña">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/eTChangePassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:maxLines="1" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Button
+                android:id="@+id/buttonChangePass"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Guardar cambios"
+                android:textColor="@color/white"
+                android:background="@drawable/botonverde"
                 android:layout_marginBottom="16dp"
                 android:padding="12dp" />
 
