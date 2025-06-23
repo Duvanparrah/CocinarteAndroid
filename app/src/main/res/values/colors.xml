@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Colores base de Android -->
+    <color name="purple_200">#BB86FC</color>
+    <color name="purple_500">#6200EE</color>
+    <color name="purple_700">#3700B3</color>
+    <color name="teal_200">#03DAC5</color>
+    <color name="teal_700">#018786</color>
+    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>
+
+    <!-- Colores personalizados -->
+    <color name="verde">#2E865E</color>
+    <color name="verde_oscuro">#1B5E20</color>
+    <color name="verde_claro">#66BB6A</color>
+    <color name="negro">#000000</color>
+    <color name="blanco">#FFFFFFFF</color>
+    <color name="beige">#F5F5DC</color>
+    <color name="gris">#666666</color>
+</resources>
