@@ -23,7 +23,9 @@
             android:background="@null"
             android:contentDescription="Atrás"
             android:src="@android:drawable/ic_menu_revert"
-            tools:ignore="TouchTargetSizeCheck" />
+            tools:ignore="TouchTargetSizeCheck"
+            android:padding="8dp"
+            />
 
         <TextView
             android:layout_width="wrap_content"

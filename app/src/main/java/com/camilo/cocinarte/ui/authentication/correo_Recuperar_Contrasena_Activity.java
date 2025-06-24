@@ -92,8 +92,7 @@ public class correo_Recuperar_Contrasena_Activity extends AppCompatActivity {
                             Toast.LENGTH_LONG).show();
 
                     // Redirigir a la pantalla de verificación de código
-                    Intent intent = new Intent(correo_Recuperar_Contrasena_Activity.this,
-                            codigo_recuperacionActivity.class);
+                    Intent intent = new Intent(correo_Recuperar_Contrasena_Activity.this, codigo_recuperacionActivity.class);
                     intent.putExtra("EMAIL", email);
                     startActivity(intent);
                     finish(); // Opcional: cierra esta actividad para que no vuelva al presionar "Atrás"

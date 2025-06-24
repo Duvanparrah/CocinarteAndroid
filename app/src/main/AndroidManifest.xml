@@ -50,13 +50,17 @@
         </activity>
 
         <!-- Otras actividades -->
-        <activity android:name=".NavigationActivity" android:exported="false" />
         <activity android:name=".ui.authentication.CuentaConfiguracionActivity" android:exported="false" />
         <activity android:name=".NotificacionesActivity" android:exported="false" />
         <activity android:name=".SoporteActivity" android:exported="false" />
         <activity android:name=".ui.authentication.RegistroActivity" android:exported="false" />
         <activity android:name=".ui.authentication.cambio_contrasenaActivity" android:exported="false" />
         <activity android:name=".ui.authentication.correo_Recuperar_Contrasena_Activity" android:exported="false" />
+        <activity android:name=".ui.authentication.codigo_recuperacionActivity" android:exported="false" />
+
+        <activity android:name=".ui.nutricion.comprobante_pago_nequiActivity" android:exported="false" />
+        <activity android:name=".ui.nutricion.Metodo_de_pago_Activity" android:exported="false" />
+        <activity android:name=".ui.nutricion.Tarjeta_creditoActivity" android:exported="false" />
 
         <!-- Formularios nutricionales -->
         <activity android:name=".ui.nutricion.formulario_plan_nutricional" android:exported="false" />

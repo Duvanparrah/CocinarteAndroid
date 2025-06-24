@@ -36,9 +36,7 @@ public class SoporteActivity extends AppCompatActivity {
 
         // Acción al presionar el botón de retroceso personalizado
         btnBack.setOnClickListener(v -> {
-            Intent intent = new Intent(SoporteActivity.this, MainActivity.class);
-            startActivity(intent);
-            finish();
+            getOnBackPressedDispatcher().onBackPressed();
         });
 
         // Inicializamos títulos y respuestas
@@ -97,14 +95,5 @@ public class SoporteActivity extends AppCompatActivity {
             data.add(children);
         }
         return data;
-    }
-
-    // Opción adicional: botón físico de "atrás" también te regresa
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Intent intent = new Intent(SoporteActivity.this, MainActivity.class);
-        startActivity(intent);
-        finish();
     }
 }

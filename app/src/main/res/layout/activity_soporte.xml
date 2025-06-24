@@ -19,7 +19,9 @@
             android:layout_height="wrap_content"
             android:background="@null"
             android:src="@android:drawable/ic_menu_revert"
-            android:contentDescription="Atrás" />
+            android:contentDescription="Atrás"
+            android:padding="8dp"
+            />
 
         <TextView
             android:id="@+id/tvTitulo"
