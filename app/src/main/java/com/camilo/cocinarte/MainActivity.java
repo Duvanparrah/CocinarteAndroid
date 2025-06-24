@@ -11,7 +11,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
-
+//importaciones repetidas
 import com.camilo.cocinarte.databinding.ActivityMainBinding;
 import com.camilo.cocinarte.session.SessionManager;
 import com.camilo.cocinarte.ui.authentication.CuentaConfiguracionActivity;
