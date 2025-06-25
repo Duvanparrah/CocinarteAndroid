@@ -399,9 +399,8 @@ public class CuentaConfiguracionActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "Cambios guardados exitosamente", Toast.LENGTH_SHORT).show();
 
                         // Regresar a MainActivity y actualizar header
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        intent.putExtra("refresh_user_info", true);
-                        startActivity(intent);
+                        getOnBackPressedDispatcher().onBackPressed();
+
                         finish();
 
                         Toast.makeText(getApplicationContext(), "Usuario actualizada", Toast.LENGTH_SHORT).show();

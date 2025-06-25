@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.camilo.cocinarte">
-
     <!-- Permisos necesarios -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -18,26 +17,25 @@
         android:theme="@style/Theme.Cocinarte"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-
+        <activity
+            android:name=".ui.favoritos.FavoritosActivity"
+            android:exported="false" />
         <!-- Actividad principal -->
         <activity
             android:name=".MainActivity"
-            android:exported="true" />
-
-        <!-- Actividad de Mis Recetas -->
+            android:exported="true" /> <!-- Actividad de Mis Recetas -->
         <activity
             android:name=".MisRecetasActivity"
             android:exported="false"
             android:label="@string/title_activity_mis_recetas"
-            android:theme="@style/Theme.Cocinarte"
-            android:parentActivityName=".MainActivity">
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.Cocinarte">
+
             <!-- Compatibilidad con versiones antiguas -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
-        </activity>
-
-        <!-- Pantalla inicial -->
+        </activity> <!-- Pantalla inicial -->
         <activity
             android:name=".ui.authentication.InicioSesionActivity"
             android:exported="true"
@@ -45,33 +43,64 @@
             android:theme="@style/Theme.Cocinarte.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
-
-        <!-- Otras actividades -->
-        <activity android:name=".ui.authentication.CuentaConfiguracionActivity" android:exported="false" />
-        <activity android:name=".NotificacionesActivity" android:exported="false" />
-        <activity android:name=".SoporteActivity" android:exported="false" />
-        <activity android:name=".ui.authentication.RegistroActivity" android:exported="false" />
-        <activity android:name=".ui.authentication.cambio_contrasenaActivity" android:exported="false" />
-        <activity android:name=".ui.authentication.correo_Recuperar_Contrasena_Activity" android:exported="false" />
-        <activity android:name=".ui.authentication.codigo_recuperacionActivity" android:exported="false" />
-
-        <activity android:name=".ui.nutricion.comprobante_pago_nequiActivity" android:exported="false" />
-        <activity android:name=".ui.nutricion.Metodo_de_pago_Activity" android:exported="false" />
-        <activity android:name=".ui.nutricion.Tarjeta_creditoActivity" android:exported="false" />
-
-        <!-- Formularios nutricionales -->
-        <activity android:name=".ui.nutricion.formulario_plan_nutricional" android:exported="false" />
-        <activity android:name=".ui.nutricion.formulario_plan_nutricional_2" android:exported="false" />
-        <activity android:name=".ui.nutricion.formulario_plan_nutricional_3" android:exported="false" />
-        <activity android:name=".ui.nutricion.formulario_plan_nutricional_4" android:exported="false" />
-        <activity android:name=".ui.nutricion.formulario_plan_nutricional_6" android:exported="false" />
-        <activity android:name=".ui.nutricion.formulario_plan_nutricional_7" android:exported="false" />
-        <activity android:name=".ui.nutricion.formulario_plan_nutricional_8" android:exported="false" />
-        <activity android:name=".ui.nutricion.formulario_plan_nutricional_9" android:exported="false" />
-
+        </activity> <!-- Otras actividades -->
+        <activity
+            android:name=".ui.authentication.CuentaConfiguracionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".NotificacionesActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SoporteActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.authentication.RegistroActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.authentication.cambio_contrasenaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.authentication.correo_Recuperar_Contrasena_Activity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.authentication.codigo_recuperacionActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.nutricion.comprobante_pago_nequiActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.nutricion.Metodo_de_pago_Activity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.nutricion.Tarjeta_creditoActivity"
+            android:exported="false" /> <!-- Formularios nutricionales -->
+        <activity
+            android:name=".ui.nutricion.formulario_plan_nutricional"
+            android:exported="false" />
+        <activity
+            android:name=".ui.nutricion.formulario_plan_nutricional_2"
+            android:exported="false" />
+        <activity
+            android:name=".ui.nutricion.formulario_plan_nutricional_3"
+            android:exported="false" />
+        <activity
+            android:name=".ui.nutricion.formulario_plan_nutricional_4"
+            android:exported="false" />
+        <activity
+            android:name=".ui.nutricion.formulario_plan_nutricional_6"
+            android:exported="false" />
+        <activity
+            android:name=".ui.nutricion.formulario_plan_nutricional_7"
+            android:exported="false" />
+        <activity
+            android:name=".ui.nutricion.formulario_plan_nutricional_8"
+            android:exported="false" />
+        <activity
+            android:name=".ui.nutricion.formulario_plan_nutricional_9"
+            android:exported="false" />
     </application>
 
 </manifest>

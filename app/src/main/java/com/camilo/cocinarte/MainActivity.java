@@ -16,6 +16,7 @@ import com.camilo.cocinarte.databinding.ActivityMainBinding;
 import com.camilo.cocinarte.session.SessionManager;
 import com.camilo.cocinarte.ui.authentication.CuentaConfiguracionActivity;
 import com.camilo.cocinarte.ui.authentication.InicioSesionActivity;
+import com.camilo.cocinarte.ui.favoritos.FavoritosActivity;
 import com.camilo.cocinarte.utils.NavigationHeaderHelper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
@@ -77,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
 
             if (id == R.id.nav_favorites) {
                 Log.d(TAG, "Navegando a Favoritos");
-                // TODO: Implementar pantalla de favoritos
+                intent = new Intent(this, FavoritosActivity.class);
             } else if (id == R.id.nav_recipes) {
                 Log.d(TAG, "Navegando a Mis Recetas");
                 intent = new Intent(this, MisRecetasActivity.class);
