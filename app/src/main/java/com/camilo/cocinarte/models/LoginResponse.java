@@ -2,8 +2,8 @@ package com.camilo.cocinarte.models;
 
 public class LoginResponse {
     private String token;
-    private UserData user; // Cambió de "usuario" a "user"
     private String message;
+    private UserData user; // Mantendremos "UserData" del modelo original
 
     // Constructor vacío
     public LoginResponse() {}
@@ -20,6 +20,10 @@ public class LoginResponse {
         return token;
     }
 
+    public String getMessage() {
+        return message;
+    }
+
     public UserData getUser() {
         return user;
     }
@@ -28,21 +32,17 @@ public class LoginResponse {
         return user; // Método de compatibilidad
     }
 
-    public String getMessage() {
-        return message;
-    }
-
     // Setters
     public void setToken(String token) {
         this.token = token;
     }
 
-    public void setUser(UserData user) {
-        this.user = user;
-    }
-
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public void setUser(UserData user) {
+        this.user = user;
     }
 
     // Método helper para verificar si el login fue exitoso
@@ -50,7 +50,7 @@ public class LoginResponse {
         return token != null && !token.isEmpty();
     }
 
-    // Clase interna para los datos del usuario en la respuesta
+    // Clase interna combinada para los datos del usuario
     public static class UserData {
         private int id;
         private String email;
@@ -67,32 +67,16 @@ public class LoginResponse {
             return id;
         }
 
-        public int getId_usuario() {
-            return id; // Método de compatibilidad
-        }
-
         public String getEmail() {
             return email;
-        }
-
-        public String getCorreo() {
-            return email; // Método de compatibilidad
         }
 
         public String getNombre() {
             return nombre;
         }
 
-        public String getNombre_usuario() {
-            return nombre; // Método de compatibilidad
-        }
-
         public String getFoto() {
             return foto;
-        }
-
-        public String getFoto_perfil() {
-            return foto; // Método de compatibilidad
         }
 
         public boolean isVerified() {
@@ -101,6 +85,22 @@ public class LoginResponse {
 
         public String getTipo_usuario() {
             return tipo_usuario;
+        }
+
+        public int getId_usuario() {
+            return id; // Compatibilidad
+        }
+
+        public String getCorreo() {
+            return email; // Compatibilidad
+        }
+
+        public String getNombre_usuario() {
+            return nombre; // Compatibilidad
+        }
+
+        public String getFoto_perfil() {
+            return foto; // Compatibilidad
         }
 
         // Setters

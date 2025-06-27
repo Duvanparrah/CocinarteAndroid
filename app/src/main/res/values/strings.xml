@@ -54,7 +54,6 @@
     <string name="save">Guardar</string>
     <string name="cancel">Cancelar</string>
 
-
     <!-- Arrays para los Spinners -->
 
     <string-array name="sexo_array">
@@ -177,6 +176,39 @@
 
     <string name="nivel_actividad">Nivel de actividad</string>
     <string name="title_activity_mis_recetas">MisRecetasActivity</string>
+
+    <string name="profile_image_desc">Descripcion de la imagen\n</string>
+
+    <string-array name="unidades_tiempo">
+        <item>Minutos</item>
+        <item>Horas</item>
+    </string-array>
+
+    <string-array name="categorias">
+        <item>Selecciona una categoría</item>
+        <item>Verduras</item>
+        <item>Frutas</item>
+        <item>Carnes</item>
+        <item>Pescados y Mariscos</item>
+        <item>Lácteos</item>
+        <item>Granos y Legumbres</item>
+        <item>Cereales</item>
+        <item>Huevos</item>
+        <item>Hierbas y Especias</item>
+        <item>Frutos secos y Semillas</item>
+        <item>Aceites y Grasas</item>
+        <item>Endulzantes</item>
+        <item>Productos Procesados</item>
+        <item>Bebidas</item>
+        <item>Harinas y Derivados</item>
+        <item>Salsas y Condimentos</item>
+    </string-array>
+
+    <string-array name="dificultades">
+        <item>Fácil</item>
+        <item>Media</item>
+        <item>Difícil</item>
+    </string-array>
 
 
 </resources>

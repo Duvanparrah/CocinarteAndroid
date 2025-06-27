@@ -57,6 +57,13 @@ public interface AuthService {
     @POST("auth/verify-reset-code")
     Call<ApiResponse> verifyRecoveryCode(@Body VerifyCodeRequest request);
 
+    // Obtener perfil del usuario autenticado
+    @Headers({
+            "Content-Type: application/json",
+            "Accept: application/json"
+    })
+    @POST("auth/profile")
+    Call<Usuario> getUserProfile(@Header("Authorization") String token);
 
     // Restablecer contraseña con código verificado
     @Headers({

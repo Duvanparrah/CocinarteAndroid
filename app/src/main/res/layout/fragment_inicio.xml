@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     android:padding="16dp">
 
     <!-- Barra superior -->
@@ -41,48 +42,60 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- Mensaje de bienvenida -->
+    <TextView
+        android:id="@+id/welcome_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="¡Bienvenido de nuevo, [Nombre del Usuario]!"
+        android:textColor="@color/verde"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/top_bar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
     <!-- Barra de búsqueda -->
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.cardview.widget.CardView
         android:id="@+id/search_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/top_bar"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="4dp"
+        app:layout_constraintTop_toBottomOf="@id/welcome_message"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Campo de búsqueda con fondo personalizado -->
-        <EditText
-            android:id="@+id/search_edit_text"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:background="@drawable/search_bar_background"
-            android:hint="¿Que te gustaría el día de hoy?..."
-            android:paddingStart="16dp"
-            android:paddingEnd="56dp"
-            android:textColorHint="@color/verde"
-            android:inputType="text"
-            android:imeOptions="actionSearch"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent" />
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:orientation="horizontal"
+            android:background="@drawable/search_bar_background">
 
-        <!-- Botón de búsqueda dentro del campo -->
-        <ImageButton
-            android:id="@+id/search_button"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginEnd="4dp"
-            android:src="@drawable/logo"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/title_search"
-            android:scaleType="centerInside"
-            app:layout_constraintEnd_toEndOf="@id/search_edit_text"
-            app:layout_constraintTop_toTopOf="@id/search_edit_text"
-            app:layout_constraintBottom_toBottomOf="@id/search_edit_text" />
+            <EditText
+                android:id="@+id/search_edit_text"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:hint="¿Qué te gustaría cocinar hoy?"
+                android:textColorHint="@color/verde"
+                android:background="@null"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <ImageButton
+                android:id="@+id/search_button"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="@android:color/transparent"
+                android:src="@drawable/logo"
+                android:contentDescription="@string/title_search" />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
     <!-- Contenido principal -->
     <ScrollView
@@ -100,58 +113,233 @@
             android:orientation="vertical"
             android:paddingBottom="16dp">
 
-            <!-- Sección de categorías populares -->
-            <TextView
+            <!-- Sección de recetas traídas desde la web -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Categorías Populares"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/verde"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
 
-            <!-- Grid de categorías (ejemplo) -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/categories_recycler"
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Recetas de la Web"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/verde"
+                    android:padding="16dp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/web_recipes_recycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </androidx.cardview.widget.CardView>
+
+            <!-- Sección de recetas del usuario -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp" />
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
 
-            <!-- Sección de recetas destacadas -->
-            <TextView
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Tus Recetas"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/verde"
+                    android:padding="16dp" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/user_recipes_recycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </androidx.cardview.widget.CardView>
+
+            <!-- Sección de banquetes -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Recetas Destacadas"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/verde"
-                android:layout_marginBottom="16dp" />
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="4dp">
 
-            <!-- Lista de recetas destacadas -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/featured_recipes_recycler"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp" />
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Banquetes para Ti"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/verde"
+                    android:padding="16dp" />
 
-            <!-- Sección para ti -->
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Recomendado para ti"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/verde"
-                android:layout_marginBottom="16dp" />
-
-            <!-- Lista de recetas recomendadas -->
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recommended_recipes_recycler"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/banquets_recycler"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </androidx.cardview.widget.CardView>
         </LinearLayout>
-
     </ScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <!--<?xml version="1.0" encoding="utf-8"?>-->
+    <!--<androidx.constraintlayout.widget.ConstraintLayout-->
+    <!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
+    <!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+    <!--    android:layout_width="match_parent"-->
+    <!--    android:layout_height="match_parent"-->
+    <!--    android:padding="16dp">-->
+
+    <!--    &lt;!&ndash; Barra superior &ndash;&gt;-->
+    <!--    <androidx.constraintlayout.widget.ConstraintLayout-->
+    <!--        android:id="@+id/top_bar"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        app:layout_constraintTop_toTopOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent">-->
+
+    <!--        &lt;!&ndash; Botón menú lateral &ndash;&gt;-->
+    <!--        <ImageButton-->
+    <!--            android:id="@+id/menu_button"-->
+    <!--            android:layout_width="48dp"-->
+    <!--            android:layout_height="48dp"-->
+    <!--            android:background="@android:color/transparent"-->
+    <!--            android:contentDescription="@string/menu"-->
+    <!--            android:src="@drawable/menu"-->
+    <!--            app:layout_constraintStart_toStartOf="parent"-->
+    <!--            app:layout_constraintTop_toTopOf="parent"-->
+    <!--            app:layout_constraintBottom_toBottomOf="parent" />-->
+
+    <!--        &lt;!&ndash; Logo centrado &ndash;&gt;-->
+    <!--        <ImageView-->
+    <!--            android:id="@+id/logo_image"-->
+    <!--            android:layout_width="161dp"-->
+    <!--            android:layout_height="66dp"-->
+    <!--            android:contentDescription="@string/logo_description"-->
+    <!--            android:src="@drawable/logo_cocinarte"-->
+    <!--            app:layout_constraintStart_toStartOf="parent"-->
+    <!--            app:layout_constraintEnd_toEndOf="parent"-->
+    <!--            app:layout_constraintTop_toTopOf="parent"-->
+    <!--            app:layout_constraintBottom_toBottomOf="parent" />-->
+
+    <!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
+
+    <!--    &lt;!&ndash; Barra de búsqueda &ndash;&gt;-->
+    <!--    <androidx.constraintlayout.widget.ConstraintLayout-->
+    <!--        android:id="@+id/search_container"-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:layout_marginTop="16dp"-->
+    <!--        app:layout_constraintTop_toBottomOf="@id/top_bar"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent">-->
+
+    <!--        &lt;!&ndash; Campo de búsqueda con fondo personalizado &ndash;&gt;-->
+    <!--        <EditText-->
+    <!--            android:id="@+id/search_edit_text"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="48dp"-->
+    <!--            android:background="@drawable/search_bar_background"-->
+    <!--            android:hint="¿Que te gustaría el día de hoy?..."-->
+    <!--            android:paddingStart="16dp"-->
+    <!--            android:paddingEnd="56dp"-->
+    <!--            android:textColorHint="@color/verde"-->
+    <!--            android:inputType="text"-->
+    <!--            android:imeOptions="actionSearch"-->
+    <!--            app:layout_constraintStart_toStartOf="parent"-->
+    <!--            app:layout_constraintEnd_toEndOf="parent"-->
+    <!--            app:layout_constraintTop_toTopOf="parent"-->
+    <!--            app:layout_constraintBottom_toBottomOf="parent" />-->
+
+    <!--        &lt;!&ndash; Botón de búsqueda dentro del campo &ndash;&gt;-->
+    <!--        <ImageButton-->
+    <!--            android:id="@+id/search_button"-->
+    <!--            android:layout_width="40dp"-->
+    <!--            android:layout_height="40dp"-->
+    <!--            android:layout_marginEnd="4dp"-->
+    <!--            android:src="@drawable/logo"-->
+    <!--            android:background="@android:color/transparent"-->
+    <!--            android:contentDescription="@string/title_search"-->
+    <!--            android:scaleType="centerInside"-->
+    <!--            app:layout_constraintEnd_toEndOf="@id/search_edit_text"-->
+    <!--            app:layout_constraintTop_toTopOf="@id/search_edit_text"-->
+    <!--            app:layout_constraintBottom_toBottomOf="@id/search_edit_text" />-->
+
+    <!--    </androidx.constraintlayout.widget.ConstraintLayout>-->
+
+    <!--    &lt;!&ndash; Contenido principal &ndash;&gt;-->
+    <!--    <ScrollView-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="0dp"-->
+    <!--        android:layout_marginTop="24dp"-->
+    <!--        app:layout_constraintTop_toBottomOf="@id/search_container"-->
+    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--        app:layout_constraintStart_toStartOf="parent"-->
+    <!--        app:layout_constraintEnd_toEndOf="parent">-->
+
+    <!--        <LinearLayout-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:orientation="vertical"-->
+    <!--            android:paddingBottom="16dp">-->
+
+    <!--            &lt;!&ndash; Sección de categorías populares &ndash;&gt;-->
+    <!--            <TextView-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:text="Categorías Populares"-->
+    <!--                android:textSize="18sp"-->
+    <!--                android:textStyle="bold"-->
+    <!--                android:textColor="@color/verde"-->
+    <!--                android:layout_marginBottom="16dp" />-->
+
+    <!--            &lt;!&ndash; Grid de categorías (ejemplo) &ndash;&gt;-->
+    <!--            <androidx.recyclerview.widget.RecyclerView-->
+    <!--                android:id="@+id/categories_recycler"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_marginBottom="24dp" />-->
+
+    <!--            &lt;!&ndash; Sección de recetas destacadas &ndash;&gt;-->
+    <!--            <TextView-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:text="Recetas Destacadas"-->
+    <!--                android:textSize="18sp"-->
+    <!--                android:textStyle="bold"-->
+    <!--                android:textColor="@color/verde"-->
+    <!--                android:layout_marginBottom="16dp" />-->
+
+    <!--            &lt;!&ndash; Lista de recetas destacadas &ndash;&gt;-->
+    <!--            <androidx.recyclerview.widget.RecyclerView-->
+    <!--                android:id="@+id/featured_recipes_recycler"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:layout_marginBottom="24dp" />-->
+
+    <!--            &lt;!&ndash; Sección para ti &ndash;&gt;-->
+    <!--            <TextView-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content"-->
+    <!--                android:text="Recomendado para ti"-->
+    <!--                android:textSize="18sp"-->
+    <!--                android:textStyle="bold"-->
+    <!--                android:textColor="@color/verde"-->
+    <!--                android:layout_marginBottom="16dp" />-->
+
+    <!--            &lt;!&ndash; Lista de recetas recomendadas &ndash;&gt;-->
+    <!--            <androidx.recyclerview.widget.RecyclerView-->
+    <!--                android:id="@+id/recommended_recipes_recycler"-->
+    <!--                android:layout_width="match_parent"-->
+    <!--                android:layout_height="wrap_content" />-->
+
+    <!--        </LinearLayout>-->
+
+    <!--    </ScrollView>-->
+
+    <!--</androidx.constraintlayout.widget.ConstraintLayout>-->
