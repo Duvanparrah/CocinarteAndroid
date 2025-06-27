@@ -1,5 +1,7 @@
 package com.camilo.cocinarte.ui.favoritos;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,24 +18,19 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.bitmap.CircleCrop;
-import com.bumptech.glide.request.RequestOptions;
+import com.camilo.cocinarte.DetalleRecetaActivity;
 import com.camilo.cocinarte.R;
+import com.camilo.cocinarte.api.ApiConfig;
 import com.camilo.cocinarte.api.FavoritosService;
 import com.camilo.cocinarte.databinding.ActivityFavoritosBinding;
 import com.camilo.cocinarte.models.FavoritosResponse;
 import com.camilo.cocinarte.session.SessionManager;
-
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
-import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class FavoritosActivity extends AppCompatActivity {
     private ActivityFavoritosBinding binding;
@@ -61,13 +58,7 @@ public class FavoritosActivity extends AppCompatActivity {
         SessionManager sessionManager = SessionManager.getInstance(this);
         String token = "Bearer " + sessionManager.getAuthToken();
 
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("https://cocinarte-backend-production.up.railway.app/")
-                .addConverterFactory(ScalarsConverterFactory.create()) // Para strings simples
-                .addConverterFactory(GsonConverterFactory.create())    // Para objetos como ResetPasswordRequest
-                .build();
-
-        FavoritosService favoritosService = retrofit.create(FavoritosService.class);
+        FavoritosService favoritosService = ApiConfig.getClient(getApplicationContext()).create(FavoritosService.class);
         favoritosService.getFavoritos(token).enqueue(new Callback<>() {
             @Override
             public void onResponse(Call<FavoritosResponse> call, Response<FavoritosResponse> response) {
@@ -98,64 +89,64 @@ public class FavoritosActivity extends AppCompatActivity {
 
 /* ================= ADAPTADOR RECYCLERVIEW ================= */
 class FavoritosAdapter extends RecyclerView.Adapter<FavoritosAdapter.ViewHolder> {
+
     private List<FavoritosResponse.Favorito> localDataSet;
 
+    // ViewHolder interno
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView textView;
         private final ImageView imgFavorito;
 
         public ViewHolder(View view) {
             super(view);
-            // Define click listener for the ViewHolder's View
-
-            textView = (TextView) view.findViewById(R.id.nombreFavorito);
-            imgFavorito = (ImageView) view.findViewById(R.id.imgFavorito);
+            textView = view.findViewById(R.id.nombreFavorito);
+            imgFavorito = view.findViewById(R.id.imgFavorito);
         }
 
         public TextView getTextView() {
             return textView;
         }
+
         public ImageView getImgFavorito() {
             return imgFavorito;
         }
     }
 
+    // Constructor del adapter
     public FavoritosAdapter(List<FavoritosResponse.Favorito> dataSet) {
         localDataSet = dataSet;
     }
 
-    // Create new views (invoked by the layout manager)
-
+    // onCreateViewHolder va AQUÍ
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int viewType) {
-        // Create a new view, which defines the UI of the list item
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.card_favoritos, viewGroup, false);
+        View view = LayoutInflater.from(viewGroup.getContext())
+                .inflate(R.layout.card_favoritos, viewGroup, false);
         return new ViewHolder(view);
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
+    // ✅ onBindViewHolder también va AQUÍ (fuera del ViewHolder)
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-        viewHolder.getTextView().setText(localDataSet.get(position).getTitulo() );
+        viewHolder.getTextView().setText(localDataSet.get(position).getTitulo());
+
         viewHolder.getImgFavorito().setOnClickListener(v -> {
-            //Navegar a receta seleccionada
+            Context context = v.getContext();
+            Intent intent = new Intent(context, DetalleRecetaActivity.class);
+            // Enviar por intent
+            intent.putExtra("receta_id", localDataSet.get(position).getRecetaId() );
+            context.startActivity(intent);
         });
 
         String photoUrl = localDataSet.get(position).getImagenUrl();
 
         if (photoUrl != null && !photoUrl.trim().isEmpty() && !photoUrl.equals("null")) {
-            // Cargar imagen desde URL
             Glide.with(viewHolder.getImgFavorito().getContext())
-                    .load(photoUrl)
-                    .apply(RequestOptions.bitmapTransform(new CircleCrop()))
-                    .placeholder(R.drawable.perfil_chef)
-                    .error(R.drawable.perfil_chef)
-                    .into(viewHolder.imgFavorito);
-            }
+                    .load(photoUrl)                     .into(viewHolder.imgFavorito);
+        }
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
         return localDataSet.size();

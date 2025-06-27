@@ -75,8 +75,6 @@ dependencies {
     implementation(libs.ui.graphics)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
-    // FLEXBOX LAYOUT - CORREGIDO
-    implementation ("com.google.android.flexbox:flexbox:3.0.0")
 
     // Testing
     testImplementation(libs.junit)
@@ -86,11 +84,15 @@ dependencies {
     //authentication
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
-    //cargar imagenes perfil
+//    cargar imagenes perfil
     implementation ("com.github.bumptech.glide:glide:4.16.0")
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)
     annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
+
+    // Flexbox
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
+
 }

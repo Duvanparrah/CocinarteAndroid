@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="12dp">
+
+    <!-- Imagen de perfil -->
+    <ImageView
+        android:id="@+id/img_perfil_comentario"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:src="@drawable/perfil"
+        android:scaleType="centerCrop"
+        android:contentDescription="Foto de perfil"
+        android:background="@drawable/circle_background"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Nombre del usuario -->
+    <TextView
+        android:id="@+id/tv_nombre_usuario_comentario"
+        android:layout_width="0dp"
+        android:layout_marginLeft="8dp"
+        android:layout_height="wrap_content"
+        android:text="Usuario"
+        android:textStyle="bold"
+        android:textSize="14sp"
+        android:textColor="@android:color/black"
+        app:layout_constraintTop_toTopOf="@+id/img_perfil_comentario"
+        app:layout_constraintStart_toEndOf="@+id/img_perfil_comentario"
+        app:layout_constraintEnd_toStartOf="@+id/btn_editar_comentario"
+        app:layout_constraintHorizontal_bias="0.0" />
+
+    <!-- Fecha -->
+    <TextView
+        android:id="@+id/tv_fecha_comentario"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hace 2h"
+
+        android:textSize="12sp"
+        android:textColor="#666666"
+        app:layout_constraintTop_toBottomOf="@+id/tv_nombre_usuario_comentario"
+        app:layout_constraintStart_toStartOf="@+id/tv_nombre_usuario_comentario" />
+
+    <!-- Botón editar -->
+    <ImageButton
+        android:id="@+id/btn_editar_comentario"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:src="@drawable/ic_edit"
+        android:background="?selectableItemBackgroundBorderless"
+        android:contentDescription="Editar comentario"
+        android:visibility="gone"
+        app:tint="@android:color/darker_gray"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btn_eliminar_comentario"
+        android:layout_marginEnd="12dp"/>
+
+    <!-- Botón eliminar -->
+    <ImageButton
+        android:id="@+id/btn_eliminar_comentario"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:src="@drawable/delete_icon"
+        android:background="?selectableItemBackgroundBorderless"
+        android:contentDescription="Eliminar comentario"
+        android:visibility="gone"
+        app:tint="@android:color/darker_gray"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Contenido del comentario -->
+    <TextView
+        android:id="@+id/tv_contenido_comentario"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Este es el contenido del comentario"
+        android:textSize="14sp"
+        android:textColor="@android:color/black"
+        app:layout_constraintTop_toBottomOf="@+id/img_perfil_comentario"
+        app:layout_constraintStart_toStartOf="@+id/img_perfil_comentario"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
