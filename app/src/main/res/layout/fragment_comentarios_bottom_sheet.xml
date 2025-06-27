@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_bottom_sheet"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <!-- Título -->
+    <TextView
+        android:id="@+id/tv_titulo_comentarios"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Comentarios"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:paddingBottom="12dp" />
+
+    <TextView
+        android:id="@+id/tv_sin_comentarios"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Actualmente no hay comentarios.\n\n¡Sé el primero en comentar!"
+        android:textAlignment="center"
+        android:textColor="@android:color/darker_gray"
+        android:padding="12dp"
+        android:visibility="gone"
+        android:textSize="14sp" />
+
+
+    <!-- Lista de comentarios -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_comentarios"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:overScrollMode="never"
+        android:scrollbars="vertical" />
+
+    <!-- Línea divisoria -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginVertical="8dp"
+        android:background="#CCCCCC" />
+
+    <!-- Campo para nuevo comentario -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <EditText
+            android:id="@+id/edit_text_comentario"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Escribe un comentario..."
+            android:background="@drawable/bg_edittext"
+            android:padding="10dp"
+            android:minHeight="48dp"
+            android:layout_marginEnd="8dp" />
+
+        <ImageButton
+            android:id="@+id/btn_enviar_comentario"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Enviar comentario"
+            android:src="@android:drawable/ic_menu_send"
+            app:tint="@color/black"
+            tools:ignore="TouchTargetSizeCheck" />
+    </LinearLayout>
+
+</LinearLayout>

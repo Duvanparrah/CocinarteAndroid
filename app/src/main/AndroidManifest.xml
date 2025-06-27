@@ -18,9 +18,11 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
-            android:name=".ui.favoritos.FavoritosActivity"
+            android:name=".DetalleRecetaActivity"
             android:exported="false" />
-        <!-- Actividad principal -->
+        <activity
+            android:name=".ui.favoritos.FavoritosActivity"
+            android:exported="false" /> <!-- Actividad principal -->
         <activity
             android:name=".MainActivity"
             android:exported="true" /> <!-- Actividad de Mis Recetas -->

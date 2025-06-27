@@ -93,4 +93,7 @@ dependencies {
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
 
+    // Flexbox
+    implementation("com.google.android.flexbox:flexbox:3.0.0")
+
 }
