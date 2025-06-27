@@ -100,7 +100,7 @@ public class CuentaConfiguracionActivity extends AppCompatActivity {
         // Listeners para botones
         binding.imageViewEditPhoto.setOnClickListener(v -> showImageSelectionDialog());
         binding.buttonSaveChanges.setOnClickListener(v -> saveChanges());
-        binding.buttonChangePass.setOnClickListener(v -> changePassword());
+
 
         // Listener para toolbar back button
         binding.toolbar.setNavigationOnClickListener(v -> finish());
@@ -420,28 +420,6 @@ public class CuentaConfiguracionActivity extends AppCompatActivity {
             Toast.makeText(this, "Error al guardar cambios", Toast.LENGTH_SHORT).show();
         }
     }
-
-    private void changePassword() {
-        String newPassword = Objects.requireNonNull(binding.eTChangePassword.getText()).toString();
-        AuthService authService = ApiConfig.getClient(getApplicationContext()).create(AuthService.class);
-        ResetPasswordRequest request = new ResetPasswordRequest(sessionManager.getEmail(), newPassword);
-        authService.resetPassword(request).enqueue(new Callback<>() {
-            @Override
-            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    ApiResponse loginResponse = response.body();
-                    Toast.makeText(getApplicationContext(), "Contraseña actualizada", Toast.LENGTH_SHORT).show();
-                } else {
-                    Toast.makeText(getApplicationContext(), "Error al actualizar la contraseña", Toast.LENGTH_SHORT).show();
-                }
-            }
-            @Override
-            public void onFailure(Call<ApiResponse> call, Throwable t) {
-                t.printStackTrace();
-            }
-        });
-    }
-
     private void showLoading(boolean show) {
         binding.buttonSaveChanges.setEnabled(!show);
         binding.buttonSaveChanges.setText(show ? "Guardando..." : "Guardar cambios");

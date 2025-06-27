@@ -163,45 +163,10 @@
                 android:layout_marginBottom="16dp"
                 android:padding="12dp" />
 
-            <!-- Sección de seguridad -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Seguridad"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="@color/black"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp" />
+
 
             <!-- Botón para cambiar contraseña -->
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/containerChangePassword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:boxStrokeColor="@color/text_input_box_stroke"
-                app:hintTextColor="@color/blanco"
-                android:hint="Cambiar contraseña">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/eTChangePassword"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPersonName"
-                    android:maxLines="1" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <Button
-                android:id="@+id/buttonChangePass"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Guardar cambios"
-                android:textColor="@color/white"
-                android:background="@drawable/botonverde"
-                android:layout_marginBottom="16dp"
-                android:padding="12dp" />
 
             <!-- ProgressBar -->
             <ProgressBar
