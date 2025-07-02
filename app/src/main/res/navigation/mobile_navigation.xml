@@ -28,19 +28,60 @@
         android:name="com.camilo.cocinarte.ui.comunidad.ComunidadFragment"
         android:label="@string/titulo_comunidad"
         tools:layout="@layout/fragment_comunidad">
+
+        <action
+            android:id="@+id/action_navegar_comunidad_to_detalleRecetaFragment"
+            app:destination="@id/detalleRecetaFragment" />
+
         <action
             android:id="@+id/action_navegar_comunidad_to_navegar_comunidad_mis_recetas"
             app:destination="@id/navegar_comunidad_mis_recetas" />
     </fragment>
 
     <fragment
+        android:id="@+id/detalleRecetaFragment"
+        android:name="com.camilo.cocinarte.ui.comunidad.DetalleRecetaFragment"
+        android:label="Detalle Receta"
+        tools:layout="@layout/activity_detalle_receta_fragment" />
+
+    <fragment
         android:id="@+id/navegar_comunidad_mis_recetas"
         android:name="com.camilo.cocinarte.ui.comunidad.Comunidad_mis_recetasFragment"
         android:label="mis_recetas"
         tools:layout="@layout/fragment_comunidad_mis_recetas">
+
         <action
             android:id="@+id/action_navegar_comunidad_mis_recetas_to_navegar_comunidad"
             app:destination="@id/navegar_comunidad" />
+        <action
+            android:id="@+id/action_navegar_comunidad_mis_recetas_to_crearRecetaFragment"
+            app:destination="@id/crearRecetaFragment" />
+        <action
+            android:id="@+id/action_navegar_comunidad_mis_recetas_to_detalleRecetaFragment"
+            app:destination="@id/detalleRecetaFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/instruccionesFragmentReceta"
+        android:name="com.camilo.cocinarte.ui.comunidad.InstruccionesFragmentReceta"
+        android:label="Instrucciones"
+        tools:layout="@layout/fragment_instrucciones_receta">
+
+        <action
+            android:id="@+id/action_instruccionesFragmentReceta_to_navegar_comunidad_mis_recetas"
+            app:destination="@id/navegar_comunidad_mis_recetas" />
+    </fragment>
+    <fragment
+        android:id="@+id/crearRecetaFragment"
+        android:name="com.camilo.cocinarte.ui.comunidad.CrearRecetaFragment"
+        android:label="Crear Receta"
+        tools:layout="@layout/fragment_crear_receta" >
+
+        <action
+            android:id="@+id/action_crearRecetaFragment_to_instruccionesFragmentReceta"
+            app:destination="@id/instruccionesFragmentReceta" />
+
+    </fragment>
+
 
 </navigation>

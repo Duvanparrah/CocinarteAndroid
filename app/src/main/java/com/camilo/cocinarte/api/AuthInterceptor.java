@@ -1,4 +1,4 @@
-package com.camilo.cocinarte.api.auth;
+package com.camilo.cocinarte.api;
 
 import android.content.Context;
 import android.content.Intent;

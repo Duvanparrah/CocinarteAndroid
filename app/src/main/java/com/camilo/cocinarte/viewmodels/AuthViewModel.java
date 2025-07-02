@@ -5,7 +5,7 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.camilo.cocinarte.api.auth.AuthRepository;
+import com.camilo.cocinarte.api.AuthRepository;
 import com.camilo.cocinarte.models.*;
 import com.camilo.cocinarte.utils.Resource;
 import com.camilo.cocinarte.utils.SingleLiveEvent;

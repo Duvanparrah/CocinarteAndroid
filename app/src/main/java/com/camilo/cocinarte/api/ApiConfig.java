@@ -2,8 +2,6 @@ package com.camilo.cocinarte.api;
 
 import android.content.Context;
 
-import com.camilo.cocinarte.api.auth.AuthCookieJar;
-
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;

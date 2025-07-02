@@ -1,4 +1,4 @@
-package com.camilo.cocinarte.api.auth;
+package com.camilo.cocinarte.api;
 
 import android.content.Context;
 import android.util.Log;
@@ -10,9 +10,9 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import java.util.concurrent.TimeUnit;
 
-public class AuthApiClient {
+public class ApiClient {
 
-    private static final String TAG = "AuthApiClient";
+    private static final String TAG = "ApiClient";
     private static final String BASE_URL = "https://cocinarte-production.up.railway.app/api/"; // CAMBIA ESTO
     private static Retrofit retrofit = null;
 

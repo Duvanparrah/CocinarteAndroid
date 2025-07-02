@@ -13,8 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 
 import com.camilo.cocinarte.R;
-import com.camilo.cocinarte.api.auth.AuthCookieJar;
-import com.camilo.cocinarte.api.auth.AuthService;
+import com.camilo.cocinarte.api.AuthCookieJar;
+import com.camilo.cocinarte.api.AuthService;
 import com.camilo.cocinarte.models.RegisterRequest;
 import com.camilo.cocinarte.models.RegisterResponse;
 import com.camilo.cocinarte.session.SessionManager;

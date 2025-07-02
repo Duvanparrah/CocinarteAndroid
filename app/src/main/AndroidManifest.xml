@@ -103,6 +103,7 @@
         <activity
             android:name=".ui.nutricion.formulario_plan_nutricional_9"
             android:exported="false" />
+
     </application>
 
 </manifest>

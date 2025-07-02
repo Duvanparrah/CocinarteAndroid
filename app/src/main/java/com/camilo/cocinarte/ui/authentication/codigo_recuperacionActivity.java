@@ -17,7 +17,7 @@ import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.camilo.cocinarte.R;
-import com.camilo.cocinarte.api.auth.AuthService;
+import com.camilo.cocinarte.api.AuthService;
 import com.camilo.cocinarte.models.VerifyCodeRequest;
 import com.camilo.cocinarte.models.ApiResponse;
 

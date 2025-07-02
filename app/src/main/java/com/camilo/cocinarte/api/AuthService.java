@@ -1,4 +1,4 @@
-package com.camilo.cocinarte.api.auth;
+package com.camilo.cocinarte.api;
 
 import com.camilo.cocinarte.models.ProfileImageResponse;
 import com.camilo.cocinarte.models.RegisterRequest;
@@ -18,10 +18,7 @@ import retrofit2.http.Header;
 import retrofit2.http.Headers;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
-import retrofit2.http.PUT;
 import retrofit2.http.Part;
-import retrofit2.http.Path;
-import retrofit2.http.Query;
 
 public interface AuthService {
 

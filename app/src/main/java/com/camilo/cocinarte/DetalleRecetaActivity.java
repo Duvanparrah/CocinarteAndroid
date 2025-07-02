@@ -30,6 +30,7 @@ import com.camilo.cocinarte.models.VerificarFavoritoResponse;
 import com.camilo.cocinarte.session.SessionManager;
 import com.camilo.cocinarte.ui.favoritos.ComentariosBottomSheetFragment;
 import com.camilo.cocinarte.utils.ReaccionCache;
+import com.camilo.cocinarte.models.Ingrediente;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -79,7 +80,7 @@ public class DetalleRecetaActivity extends AppCompatActivity {
             String token = "Bearer " + sessionManager.getAuthToken();
 
             RecetasService recetasService = ApiConfig.getClient(getApplicationContext()).create(RecetasService.class);
-            recetasService.sendLike(recetaActual.getId_receta(), token).enqueue(new Callback<>() {
+            recetasService.sendLike(recetaActual.getIdReceta(), token).enqueue(new Callback<>() {
                 @Override
                 public void onResponse(Call<LikeResponse> call, Response<LikeResponse> response) {
                     if (response.isSuccessful() && response.body() != null) {
@@ -126,7 +127,7 @@ public class DetalleRecetaActivity extends AppCompatActivity {
         imgFavorito.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setFavorito(recetaActual.getId_receta());
+                setFavorito(recetaActual.getIdReceta());
             }
         });
 
@@ -272,7 +273,7 @@ public class DetalleRecetaActivity extends AppCompatActivity {
         TextView tiempo = findViewById(R.id.tv_tiempo);
         TextView dificultad = findViewById(R.id.tv_dificultad);
 
-        tiempo.setText(receta.getTiempo_preparacion());
+        tiempo.setText(receta.getTiempoPreparacion());
         dificultad.setText(receta.getDificultad());
 
 
@@ -281,8 +282,9 @@ public class DetalleRecetaActivity extends AppCompatActivity {
 
         List<String> ingredientes = new ArrayList<>();
         if (receta.getIngredientes() != null) {
-            for (Receta.Ingrediente ingrediente : receta.getIngredientes()) {
-                ingredientes.add(ingrediente.getNombre_ingrediente());
+            for (Ingrediente ingrediente : receta.getIngredientes())
+            {
+                ingredientes.add(ingrediente.getNombreIngrediente());
             }
         }
 
@@ -342,7 +344,7 @@ public class DetalleRecetaActivity extends AppCompatActivity {
     private void abrirSeccionComentarios() {
         if (recetaActual != null) {
             ReaccionApi api =  ApiConfig.getClient(getApplicationContext()).create(ReaccionApi.class);
-            api.getReaccionesPorReceta(recetaActual.getId_receta()).enqueue(new Callback<ResponseBody>() {
+            api.getReaccionesPorReceta(recetaActual.getIdReceta()).enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
                     if (response.isSuccessful() && response.body() != null) {
@@ -351,7 +353,7 @@ public class DetalleRecetaActivity extends AppCompatActivity {
                             JSONObject obj = new JSONObject(json);
                             JSONArray comentariosArray = obj.getJSONArray("comentarios");
 
-                            ComentariosBottomSheetFragment modal = ComentariosBottomSheetFragment.newInstance(comentariosArray, recetaActual.getId_receta());
+                            ComentariosBottomSheetFragment modal = ComentariosBottomSheetFragment.newInstance(comentariosArray, recetaActual.getIdReceta());
                             modal.show(getSupportFragmentManager(), modal.getTag());
                         } catch (Exception e) {
                             e.printStackTrace();

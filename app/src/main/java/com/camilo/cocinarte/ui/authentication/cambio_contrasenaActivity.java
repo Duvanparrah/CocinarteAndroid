@@ -12,8 +12,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.camilo.cocinarte.R;
-import com.camilo.cocinarte.api.auth.AuthApiClient;
-import com.camilo.cocinarte.api.auth.AuthService;
+import com.camilo.cocinarte.api.ApiClient;
+import com.camilo.cocinarte.api.AuthService;
 import com.camilo.cocinarte.models.ResetPasswordRequest;
 import com.camilo.cocinarte.models.ApiResponse;
 import com.google.android.material.textfield.TextInputEditText;
@@ -194,7 +194,7 @@ public class cambio_contrasenaActivity extends AppCompatActivity {
 
         ResetPasswordRequest request = new ResetPasswordRequest(cleanEmail, newPassword);
 
-        AuthService authService = AuthApiClient.getClient(getApplicationContext()).create(AuthService.class);
+        AuthService authService = ApiClient.getClient(getApplicationContext()).create(AuthService.class);
 
         Call<ApiResponse> call = authService.resetPassword(request);
         call.enqueue(new Callback<ApiResponse>() {

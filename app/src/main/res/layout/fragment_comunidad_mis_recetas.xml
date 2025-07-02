@@ -7,27 +7,24 @@
     android:background="@color/white"
     tools:context=".ui.comunidad.Comunidad_mis_recetasFragment">
 
-    <!-- Top Bar with Logo and Menu -->
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/top_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:padding="16dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
             android:id="@+id/logo_image"
-            android:layout_width="161dp"
+            android:layout_width="wrap_content"
             android:layout_height="66dp"
-            android:layout_marginStart="96dp"
             android:contentDescription="@string/logo_description"
             android:src="@drawable/logo_cocinarte"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
 
         <ImageButton
             android:id="@+id/menu_button"
@@ -39,7 +36,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- Search Bar and Filter Button Row -->
@@ -67,7 +63,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <!-- Use a shape drawable for the green border -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
@@ -116,76 +111,164 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- Segment Control Button for Comunidad/Mis recetas -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/segment_control"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:layout_marginTop="16dp"
-        app:cardCornerRadius="24dp"
-        app:cardElevation="2dp"
-        app:layout_constraintEnd_toEndOf="parent"
+    <!-- ScrollView principal que contendrá TODO el contenido desplazable -->
+    <ScrollView
+        android:id="@+id/main_scrollview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/search_row"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/search_row">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
-            <!-- Comunidad Tab -->
+
+            <!-- Segment Control Button for Comunidad/Mis recetas -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/segment_control"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:layout_marginTop="20dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="2dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/search_row">
+
+
+                <LinearLayout
+
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <!-- Comunidad Tab -->
+                    <LinearLayout
+                        android:id="@+id/comunidad_tab"
+                        android:layout_width="140dp"
+                        android:layout_height="match_parent"
+                        android:background="@color/white"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/comunida" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Comunidad"
+                            android:textColor="@color/black"
+                            android:textSize="16sp" />
+                    </LinearLayout>
+
+                    <!-- Mis recetas Tab -->
+                    <LinearLayout
+                        android:id="@+id/mis_recetas_tab"
+                        android:layout_width="140dp"
+                        android:layout_height="match_parent"
+                        android:background="@color/verde"
+                        android:gravity="center"
+                        android:orientation="horizontal"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_marginEnd="8dp"
+                            android:src="@drawable/recetas_mias" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Mis recetas"
+                            android:textColor="@color/white"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+
+
+            </androidx.cardview.widget.CardView>
+
+
+            <!-- Perfil de usuario -->
             <LinearLayout
-                android:id="@+id/comunidad_tab"
-                android:layout_width="140dp"
-                android:layout_height="match_parent"
-                android:background="@color/white"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp">
+                android:id="@+id/profile_card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/comunida" />
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
 
+                    <!-- Imagen de perfil circular -->
+                    <ImageView
+                        android:id="@+id/user_profile_image"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:scaleType="centerCrop"
+                        android:src="@mipmap/ic_launcher_round"
+                        android:contentDescription="@string/profile_image_desc"
+                        android:background="@drawable/circle_background" />
+
+                </FrameLayout>
+
+                <!-- Correo electrónico -->
                 <TextView
+                    android:id="@+id/user_email"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Comunidad"
+                    android:layout_marginBottom="2dp"
+                    android:layout_marginTop="7dp"
+                    android:text="correo@ejemplo.com"
                     android:textColor="@color/black"
-                    android:textSize="16sp" />
-            </LinearLayout>
+                    android:textSize="16sp"/>
 
-            <!-- Mis recetas Tab -->
-            <LinearLayout
-                android:id="@+id/mis_recetas_tab"
-                android:layout_width="140dp"
-                android:layout_height="match_parent"
-                android:background="@color/verde"
-                android:gravity="center"
-                android:orientation="horizontal"
-                android:paddingStart="16dp"
-                android:paddingEnd="16dp">
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="8dp"
-                    android:src="@drawable/recetas_mias" />
-
+                <!-- Nombre de usuario -->
                 <TextView
+                    android:id="@+id/user_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Mis recetas"
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
+                    android:text="nombre_usuario"
+                    android:textColor="@color/gris"
+                    android:textSize="15sp" />
             </LinearLayout>
+
+
+            <!-- Botón Crear Receta -->
+            <Button
+                android:id="@+id/btn_crear_receta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_gravity="center_horizontal"
+                android:backgroundTint="@color/verde"
+                android:text="Crear receta"
+                android:textColor="@android:color/white" />
+
+            <!-- Contenedor de recetas -->
+            <LinearLayout
+                android:id="@+id/contenedor_recetas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="8dp"/>
         </LinearLayout>
-
-    </androidx.cardview.widget.CardView>
-
-
-
+    </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,4 +1,4 @@
-package com.camilo.cocinarte.api.auth;
+package com.camilo.cocinarte.api;
 import static android.content.Context.MODE_PRIVATE;
 
 import android.content.Context;

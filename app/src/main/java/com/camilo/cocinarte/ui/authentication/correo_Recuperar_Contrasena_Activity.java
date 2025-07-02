@@ -12,7 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.camilo.cocinarte.R;
-import com.camilo.cocinarte.api.auth.AuthService;
+import com.camilo.cocinarte.api.AuthService;
 import com.camilo.cocinarte.models.ForgotPasswordRequest;
 import com.camilo.cocinarte.models.ApiResponse;
 

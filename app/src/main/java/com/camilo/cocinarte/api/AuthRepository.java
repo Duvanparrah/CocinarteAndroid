@@ -1,4 +1,4 @@
-package com.camilo.cocinarte.api.auth;
+package com.camilo.cocinarte.api;
 
 import android.app.Application;
 import androidx.lifecycle.LiveData;
@@ -26,7 +26,7 @@ public class AuthRepository {
 
     private AuthRepository(Application application) {
         this.application = application;
-        this.authService = com.camilo.cocinarte.api.auth.AuthApiClient.getClient(application).create(AuthService.class);
+        this.authService = ApiClient.getClient(application).create(AuthService.class);
         this.sessionManager = SessionManager.getInstance(application);
     }
 

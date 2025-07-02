@@ -18,8 +18,8 @@ import androidx.fragment.app.Fragment;
 
 import com.camilo.cocinarte.MainActivity;
 import com.camilo.cocinarte.R;
-import com.camilo.cocinarte.api.auth.AuthApiClient;
-import com.camilo.cocinarte.api.auth.AuthService;
+import com.camilo.cocinarte.api.ApiClient;
+import com.camilo.cocinarte.api.AuthService;
 import com.camilo.cocinarte.models.Usuario;
 
 import retrofit2.Call;
@@ -72,7 +72,7 @@ public class InicioFragment extends Fragment {
     }
 
     private void setupApi() {
-        authService = AuthApiClient.getClient(requireContext()).create(AuthService.class);
+        authService = ApiClient.getClient(requireContext()).create(AuthService.class);
     }
 
     private void setupListeners() {
