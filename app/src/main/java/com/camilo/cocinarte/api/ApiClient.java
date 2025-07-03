@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 public class ApiClient {
 
     private static final String TAG = "ApiClient";
-    private static final String BASE_URL = "https://cocinarte-production.up.railway.app/api/"; // CAMBIA ESTO
+    private static final String BASE_URL = "https://cocinarte-backend-production.up.railway.app/api/"; // CAMBIA ESTO
     private static Retrofit retrofit = null;
 
     public static Retrofit getClient(Context context) {
