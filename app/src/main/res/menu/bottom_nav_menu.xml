@@ -12,7 +12,7 @@
         android:title="Banquetes" />
 
     <item
-        android:id="@+id/nav_nutricion"
+        android:id="@+id/navigation_nutricion"
         android:icon="@drawable/nutricion"
         android:title="Nutrición" />
 
