@@ -1,6 +1,7 @@
 package com.camilo.cocinarte.models;
 
 import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 public class Receta {
@@ -27,19 +28,19 @@ public class Receta {
     private String dificultad;
 
     @SerializedName("calorias")
-    private int calorias;
+    private Double calorias;
 
     @SerializedName("proteinas")
-    private int proteinas;
+    private Double proteinas;
 
     @SerializedName("carbohidratos")
-    private int carbohidratos;
+    private Double carbohidratos;
 
     @SerializedName("grasas")
-    private int grasas;
+    private Double grasas;
 
     @SerializedName("azucar")
-    private Double azucar;
+    private Double azucar; // Puede venir null
 
     @SerializedName("seccion")
     private String seccion;
@@ -59,18 +60,13 @@ public class Receta {
     @SerializedName("preparacion")
     private String preparacion;
 
-    // Usuario de la receta cuando se consulta individualmente
     @SerializedName("Usuario")
     private Usuario usuario;
-
-    // Usuario que creó la receta (cuando viene desde comunidad o listados)
-    @SerializedName("creador")
-    private Usuario creador;
 
     @SerializedName("Ingredientes")
     private List<Ingrediente> ingredientes;
 
-    // --- Getters y Setters ---
+    // Getters y Setters
 
     public int getIdReceta() {
         return idReceta;
@@ -128,35 +124,35 @@ public class Receta {
         this.dificultad = dificultad;
     }
 
-    public Integer getCalorias() {
+    public Double getCalorias() {
         return calorias;
     }
 
-    public void setCalorias(Integer calorias) {
+    public void setCalorias(Double calorias) {
         this.calorias = calorias;
     }
 
-    public Integer getProteinas() {
+    public Double getProteinas() {
         return proteinas;
     }
 
-    public void setProteinas(Integer proteinas) {
+    public void setProteinas(Double proteinas) {
         this.proteinas = proteinas;
     }
 
-    public Integer getCarbohidratos() {
+    public Double getCarbohidratos() {
         return carbohidratos;
     }
 
-    public void setCarbohidratos(Integer carbohidratos) {
+    public void setCarbohidratos(Double carbohidratos) {
         this.carbohidratos = carbohidratos;
     }
 
-    public Integer getGrasas() {
+    public Double getGrasas() {
         return grasas;
     }
 
-    public void setGrasas(Integer grasas) {
+    public void setGrasas(Double grasas) {
         this.grasas = grasas;
     }
 
@@ -174,6 +170,14 @@ public class Receta {
 
     public void setSeccion(String seccion) {
         this.seccion = seccion;
+    }
+
+    public String getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(String categoria) {
+        this.categoria = categoria;
     }
 
     public String getFechaCreacion() {
@@ -200,28 +204,12 @@ public class Receta {
         this.editado = editado;
     }
 
-    public String getCategoria() {
-        return categoria;
-    }
-
-    public void setCategoria(String categoria) {
-        this.categoria = categoria;
-    }
-
     public String getPreparacion() {
         return preparacion;
     }
 
     public void setPreparacion(String preparacion) {
         this.preparacion = preparacion;
-    }
-
-    public List<Ingrediente> getIngredientes() {
-        return ingredientes;
-    }
-
-    public void setIngredientes(List<Ingrediente> ingredientes) {
-        this.ingredientes = ingredientes;
     }
 
     public Usuario getUsuario() {
@@ -232,12 +220,11 @@ public class Receta {
         this.usuario = usuario;
     }
 
-    public Usuario getCreador() {
-        return creador;
+    public List<Ingrediente> getIngredientes() {
+        return ingredientes;
     }
 
-    public void setCreador(Usuario creador) {
-        this.creador = creador;
+    public void setIngredientes(List<Ingrediente> ingredientes) {
+        this.ingredientes = ingredientes;
     }
 }
-

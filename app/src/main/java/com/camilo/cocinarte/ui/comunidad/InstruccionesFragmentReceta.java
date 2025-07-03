@@ -105,9 +105,9 @@ public class InstruccionesFragmentReceta extends Fragment {
                 receta.setTiempoPreparacion(datos.getString("tiempo"));
                 receta.setDificultad(datos.getString("dificultad"));
 
-                int idCategoria = datos.getInt("categoriaId", 1); // usa 1 por defecto si no se pasa
+                String nombreCategoria = datos.getString("categoria", "");
+                int idCategoria = obtenerIdCategoriaDesdeNombre(nombreCategoria);
                 receta.setIdCategoria(idCategoria);
-
 
                 receta.setCalorias(Integer.parseInt(datos.getString("kcal", "0")));
                 receta.setProteinas(Integer.parseInt(datos.getString("proteinas", "0")));

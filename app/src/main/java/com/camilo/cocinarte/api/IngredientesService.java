@@ -13,11 +13,4 @@ public interface IngredientesService {
             @Query("categoria") String categoria,
             @Header("Authorization") String token
     );
-
-    @GET("ingredientes")
-    Call<IngredientesByCategoriaResponse> obtenerTodosLosIngredientes(
-            @Header("Authorization") String token
-    );
-
-
 }
