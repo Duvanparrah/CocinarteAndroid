@@ -44,7 +44,7 @@
 
     <!-- Mensaje de bienvenida -->
     <TextView
-        android:id="@+id/welcome_message"
+        android:id="@+id/welcomemessage"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="¡Bienvenido de nuevo, [Nombre del Usuario]!"
@@ -59,13 +59,13 @@
 
     <!-- Barra de búsqueda -->
     <androidx.cardview.widget.CardView
-        android:id="@+id/search_container"
+        android:id="@+id/searchcontainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         app:cardCornerRadius="16dp"
         app:cardElevation="4dp"
-        app:layout_constraintTop_toBottomOf="@id/welcome_message"
+        app:layout_constraintTop_toBottomOf="@id/welcomemessage"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
@@ -102,7 +102,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="24dp"
-        app:layout_constraintTop_toBottomOf="@id/search_container"
+        app:layout_constraintTop_toBottomOf="@id/searchcontainer"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
@@ -131,7 +131,7 @@
                     android:padding="16dp" />
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/web_recipes_recycler"
+                    android:id="@+id/web_recipesrecycler"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
             </androidx.cardview.widget.CardView>
@@ -154,7 +154,7 @@
                     android:padding="16dp" />
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/user_recipes_recycler"
+                    android:id="@+id/user_recipesrecycler"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
             </androidx.cardview.widget.CardView>
@@ -177,7 +177,7 @@
                     android:padding="16dp" />
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/banquets_recycler"
+                    android:id="@+id/banquetsrecycler"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
             </androidx.cardview.widget.CardView>
