@@ -101,7 +101,7 @@ public class InicioFragment extends Fragment {
         menuButton = root.findViewById(R.id.menu_button);
         searchButton = root.findViewById(R.id.search_button);
         searchEditText = root.findViewById(R.id.search_edit_text);
-        welcomeMessage = root.findViewById(R.id.welcome_message);
+        welcomeMessage = root.findViewById(R.id.welcomemessage);
 
         // ✅ NO HAY PROGRESSBAR EN EL LAYOUT - No inicializar
         progressBar = null;
