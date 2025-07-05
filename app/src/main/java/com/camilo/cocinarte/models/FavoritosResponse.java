@@ -34,7 +34,7 @@ public class FavoritosResponse {
         return mensaje;
     }
 
-    // -------------------- Clase interna Favorito --------------------
+    // -------------------- Clase interna Favorito CORREGIDA --------------------
     public static class Favorito {
 
         @SerializedName("id")
@@ -76,17 +76,18 @@ public class FavoritosResponse {
         @SerializedName("tiempo")
         private String tiempo;
 
+        // ✅ CAMBIADOS DE INT A DOUBLE/FLOAT PARA MANEJAR DECIMALES
         @SerializedName("calorias")
-        private int calorias;
+        private double calorias;
 
         @SerializedName("proteinas")
-        private int proteinas;
+        private double proteinas;
 
         @SerializedName("carbohidratos")
-        private int carbohidratos;
+        private double carbohidratos;
 
         @SerializedName("grasas")
-        private int grasas;
+        private double grasas;
 
         @SerializedName("autor")
         private String autor;
@@ -97,7 +98,7 @@ public class FavoritosResponse {
         @SerializedName("receta")
         private Receta receta;
 
-        // Getters
+        // ✅ GETTERS ACTUALIZADOS PARA USAR DOUBLE
         public int getId() {
             return id;
         }
@@ -150,19 +151,20 @@ public class FavoritosResponse {
             return tiempo;
         }
 
-        public int getCalorias() {
+        // ✅ GETTERS CORREGIDOS PARA VALORES NUTRICIONALES
+        public double getCalorias() {
             return calorias;
         }
 
-        public int getProteinas() {
+        public double getProteinas() {
             return proteinas;
         }
 
-        public int getCarbohidratos() {
+        public double getCarbohidratos() {
             return carbohidratos;
         }
 
-        public int getGrasas() {
+        public double getGrasas() {
             return grasas;
         }
 
@@ -179,7 +181,7 @@ public class FavoritosResponse {
         }
     }
 
-    // -------------------- Clase interna Receta --------------------
+    // -------------------- Clase interna Receta CORREGIDA --------------------
     public static class Receta {
 
         @SerializedName("id_receta")
@@ -200,13 +202,14 @@ public class FavoritosResponse {
         @SerializedName("dificultad")
         private String dificultad;
 
+        // ✅ CAMBIADO DE INT A DOUBLE
         @SerializedName("calorias")
-        private int calorias;
+        private double calorias;
 
         @SerializedName("autor")
         private String autor;
 
-        // Getters
+        // ✅ GETTERS CORREGIDOS
         public int getIdReceta() {
             return idReceta;
         }
@@ -231,7 +234,7 @@ public class FavoritosResponse {
             return dificultad;
         }
 
-        public int getCalorias() {
+        public double getCalorias() {
             return calorias;
         }
 

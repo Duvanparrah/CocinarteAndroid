@@ -61,9 +61,7 @@
                     android:layout_marginLeft="50dp"
                     android:layout_marginRight="50dp"
                     android:maxLines="1"
-                    android:ellipsize="end"
-
-                    />
+                    android:ellipsize="end" />
 
                 <!-- Línea inferior más larga -->
                 <View
@@ -232,7 +230,6 @@
 
             </LinearLayout>
 
-
             <LinearLayout
                 android:id="@+id/contenedorFoto"
                 android:layout_width="match_parent"
@@ -288,11 +285,7 @@
                     </LinearLayout>
                 </FrameLayout>
 
-                <!-- Contenedor de iconos de interacción -->
-
             </LinearLayout>
-
-
 
             <!-- Contenedor completo debajo del recuadro de la imagen -->
             <LinearLayout
@@ -378,7 +371,6 @@
                     android:gravity="center_vertical"
                     android:layout_marginTop="8dp">
 
-
                     <ImageView
                         android:layout_width="24dp"
                         android:layout_height="24dp"
@@ -398,22 +390,7 @@
 
                 </LinearLayout>
 
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginTop="8dp">
-
-
-
-                    <!-- Spinner dificultad -->
-
-                </LinearLayout>
-
-
-                <!-- CONTENEDOR PRINCIPAL -->
+                <!-- CONTENEDOR PRINCIPAL INGREDIENTES -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -439,53 +416,12 @@
                             android:gravity="center"
                             android:layout_marginBottom="16dp" />
 
-                        <!-- Input y botón de agregar -
-                        <LinearLayout
-                            android:layout_marginTop="12dp"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
-                            android:layout_marginBottom="12dp">
-
-                            !- Icono ingrediente -
-                            <ImageView
-                                android:layout_width="24dp"
-                                android:layout_height="24dp"
-                                android:src="@drawable/logo_ingredientes"
-                                app:tint="@color/gris"
-                                android:layout_marginEnd="8dp" />
-
-                            !- EditText -
-                            <EditText
-
-                                android:id="@+id/et_ingrediente"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:hint="Agregar un ingrediente"
-                                android:inputType="text"
-                                android:background="@android:color/transparent"
-                                android:textColor="@android:color/black" />
-
-                            !- Botón agregar
-                            <ImageButton
-                                android:id="@+id/btn_agregar_ingrediente"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:src="@drawable/ci_add_add"
-                                android:background="@android:color/transparent"
-                                android:contentDescription="Agregar ingrediente"
-                                app:tint="@color/verde" />
-                        </LinearLayout> -->
-
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="horizontal"
                             android:gravity="center_vertical"
                             android:layout_marginTop="8dp">
-
 
                             <EditText
                                 android:id="@+id/search_ingrediente"
@@ -498,6 +434,7 @@
                                 android:inputType="text"
                                 android:drawableStart="@drawable/ic_lupa_scaled" />
                         </LinearLayout>
+
                         <!-- Contenedor para sugerencias de ingredientes -->
                         <com.google.android.flexbox.FlexboxLayout
                             android:id="@+id/sugerenciasContainer"
@@ -531,17 +468,80 @@
                     </LinearLayout>
                 </LinearLayout>
 
+            </LinearLayout>
+
+            <!-- SECCIÓN DE PREPARACIÓN PASO A PASO -->
+            <LinearLayout
+                android:id="@+id/seccion_instrucciones"
+                android:orientation="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:padding="16dp"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/tv_preparacion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Preparación paso a paso"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/verde"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- Input + botón agregar paso -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp">
+
+                    <EditText
+                        android:id="@+id/et_paso"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content"
+                        android:minHeight="48dp"
+                        android:padding="12dp"
+                        android:hint="1. Agrega los pasos de tu receta"
+                        android:inputType="text"
+                        android:background="@drawable/bg_edittext" />
+
+                    <ImageButton
+                        android:id="@+id/btn_agregar_paso"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:minWidth="48dp"
+                        android:minHeight="48dp"
+                        android:src="@drawable/ci_add_add"
+                        app:tint="@color/verde"
+                        android:contentDescription="Agregar paso"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:layout_marginStart="8dp" />
+                </LinearLayout>
+
+                <!-- Lista de pasos como texto enumerado -->
+                <LinearLayout
+                    android:id="@+id/lista_pasos"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="16dp" />
+
+                <Button
+                    android:id="@+id/btn_publicar_receta"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Publicar receta"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="32dp"
+                    android:textColor="@android:color/white"
+                    android:backgroundTint="@color/verde" />
 
             </LinearLayout>
 
-            <Button
-                android:id="@+id/btn_instrucciones"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Ultimo paso"
-                android:layout_marginTop="24dp" />
         </LinearLayout>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>
-
-

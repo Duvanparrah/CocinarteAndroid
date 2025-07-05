@@ -20,4 +20,9 @@
 
     <color name="gris_claro">#E0E0E0</color>
 
+
+    <!-- Color para likes activos -->
+    <color name="like_red">#E53935</color>
+    <color name="like_red_dark">#C62828</color>
+
 </resources>

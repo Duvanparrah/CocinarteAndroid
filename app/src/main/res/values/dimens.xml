@@ -5,4 +5,11 @@
     <dimen name="nav_header_vertical_spacing">8dp</dimen>
     <dimen name="nav_header_height">176dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
+    <!-- Espaciado para el grid de recetas -->
+    <dimen name="grid_spacing">8dp</dimen>
+
+    <!-- Otras dimensiones que puedas necesitar -->
+    <dimen name="card_margin">8dp</dimen>
+    <dimen name="card_corner_radius">12dp</dimen>
+    <dimen name="card_elevation">4dp</dimen>
 </resources>

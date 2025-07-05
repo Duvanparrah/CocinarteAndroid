@@ -46,18 +46,40 @@
                     android:src="@drawable/perfil_chef"
                     android:background="@drawable/circle_background" />
 
-                <TextView
-                    android:id="@+id/tVNameUser"
+                <!-- ✅ MODIFICADO: Cambié a LinearLayout vertical para agregar el email -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="DoñaReceta"
-                    android:textColor="@android:color/white"
-                    android:textSize="14sp"
-                    android:textStyle="bold"
-                    android:shadowColor="#AA000000"
-                    android:shadowDx="0"
-                    android:shadowDy="2"
-                    android:shadowRadius="4" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tVNameUser"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="DoñaReceta"
+                        android:textColor="@android:color/white"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:shadowColor="#AA000000"
+                        android:shadowDx="0"
+                        android:shadowDy="2"
+                        android:shadowRadius="4" />
+
+                    <!-- ✅ NUEVO: TextView para el email -->
+                    <TextView
+                        android:id="@+id/tVEmailUser"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="usuario@email.com"
+                        android:textColor="@android:color/white"
+                        android:textSize="12sp"
+                        android:shadowColor="#AA000000"
+                        android:shadowDx="0"
+                        android:shadowDy="2"
+                        android:shadowRadius="4"
+                        android:visibility="gone" />
+
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Título de receta -->

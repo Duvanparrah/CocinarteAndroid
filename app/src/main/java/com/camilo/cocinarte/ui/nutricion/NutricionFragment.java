@@ -8,25 +8,43 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
+import com.camilo.cocinarte.MainActivity;
+import com.camilo.cocinarte.R;
 import com.camilo.cocinarte.databinding.FragmentNutricionBinding;
 
 public class NutricionFragment extends Fragment {
 
     private FragmentNutricionBinding binding;
+    private DrawerLayout drawerLayout;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
         binding = FragmentNutricionBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        // Obtener referencia al DrawerLayout desde MainActivity
+        if (getActivity() instanceof MainActivity) {
+            MainActivity mainActivity = (MainActivity) getActivity();
+            drawerLayout = mainActivity.getDrawerLayout();
+        }
 
         // Configurar oyentes de eventos
         setupEventListeners();
 
-        return root;
+        // Configurar navegación entre fragments
+        setupNavigationListeners(view);
     }
 
     private void setupEventListeners() {
@@ -46,9 +64,76 @@ public class NutricionFragment extends Fragment {
 
         // Botón de filtro (ícono de menú)
         binding.filterButton.setOnClickListener(view -> {
-            Toast.makeText(getContext(), "Filtrar planes (funcionalidad pendiente)", Toast.LENGTH_SHORT).show();
-            // Aquí puedes abrir un diálogo de filtros, si lo deseas
+            if (drawerLayout != null) {
+                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    drawerLayout.closeDrawer(GravityCompat.START);
+                } else {
+                    drawerLayout.openDrawer(GravityCompat.START);
+                }
+            } else {
+                Toast.makeText(getContext(), "Filtrar planes (funcionalidad pendiente)", Toast.LENGTH_SHORT).show();
+            }
         });
+    }
+
+    // ✅ FUNCIÓN PARA CONFIGURAR NAVEGACIÓN ENTRE FRAGMENTS
+    private void setupNavigationListeners(View view) {
+        // La navegación principal se maneja mediante el Bottom Navigation
+
+        // Ejemplo: Navegar después de seleccionar plan gratuito
+        binding.btnGratis.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Plan Gratuito activado. Redirigiendo a Inicio...", Toast.LENGTH_SHORT).show();
+
+            // Navegar a inicio después de un pequeño delay
+            v.postDelayed(() -> {
+                navigateToInicio();
+            }, 1500);
+        });
+    }
+
+    // ✅ MÉTODOS DE NAVEGACIÓN USANDO MAINACTIVITY
+    public void navigateToFragment(int fragmentId) {
+        if (getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).navigateToFragment(fragmentId);
+        }
+    }
+
+    public void navigateToInicio() {
+        navigateToFragment(R.id.navigation_inicio);
+    }
+
+    public void navigateToBanquetes() {
+        navigateToFragment(R.id.navigation_banquetes);
+    }
+
+    public void navigateToComunidad() {
+        navigateToFragment(R.id.navegar_comunidad);
+    }
+
+    // ✅ MÉTODO PARA MANEJAR LA SELECCIÓN DE PLANES CON NAVEGACIÓN
+    private void handlePlanSelection(String planType) {
+        switch (planType) {
+            case "gratuito":
+                Toast.makeText(getContext(), "Plan Gratuito activado", Toast.LENGTH_SHORT).show();
+                // Redirigir a inicio o mantener en nutrición
+                navigateToInicio();
+                break;
+            case "pro":
+                Toast.makeText(getContext(), "Procesando Plan Pro...", Toast.LENGTH_SHORT).show();
+                // Iniciar actividad de pago y después redirigir
+                Intent intent = new Intent(getActivity(), Metodo_de_pago_Activity.class);
+                startActivity(intent);
+                break;
+        }
+    }
+
+    // ✅ MÉTODOS DE EJEMPLO PARA LLAMAR DESDE ACCIONES ESPECÍFICAS
+    public void onPlanGratuitoSelected() {
+        handlePlanSelection("gratuito");
+    }
+
+    public void onPlanProSelected() {
+        handlePlanSelection("pro");
     }
 
     @Override

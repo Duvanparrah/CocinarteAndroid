@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -12,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.camilo.cocinarte.MainActivity;
 import com.camilo.cocinarte.R;
+import com.camilo.cocinarte.api.LoginManager; // ✅ IMPORTAR LoginManager
 import com.camilo.cocinarte.databinding.ActivityInicioSesionBinding;
 import com.camilo.cocinarte.models.LoginResponse;
 import com.camilo.cocinarte.session.SessionManager;
@@ -19,23 +21,27 @@ import com.camilo.cocinarte.utils.Resource;
 import com.camilo.cocinarte.viewmodels.AuthViewModel;
 
 public class InicioSesionActivity extends AppCompatActivity {
+    private static final String TAG = "InicioSesionActivity";
 
     private ActivityInicioSesionBinding binding;
     private AuthViewModel authViewModel;
     private SessionManager sessionManager;
+    private LoginManager loginManager; // ✅ AGREGAR LoginManager
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Inicializar SessionManager
+        // ✅ INICIALIZAR AMBOS MANAGERS
         sessionManager = SessionManager.getInstance(this);
+        loginManager = new LoginManager(this); // ✅ INICIALIZAR LoginManager
 
         // Inicializar ViewModel
         authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
 
         // Verificar si ya hay sesión activa
-        if (authViewModel.isUserLoggedIn()) {
+        if (authViewModel.isUserLoggedIn() || loginManager.hasActiveSession()) {
+            Log.d(TAG, "✅ Sesión activa encontrada, navegando a MainActivity");
             navigateToMain();
             return;
         }
@@ -158,15 +164,16 @@ public class InicioSesionActivity extends AppCompatActivity {
     }
 
     /**
-     * Maneja el login exitoso guardando todos los datos del usuario
+     * ✅ MÉTODO CORREGIDO: Maneja el login exitoso guardando datos en AMBOS sistemas
      */
     private void handleLoginSuccess(LoginResponse loginResponse, String email, String password) {
         try {
-            // Verificar si la respuesta incluye datos del usuario
+            Log.d(TAG, "🚀 Procesando login exitoso...");
+
+            // ✅ GUARDAR EN SessionManager (sistema existente)
             if (loginResponse.getUser() != null) {
                 LoginResponse.UserData userData = loginResponse.getUser();
 
-                // Guardar sesión completa con todos los datos del usuario
                 sessionManager.saveCompleteUserSession(
                         email,
                         password,
@@ -178,12 +185,19 @@ public class InicioSesionActivity extends AppCompatActivity {
                         userData.isVerified()
                 );
 
-                android.util.Log.d("Login", "Datos del usuario guardados: " + userData.getNombre());
-
+                Log.d(TAG, "✅ Sesión guardada en SessionManager");
             } else {
-                // Si solo hay token, guardar sesión básica
                 sessionManager.saveUserSession(email, password, loginResponse.getToken());
-                android.util.Log.d("Login", "Sesión básica guardada, falta información del usuario");
+                Log.d(TAG, "✅ Sesión básica guardada en SessionManager");
+            }
+
+            // ✅ GUARDAR EN LoginManager (para compatibilidad con MisRecetas)
+            if (loginResponse.getUser() != null) {
+                loginManager.saveToken(loginResponse.getToken());
+                loginManager.saveUser(loginResponse.getUser());
+
+                Log.d(TAG, "✅ Datos guardados en LoginManager:");
+                loginManager.debugPrintUserData(); // Debug para verificar
             }
 
             // Mostrar mensaje de bienvenida
@@ -195,7 +209,8 @@ public class InicioSesionActivity extends AppCompatActivity {
             navigateToMain();
 
         } catch (Exception e) {
-            android.util.Log.e("Login", "Error al guardar sesión: " + e.getMessage());
+            Log.e(TAG, "❌ Error al guardar sesión: " + e.getMessage());
+            e.printStackTrace();
             Toast.makeText(this, "Error al guardar sesión", Toast.LENGTH_SHORT).show();
         }
     }
@@ -221,6 +236,7 @@ public class InicioSesionActivity extends AppCompatActivity {
     }
 
     private void navigateToMain() {
+        Log.d(TAG, "🏠 Navegando a MainActivity");
         Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("fragment_to_show", "inicio");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

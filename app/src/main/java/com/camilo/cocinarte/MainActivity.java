@@ -11,7 +11,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
-//importaciones repetidas
+
+import com.camilo.cocinarte.api.LoginManager;
 import com.camilo.cocinarte.databinding.ActivityMainBinding;
 import com.camilo.cocinarte.session.SessionManager;
 import com.camilo.cocinarte.ui.authentication.CuentaConfiguracionActivity;
@@ -28,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private NavController navController;
     private SessionManager sessionManager;
+    private LoginManager loginManager;
     private DrawerLayout drawerLayout;
     private NavigationView navigationView;
 
@@ -42,18 +44,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        // ✅ INICIALIZAR AMBOS MANAGERS
         sessionManager = SessionManager.getInstance(this);
+        loginManager = new LoginManager(this);
 
-        // Validar sesión
-        if (!sessionManager.isLoggedIn() || !sessionManager.hasValidToken() || sessionManager.isSessionExpired()) {
+        // ✅ DEBUG: Mostrar información disponible
+        Log.d(TAG, "=== INICIO MainActivity ===");
+        NavigationHeaderHelper.debugUserInfo(this);
+
+        // ✅ VALIDACIÓN DE SESIÓN MEJORADA
+        if (!isValidSession()) {
             Log.d(TAG, "Sesión no válida o expirada. Redirigiendo al login.");
-            sessionManager.logout();
-            Toast.makeText(this, "Tu sesión ha expirado. Por favor, inicia sesión nuevamente.", Toast.LENGTH_LONG).show();
-
-            Intent intent = new Intent(this, InicioSesionActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
-            finish();
+            redirectToLogin("Tu sesión ha expirado. Por favor, inicia sesión nuevamente.");
             return;
         }
 
@@ -66,57 +68,156 @@ public class MainActivity extends AppCompatActivity {
             getSupportActionBar().hide();
         }
 
-        drawerLayout = binding.drawerLayout;
-        navigationView = findViewById(R.id.navigation_view);
+        // Inicializar componentes de navegación
+        initializeNavigation();
 
+        // Cargar información del usuario
         loadUserInfoInNavigationHeader();
 
-        // Manejar clics del Drawer
-        navigationView.setNavigationItemSelectedListener(menuItem -> {
-            int id = menuItem.getItemId();
-            Intent intent = null;
+        // Configurar listeners del drawer
+        setupDrawerListeners();
 
-            if (id == R.id.nav_favorites) {
-                Log.d(TAG, "Navegando a Favoritos");
-                intent = new Intent(this, FavoritosActivity.class);
-            } else if (id == R.id.nav_recipes) {
-                Log.d(TAG, "Navegando a Mis Recetas");
-                intent = new Intent(this, MisRecetasActivity.class);
-            } else if (id == R.id.nav_notifications) {
-                Log.d(TAG, "Navegando a Notificaciones");
-                intent = new Intent(this, NotificacionesActivity.class);
-            } else if (id == R.id.nav_account) {
-                Log.d(TAG, "Navegando a Cuenta y configuración");
-                intent = new Intent(this, CuentaConfiguracionActivity.class);
-            } else if (id == R.id.nav_support) {
-                Log.d(TAG, "Navegando a Soporte");
-                intent = new Intent(this, SoporteActivity.class);
-            } else if (id == R.id.nav_sign_out) {
-                Log.d(TAG, "Cerrando sesión...");
-                sessionManager.logout();
-                intent = new Intent(this, InicioSesionActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            } else {
-                Log.d(TAG, "Elemento desconocido seleccionado");
+        // Manejar intent de navegación
+        handleNavigationIntent(getIntent());
+    }
+
+    /**
+     * ✅ MÉTODO MEJORADO: Validación robusta de sesión
+     */
+    private boolean isValidSession() {
+        try {
+            // Verificar en LoginManager primero
+            boolean loginManagerValid = loginManager.hasActiveSession();
+
+            if (loginManagerValid) {
+                Log.d(TAG, "✅ Sesión válida en LoginManager");
+                return true;
             }
 
-            if (intent != null) {
-                startActivity(intent);
-                // ❌ Ya no se cierra MainActivity innecesariamente
-                // finish();
-                overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out); // Opcional: transición suave
+            // Si LoginManager no tiene sesión, verificar SessionManager
+            boolean sessionManagerValid = sessionManager.isLoggedIn() &&
+                    sessionManager.hasValidToken() &&
+                    !sessionManager.isSessionExpired();
+
+            if (sessionManagerValid) {
+                Log.d(TAG, "✅ Sesión válida en SessionManager, migrando a LoginManager...");
+                // Migrar datos de SessionManager a LoginManager
+                loginManager.migrarDesdeSessionManager(this);
+                return true;
             }
 
-            drawerLayout.closeDrawer(GravityCompat.START);
-            return true;
-        });
+            Log.w(TAG, "⚠️ No hay sesión válida en ningún manager");
+            return false;
+
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error al validar sesión: " + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * ✅ MÉTODO PARA REDIRIGIR AL LOGIN
+     */
+    private void redirectToLogin(String message) {
+        try {
+            // Limpiar sesiones
+            sessionManager.logout();
+            loginManager.clear();
+
+            if (message != null) {
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            }
+
+            Intent intent = new Intent(this, InicioSesionActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+
+        } catch (Exception e) {
+            Log.e(TAG, "Error al redirigir al login: " + e.getMessage());
+            finish(); // Al menos cerrar esta actividad
+        }
+    }
+
+    /**
+     * ✅ INICIALIZAR COMPONENTES DE NAVEGACIÓN
+     */
+    private void initializeNavigation() {
+        drawerLayout = binding.drawerLayout;
+        navigationView = findViewById(R.id.navigation_view);
 
         // Bottom Navigation
         BottomNavigationView navView = binding.navView;
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupWithNavController(navView, navController);
 
-        handleNavigationIntent(getIntent());
+        // ✅ Configurar listener para el bottom navigation con IDs correctos del menú
+        navView.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.nav_inicio) {
+                navController.navigate(R.id.navigation_inicio);
+                return true;
+            } else if (itemId == R.id.nav_banquetes) {
+                navController.navigate(R.id.navigation_banquetes);
+                return true;
+            } else if (itemId == R.id.nav_nutricion) {
+                navController.navigate(R.id.navigation_nutricion);
+                return true;
+            } else if (itemId == R.id.navegar_comunidad) {
+                navController.navigate(R.id.navegar_comunidad);
+                return true;
+            }
+
+            return false;
+        });
+
+        Log.d(TAG, "Navegación inicializada correctamente");
+    }
+
+    /**
+     * ✅ CONFIGURAR LISTENERS DEL DRAWER
+     */
+    private void setupDrawerListeners() {
+        if (navigationView != null) {
+            navigationView.setNavigationItemSelectedListener(menuItem -> {
+                int id = menuItem.getItemId();
+                Intent intent = null;
+
+                if (id == R.id.nav_favorites) {
+                    Log.d(TAG, "Navegando a Favoritos");
+                    intent = new Intent(this, FavoritosActivity.class);
+                } else if (id == R.id.nav_recipes) {
+                    Log.d(TAG, "Navegando a Mis Recetas");
+                    intent = new Intent(this, MisRecetasActivity.class);
+                } else if (id == R.id.nav_notifications) {
+                    Log.d(TAG, "Navegando a Notificaciones");
+                    intent = new Intent(this, NotificacionesActivity.class);
+                } else if (id == R.id.nav_account) {
+                    Log.d(TAG, "Navegando a Cuenta y configuración");
+                    intent = new Intent(this, CuentaConfiguracionActivity.class);
+                } else if (id == R.id.nav_support) {
+                    Log.d(TAG, "Navegando a Soporte");
+                    intent = new Intent(this, SoporteActivity.class);
+                } else if (id == R.id.nav_sign_out) {
+                    Log.d(TAG, "Cerrando sesión...");
+                    sessionManager.logout();
+                    loginManager.clear();
+                    intent = new Intent(this, InicioSesionActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                } else {
+                    Log.d(TAG, "Elemento desconocido seleccionado");
+                }
+
+                if (intent != null) {
+                    startActivity(intent);
+                    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out);
+                }
+
+                drawerLayout.closeDrawer(GravityCompat.START);
+                return true;
+            });
+        }
     }
 
     @Override
@@ -128,6 +229,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        // ✅ VALIDAR SESIÓN EN onResume TAMBIÉN
+        if (!isValidSession()) {
+            Log.w(TAG, "Sesión inválida detectada en onResume");
+            redirectToLogin("Tu sesión ha expirado");
+            return;
+        }
+
         refreshUserInfo();
 
         Intent intent = getIntent();
@@ -137,9 +246,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * ✅ MANEJAR INTENTS DE NAVEGACIÓN
+     */
     private void handleNavigationIntent(Intent intent) {
         if (intent != null && intent.hasExtra("fragment_to_show")) {
             String fragmentToShow = intent.getStringExtra("fragment_to_show");
+            Log.d(TAG, "Navegando a fragment: " + fragmentToShow);
 
             switch (fragmentToShow) {
                 case "inicio":
@@ -155,6 +268,7 @@ public class MainActivity extends AppCompatActivity {
                     navController.navigate(R.id.navegar_comunidad);
                     break;
                 default:
+                    Log.d(TAG, "Fragment desconocido, navegando a inicio");
                     navController.navigate(R.id.navigation_inicio);
                     break;
             }
@@ -170,19 +284,97 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * ✅ MÉTODOS PÚBLICOS PARA NAVEGACIÓN PROGRAMÁTICA
+     */
     public DrawerLayout getDrawerLayout() {
         return drawerLayout;
     }
 
+    public NavController getNavController() {
+        return navController;
+    }
+
+    // ✅ MÉTODO GENERAL PARA NAVEGAR A CUALQUIER FRAGMENT
+    public void navigateToFragment(int fragmentId) {
+        if (navController != null) {
+            try {
+                navController.navigate(fragmentId);
+                Log.d(TAG, "Navegación exitosa a fragmentId: " + fragmentId);
+            } catch (Exception e) {
+                Log.e(TAG, "Error al navegar a fragmentId: " + fragmentId, e);
+                Toast.makeText(this, "Error de navegación", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            Log.e(TAG, "NavController es null, no se puede navegar");
+        }
+    }
+
+    // ✅ MÉTODOS ESPECÍFICOS PARA CADA FRAGMENT
+    public void navigateToInicio() {
+        Log.d(TAG, "Navegando a Inicio");
+        navigateToFragment(R.id.navigation_inicio);
+    }
+
+    public void navigateToBanquetes() {
+        Log.d(TAG, "Navegando a Banquetes");
+        navigateToFragment(R.id.navigation_banquetes);
+    }
+
+    public void navigateToNutricion() {
+        Log.d(TAG, "Navegando a Nutrición");
+        navigateToFragment(R.id.navigation_nutricion);
+    }
+
+    public void navigateToComunidad() {
+        Log.d(TAG, "Navegando a Comunidad");
+        navigateToFragment(R.id.navegar_comunidad);
+    }
+
+    // ✅ MÉTODO PARA NAVEGAR CON BUNDLE DE DATOS
+    public void navigateToFragmentWithBundle(int fragmentId, Bundle bundle) {
+        if (navController != null) {
+            try {
+                navController.navigate(fragmentId, bundle);
+                Log.d(TAG, "Navegación con bundle exitosa a fragmentId: " + fragmentId);
+            } catch (Exception e) {
+                Log.e(TAG, "Error al navegar con bundle a fragmentId: " + fragmentId, e);
+                Toast.makeText(this, "Error de navegación", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    // ✅ MÉTODO PARA VERIFICAR SI ESTAMOS EN UN FRAGMENT ESPECÍFICO
+    public boolean isCurrentDestination(int fragmentId) {
+        if (navController != null && navController.getCurrentDestination() != null) {
+            return navController.getCurrentDestination().getId() == fragmentId;
+        }
+        return false;
+    }
+
+    // ✅ MÉTODO PARA OBTENER EL FRAGMENT ACTUAL
+    public int getCurrentFragmentId() {
+        if (navController != null && navController.getCurrentDestination() != null) {
+            return navController.getCurrentDestination().getId();
+        }
+        return -1;
+    }
+
+    /**
+     * ✅ GESTIÓN DE INFORMACIÓN DE USUARIO CORREGIDA
+     */
     private void loadUserInfoInNavigationHeader() {
         if (navigationView != null) {
             Log.d(TAG, "Cargando información del usuario en el header...");
-            NavigationHeaderHelper.loadUserInfo(this, navigationView);
 
-            SessionManager.SessionData sessionData = sessionManager.getSessionData();
-            Log.d(TAG, "Usuario: " + sessionData.userName);
-            Log.d(TAG, "Email: " + sessionData.email);
-            Log.d(TAG, "Foto: " + sessionData.userPhoto);
+            try {
+                // ✅ USAR EL NavigationHeaderHelper CORREGIDO
+                NavigationHeaderHelper.loadUserInfo(this, navigationView);
+                Log.d(TAG, "✅ Información del usuario cargada exitosamente");
+
+            } catch (Exception e) {
+                Log.e(TAG, "❌ Error al cargar información del usuario: " + e.getMessage());
+            }
         } else {
             Log.e(TAG, "NavigationView es null, no se puede cargar información del usuario");
         }
@@ -195,7 +387,37 @@ public class MainActivity extends AppCompatActivity {
     public void refreshUserInfo() {
         if (navigationView != null) {
             Log.d(TAG, "Refrescando información del usuario...");
-            NavigationHeaderHelper.refreshUserInfo(this, navigationView);
+            try {
+                NavigationHeaderHelper.refreshUserInfo(this, navigationView);
+                Log.d(TAG, "✅ Información del usuario refrescada");
+            } catch (Exception e) {
+                Log.e(TAG, "❌ Error al refrescar información del usuario: " + e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * ✅ MÉTODO PARA MANEJO DE ERRORES DE NAVEGACIÓN
+     */
+    public void handleNavigationError(Exception error) {
+        Log.e(TAG, "Error de navegación: ", error);
+        Toast.makeText(this, "Error de navegación. Reintentando...", Toast.LENGTH_SHORT).show();
+
+        // En caso de error, navegar a inicio como fallback
+        try {
+            navController.navigate(R.id.navigation_inicio);
+        } catch (Exception fallbackError) {
+            Log.e(TAG, "Error crítico de navegación: ", fallbackError);
+        }
+    }
+
+    /**
+     * ✅ MÉTODO PARA RESETEAR NAVEGACIÓN
+     */
+    public void resetNavigation() {
+        Log.d(TAG, "Reseteando navegación a inicio");
+        if (navController != null) {
+            navController.popBackStack(R.id.navigation_inicio, false);
         }
     }
 
@@ -203,5 +425,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         binding = null;
+        navController = null;
+        Log.d(TAG, "MainActivity destruida");
     }
 }

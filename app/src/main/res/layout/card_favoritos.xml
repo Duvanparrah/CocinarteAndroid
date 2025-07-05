@@ -1,38 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"
+    android:background="@color/white">
 
-
-    <androidx.cardview.widget.CardView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        app:cardCornerRadius="12dp"
-        app:cardElevation="6dp">
+        android:orientation="horizontal"
+        android:padding="16dp">
 
+        <!-- Imagen de la receta -->
+        <ImageView
+            android:id="@+id/imgFavorito"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginEnd="16dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/logo_cocinarte"
+            android:background="@drawable/rounded_corner"
+            android:contentDescription="Imagen de la receta favorita" />
+
+        <!-- Información de la receta -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/imgFavorito"
-                android:layout_width="match_parent"
-                android:layout_height="200dp"
-                android:scaleType="centerCrop"
-                android:src="@drawable/images" />
-
+            <!-- Título de la receta -->
             <TextView
                 android:id="@+id/nombreFavorito"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="12dp"
-                android:text="Ajiaco Santafereño"
-                android:textSize="18sp"
+                android:text="Nombre de la receta"
+                android:textColor="@android:color/black"
+                android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="#000000" />
+                android:maxLines="2"
+                android:ellipsize="end" />
+
+            <!-- Descripción -->
+            <TextView
+                android:id="@+id/descripcionFavorito"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Descripción de la receta"
+                android:textColor="@android:color/darker_gray"
+                android:textSize="14sp"
+                android:maxLines="2"
+                android:ellipsize="end" />
+
+            <!-- Información adicional -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal">
+
+                <!-- Tiempo -->
+                <TextView
+                    android:id="@+id/tiempoFavorito"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="30 min"
+                    android:textColor="@android:color/holo_green_dark"
+                    android:textSize="12sp"
+                    android:background="@drawable/chip_simple"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp" />
+
+                <!-- Dificultad -->
+                <TextView
+                    android:id="@+id/dificultadFavorito"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Fácil"
+                    android:textColor="@android:color/holo_orange_dark"
+                    android:textSize="12sp"
+                    android:background="@drawable/chip_simple"
+                    android:paddingStart="8dp"
+                    android:paddingEnd="8dp"
+                    android:paddingTop="4dp"
+                    android:paddingBottom="4dp" />
+
+            </LinearLayout>
+
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
-</RelativeLayout>
+
+        <!-- Icono de favorito -->
+        <ImageView
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_favoritos"
+            app:tint="@android:color/holo_orange_light"
+            android:contentDescription="Favorito" />
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

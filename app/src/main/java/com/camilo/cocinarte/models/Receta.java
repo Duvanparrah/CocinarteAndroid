@@ -1,50 +1,22 @@
 package com.camilo.cocinarte.models;
 
 import com.google.gson.annotations.SerializedName;
+import java.io.Serializable;
 import java.util.List;
 
-public class Receta {
+public class Receta implements Serializable {
 
     @SerializedName("id_receta")
     private int idReceta;
 
-    @SerializedName("id_usuario")
-    private int idUsuario;
-
-    @SerializedName("titulo")
     private String titulo;
-
-    @SerializedName("descripcion")
     private String descripcion;
-
-    @SerializedName("imagen")
     private String imagen;
 
-    @SerializedName("tiempo")
+    @SerializedName("tiempo_preparacion")
     private String tiempoPreparacion;
 
-    @SerializedName("dificultad")
     private String dificultad;
-
-    @SerializedName("calorias")
-    private int calorias;
-
-    @SerializedName("proteinas")
-    private int proteinas;
-
-    @SerializedName("carbohidratos")
-    private int carbohidratos;
-
-    @SerializedName("grasas")
-    private int grasas;
-
-    @SerializedName("azucar")
-    private Double azucar;
-
-    @SerializedName("seccion")
-    private String seccion;
-
-    @SerializedName("categoria")
     private String categoria;
 
     @SerializedName("fecha_creacion")
@@ -53,191 +25,259 @@ public class Receta {
     @SerializedName("fecha_edicion")
     private String fechaEdicion;
 
-    @SerializedName("editado")
-    private Boolean editado;
+    private boolean editado;
 
-    @SerializedName("preparacion")
-    private String preparacion;
+    @SerializedName("id_usuario")
+    private int idUsuario;
 
-    // Usuario de la receta cuando se consulta individualmente
-    @SerializedName("Usuario")
-    private Usuario usuario;
+    @SerializedName("id_categoria")
+    private int idCategoria;
 
-    // Usuario que creó la receta (cuando viene desde comunidad o listados)
-    @SerializedName("creador")
-    private Usuario creador;
+    private String seccion;
 
+    // ✅ CAMPOS NUTRICIONALES
+    private int calorias;
+    private double proteinas;
+    private double carbohidratos;
+    private double grasas;
+    private double azucar;
+
+    // ✅ INFORMACIÓN DEL CREADOR (CLAVE PARA FILTRAR)
+    private CreadorInfo creador;
+
+    // ✅ INGREDIENTES
     @SerializedName("Ingredientes")
     private List<Ingrediente> ingredientes;
 
-    // --- Getters y Setters ---
+    // ✅ INFORMACIÓN NUTRICIONAL AGRUPADA
+    private NutricionInfo nutricion;
 
-    public int getIdReceta() {
-        return idReceta;
-    }
+    // Constructores
+    public Receta() {}
 
-    public void setIdReceta(int idReceta) {
+    public Receta(int idReceta, String titulo, String descripcion, String imagen,
+                  String tiempoPreparacion, String dificultad, String categoria) {
         this.idReceta = idReceta;
-    }
-
-    public int getIdUsuario() {
-        return idUsuario;
-    }
-
-    public void setIdUsuario(int idUsuario) {
-        this.idUsuario = idUsuario;
-    }
-
-    public String getTitulo() {
-        return titulo;
-    }
-
-    public void setTitulo(String titulo) {
         this.titulo = titulo;
-    }
-
-    public String getDescripcion() {
-        return descripcion;
-    }
-
-    public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
-    }
-
-    public String getImagen() {
-        return imagen;
-    }
-
-    public void setImagen(String imagen) {
         this.imagen = imagen;
-    }
-
-    public String getTiempoPreparacion() {
-        return tiempoPreparacion;
-    }
-
-    public void setTiempoPreparacion(String tiempoPreparacion) {
         this.tiempoPreparacion = tiempoPreparacion;
-    }
-
-    public String getDificultad() {
-        return dificultad;
-    }
-
-    public void setDificultad(String dificultad) {
         this.dificultad = dificultad;
-    }
-
-    public Integer getCalorias() {
-        return calorias;
-    }
-
-    public void setCalorias(Integer calorias) {
-        this.calorias = calorias;
-    }
-
-    public Integer getProteinas() {
-        return proteinas;
-    }
-
-    public void setProteinas(Integer proteinas) {
-        this.proteinas = proteinas;
-    }
-
-    public Integer getCarbohidratos() {
-        return carbohidratos;
-    }
-
-    public void setCarbohidratos(Integer carbohidratos) {
-        this.carbohidratos = carbohidratos;
-    }
-
-    public Integer getGrasas() {
-        return grasas;
-    }
-
-    public void setGrasas(Integer grasas) {
-        this.grasas = grasas;
-    }
-
-    public Double getAzucar() {
-        return azucar;
-    }
-
-    public void setAzucar(Double azucar) {
-        this.azucar = azucar;
-    }
-
-    public String getSeccion() {
-        return seccion;
-    }
-
-    public void setSeccion(String seccion) {
-        this.seccion = seccion;
-    }
-
-    public String getFechaCreacion() {
-        return fechaCreacion;
-    }
-
-    public void setFechaCreacion(String fechaCreacion) {
-        this.fechaCreacion = fechaCreacion;
-    }
-
-    public String getFechaEdicion() {
-        return fechaEdicion;
-    }
-
-    public void setFechaEdicion(String fechaEdicion) {
-        this.fechaEdicion = fechaEdicion;
-    }
-
-    public Boolean getEditado() {
-        return editado;
-    }
-
-    public void setEditado(Boolean editado) {
-        this.editado = editado;
-    }
-
-    public String getCategoria() {
-        return categoria;
-    }
-
-    public void setCategoria(String categoria) {
         this.categoria = categoria;
     }
 
-    public String getPreparacion() {
-        return preparacion;
+    // ✅ GETTERS Y SETTERS BÁSICOS
+    public int getIdReceta() { return idReceta; }
+    public void setIdReceta(int idReceta) { this.idReceta = idReceta; }
+
+    public String getTitulo() { return titulo; }
+    public void setTitulo(String titulo) { this.titulo = titulo; }
+
+    public String getDescripcion() { return descripcion; }
+    public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+
+    public String getImagen() { return imagen; }
+    public void setImagen(String imagen) { this.imagen = imagen; }
+
+    public String getTiempoPreparacion() { return tiempoPreparacion; }
+    public void setTiempoPreparacion(String tiempoPreparacion) { this.tiempoPreparacion = tiempoPreparacion; }
+
+    public String getDificultad() { return dificultad; }
+    public void setDificultad(String dificultad) { this.dificultad = dificultad; }
+
+    public String getCategoria() { return categoria; }
+    public void setCategoria(String categoria) { this.categoria = categoria; }
+
+    public String getFechaCreacion() { return fechaCreacion; }
+    public void setFechaCreacion(String fechaCreacion) { this.fechaCreacion = fechaCreacion; }
+
+    public String getFechaEdicion() { return fechaEdicion; }
+    public void setFechaEdicion(String fechaEdicion) { this.fechaEdicion = fechaEdicion; }
+
+    public boolean isEditado() { return editado; }
+    public void setEditado(boolean editado) { this.editado = editado; }
+
+    public int getIdUsuario() { return idUsuario; }
+    public void setIdUsuario(int idUsuario) { this.idUsuario = idUsuario; }
+
+    public int getIdCategoria() { return idCategoria; }
+    public void setIdCategoria(int idCategoria) { this.idCategoria = idCategoria; }
+
+    public String getSeccion() { return seccion; }
+    public void setSeccion(String seccion) { this.seccion = seccion; }
+
+    // ✅ GETTERS Y SETTERS NUTRICIONALES
+    public int getCalorias() { return calorias; }
+    public void setCalorias(int calorias) { this.calorias = calorias; }
+
+    public double getProteinas() { return proteinas; }
+    public void setProteinas(double proteinas) { this.proteinas = proteinas; }
+
+    public double getCarbohidratos() { return carbohidratos; }
+    public void setCarbohidratos(double carbohidratos) { this.carbohidratos = carbohidratos; }
+
+    public double getGrasas() { return grasas; }
+    public void setGrasas(double grasas) { this.grasas = grasas; }
+
+    public double getAzucar() { return azucar; }
+    public void setAzucar(double azucar) { this.azucar = azucar; }
+
+    // ✅ GETTERS Y SETTERS DEL CREADOR (IMPORTANTE)
+    public CreadorInfo getCreador() { return creador; }
+    public void setCreador(CreadorInfo creador) { this.creador = creador; }
+
+    // ✅ GETTERS Y SETTERS DE INGREDIENTES
+    public List<Ingrediente> getIngredientes() { return ingredientes; }
+    public void setIngredientes(List<Ingrediente> ingredientes) { this.ingredientes = ingredientes; }
+
+    // ✅ GETTERS Y SETTERS DE NUTRICIÓN
+    public NutricionInfo getNutricion() { return nutricion; }
+    public void setNutricion(NutricionInfo nutricion) { this.nutricion = nutricion; }
+
+    // ✅ MÉTODOS DE UTILIDAD
+
+    /**
+     * Verifica si la receta fue creada por un usuario regular (no administrador)
+     */
+    public boolean esDeUsuarioRegular() {
+        return creador != null && "usuario".equals(creador.getTipo_usuario());
     }
 
-    public void setPreparacion(String preparacion) {
-        this.preparacion = preparacion;
+    /**
+     * Verifica si la receta fue creada por un administrador
+     */
+    public boolean esDeAdministrador() {
+        return creador != null &&
+                ("administrador".equals(creador.getTipo_usuario()) ||
+                        "administrador_lider".equals(creador.getTipo_usuario()));
     }
 
-    public List<Ingrediente> getIngredientes() {
-        return ingredientes;
+    /**
+     * Obtiene el nombre del creador de forma segura
+     */
+    public String getNombreCreador() {
+        return creador != null ? creador.getNombre_usuario() : "Desconocido";
     }
 
-    public void setIngredientes(List<Ingrediente> ingredientes) {
-        this.ingredientes = ingredientes;
+    /**
+     * Obtiene el correo del creador de forma segura
+     */
+    public String getCorreoCreador() {
+        return creador != null ? creador.getCorreo() : "";
     }
 
-    public Usuario getUsuario() {
-        return usuario;
+    /**
+     * Obtiene el tipo de usuario del creador de forma segura
+     */
+    public String getTipoCreador() {
+        return creador != null ? creador.getTipo_usuario() : "usuario";
     }
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
+    // ✅ CLASE INTERNA: INFORMACIÓN DEL CREADOR
+    public static class CreadorInfo implements Serializable {
+        @SerializedName("id_usuario")
+        private int id_usuario;
+
+        @SerializedName("nombre_usuario")
+        private String nombre_usuario;
+
+        private String correo;         // ✅ CAMPO CLAVE PARA MOSTRAR
+
+        @SerializedName("tipo_usuario")
+        private String tipo_usuario;   // ✅ CAMPO CLAVE PARA FILTRAR
+
+        @SerializedName("foto_perfil")
+        private String foto_perfil;
+
+        public CreadorInfo() {}
+
+        public CreadorInfo(int id_usuario, String nombre_usuario, String correo, String tipo_usuario) {
+            this.id_usuario = id_usuario;
+            this.nombre_usuario = nombre_usuario;
+            this.correo = correo;
+            this.tipo_usuario = tipo_usuario;
+        }
+
+        // Getters y setters
+        public int getId_usuario() { return id_usuario; }
+        public void setId_usuario(int id_usuario) { this.id_usuario = id_usuario; }
+
+        public String getNombre_usuario() { return nombre_usuario; }
+        public void setNombre_usuario(String nombre_usuario) { this.nombre_usuario = nombre_usuario; }
+
+        public String getCorreo() { return correo; }
+        public void setCorreo(String correo) { this.correo = correo; }
+
+        public String getTipo_usuario() { return tipo_usuario; }
+        public void setTipo_usuario(String tipo_usuario) { this.tipo_usuario = tipo_usuario; }
+
+        public String getFoto_perfil() { return foto_perfil; }
+        public void setFoto_perfil(String foto_perfil) { this.foto_perfil = foto_perfil; }
+
+        @Override
+        public String toString() {
+            return "CreadorInfo{" +
+                    "id_usuario=" + id_usuario +
+                    ", nombre_usuario='" + nombre_usuario + '\'' +
+                    ", correo='" + correo + '\'' +
+                    ", tipo_usuario='" + tipo_usuario + '\'' +
+                    '}';
+        }
     }
 
-    public Usuario getCreador() {
-        return creador;
+    // ✅ CLASE INTERNA: INFORMACIÓN NUTRICIONAL
+    public static class NutricionInfo implements Serializable {
+        private int calorias;
+        private double proteinas;
+        private double carbohidratos;
+        private double grasas;
+        private double azucar;
+
+        public NutricionInfo() {}
+
+        public NutricionInfo(int calorias, double proteinas, double carbohidratos, double grasas, double azucar) {
+            this.calorias = calorias;
+            this.proteinas = proteinas;
+            this.carbohidratos = carbohidratos;
+            this.grasas = grasas;
+            this.azucar = azucar;
+        }
+
+        // Getters y setters
+        public int getCalorias() { return calorias; }
+        public void setCalorias(int calorias) { this.calorias = calorias; }
+
+        public double getProteinas() { return proteinas; }
+        public void setProteinas(double proteinas) { this.proteinas = proteinas; }
+
+        public double getCarbohidratos() { return carbohidratos; }
+        public void setCarbohidratos(double carbohidratos) { this.carbohidratos = carbohidratos; }
+
+        public double getGrasas() { return grasas; }
+        public void setGrasas(double grasas) { this.grasas = grasas; }
+
+        public double getAzucar() { return azucar; }
+        public void setAzucar(double azucar) { this.azucar = azucar; }
+
+        @Override
+        public String toString() {
+            return "NutricionInfo{" +
+                    "calorias=" + calorias +
+                    ", proteinas=" + proteinas +
+                    ", carbohidratos=" + carbohidratos +
+                    ", grasas=" + grasas +
+                    ", azucar=" + azucar +
+                    '}';
+        }
     }
 
-    public void setCreador(Usuario creador) {
-        this.creador = creador;
+    @Override
+    public String toString() {
+        return "Receta{" +
+                "idReceta=" + idReceta +
+                ", titulo='" + titulo + '\'' +
+                ", creador=" + (creador != null ? creador.toString() : "null") +
+                ", esDeUsuarioRegular=" + esDeUsuarioRegular() +
+                '}';
     }
 }
-

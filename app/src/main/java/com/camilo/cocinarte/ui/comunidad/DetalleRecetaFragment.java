@@ -61,7 +61,6 @@ public class DetalleRecetaFragment extends Fragment {
 
     private String origen = "mis_recetas";
 
-
     private JSONArray comentariosArray = new JSONArray();
     private Handler pollingHandler = new Handler();
     private Runnable pollingRunnable;
@@ -85,10 +84,8 @@ public class DetalleRecetaFragment extends Fragment {
 
         cargarDatosUsuario(view);
 
-
         ImageView iconComentario = view.findViewById(R.id.icon_comentario);
         iconComentario.setOnClickListener(v -> abrirSeccionComentarios());
-
 
         ImageView iconCompartir = view.findViewById(R.id.icon_compartir);
         iconCompartir.setOnClickListener(v -> {
@@ -105,7 +102,6 @@ public class DetalleRecetaFragment extends Fragment {
                 Toast.makeText(getContext(), "Espera a que se cargue la receta", Toast.LENGTH_SHORT).show();
             }
         });
-
 
         iconGuardar = view.findViewById(R.id.icon_guardar);
 
@@ -150,13 +146,7 @@ public class DetalleRecetaFragment extends Fragment {
         } else {
             btnEliminar.setOnClickListener(v -> confirmarEliminacion());
         }
-
-
     }
-
-
-
-
 
     private void actualizarIconoGuardar() {
         if (iconGuardar != null) {
@@ -166,7 +156,6 @@ public class DetalleRecetaFragment extends Fragment {
             iconGuardar.setImageResource(iconRes);
         }
     }
-
 
     private void abrirSeccionComentarios() {
         if (recetaActual != null) {
@@ -206,9 +195,6 @@ public class DetalleRecetaFragment extends Fragment {
         }
     }
 
-
-
-
     private void iniciarPollingComentarios() {
         pollingRunnable = new Runnable() {
             @Override
@@ -242,8 +228,6 @@ public class DetalleRecetaFragment extends Fragment {
         scaleX.start();
         scaleY.start();
     }
-
-
 
     private void verificarCargaCompleta() {
         if (recetaCargada && reaccionesCargadas) {
@@ -282,7 +266,6 @@ public class DetalleRecetaFragment extends Fragment {
         });
     }
 
-
     private void obtenerReacciones(int recetaId) {
         ReaccionApi reaccionApi = ApiClient.getClient(requireContext()).create(ReaccionApi.class);
         reaccionApi.getReaccionesPorReceta(recetaId).enqueue(new Callback<ResponseBody>() {
@@ -297,7 +280,6 @@ public class DetalleRecetaFragment extends Fragment {
                         userLiked = obj.getJSONObject("likes").getBoolean("user_liked");
                         likeInicializado = true;
                         actualizarLikeUI();
-
 
                         comentariosArray = obj.getJSONArray("comentarios");
                         int totalComentarios = obj.getInt("total_comentarios");
@@ -419,7 +401,6 @@ public class DetalleRecetaFragment extends Fragment {
         }
     }
 
-
     private void mostrarDetallesReceta(Receta receta) {
         TextView nombreReceta = getView().findViewById(R.id.recipe_name);
         nombreReceta.setText(receta.getTitulo());
@@ -451,11 +432,21 @@ public class DetalleRecetaFragment extends Fragment {
         LinearLayout contenedorPasos = getView().findViewById(R.id.lista_pasos);
         contenedorPasos.removeAllViews();
 
-        List<String> pasos = Arrays.asList(receta.getPreparacion().split("\n"));
+        // ✅ CORRECCIÓN: Usar getDescripcion() en lugar de getPreparacion()
+        List<String> pasos;
+        if (receta.getDescripcion() != null && !receta.getDescripcion().isEmpty()) {
+            pasos = Arrays.asList(receta.getDescripcion().split("\n"));
+        } else {
+            pasos = Arrays.asList("No hay pasos de preparación disponibles");
+        }
+
         int pasoNum = 1;
         for (String paso : pasos) {
+            // Evitar pasos vacíos
+            if (paso.trim().isEmpty()) continue;
+
             TextView tvPaso = new TextView(getContext());
-            tvPaso.setText(String.format("%d. %s", pasoNum++, paso));
+            tvPaso.setText(String.format("%d. %s", pasoNum++, paso.trim()));
             tvPaso.setTextSize(16);
             tvPaso.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
             tvPaso.setPadding(0, 0, 0, 16);

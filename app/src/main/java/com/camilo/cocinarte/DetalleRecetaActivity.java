@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.camilo.cocinarte.api.ApiConfig;
 import com.camilo.cocinarte.api.FavoritosService;
 import com.camilo.cocinarte.api.ReaccionApi;
@@ -29,7 +30,6 @@ import com.camilo.cocinarte.models.Receta;
 import com.camilo.cocinarte.models.VerificarFavoritoResponse;
 import com.camilo.cocinarte.session.SessionManager;
 import com.camilo.cocinarte.ui.favoritos.ComentariosBottomSheetFragment;
-import com.camilo.cocinarte.utils.ReaccionCache;
 import com.camilo.cocinarte.models.Ingrediente;
 
 import org.json.JSONArray;
@@ -45,245 +45,229 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class DetalleRecetaActivity extends AppCompatActivity {
+    private static final String TAG = "DetalleRecetaActivity";
+
     private Receta recetaActual;
     private ReaccionesResponse reaccionesResponse;
+    private SessionManager sessionManager;
+
+    // Views principales
+    private ImageView imgFavorito;
+    private ImageView btnLikes;
+    private ImageView btnComentarios;
+    private TextView likesCount;
+    private TextView comentariosCount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_detalle_receta);
-        /*ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });*/
 
+        // Inicializar SessionManager
+        sessionManager = SessionManager.getInstance(this);
+
+        // Inicializar vistas
+        initViews();
+
+        // Obtener ID de la receta del intent
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("receta_id")) {
             int recetaId = intent.getIntExtra("receta_id", -1);
-            getRecetaById(recetaId);
+            Log.d(TAG, "Recibido receta_id: " + recetaId);
+
+            if (recetaId != -1) {
+                getRecetaById(recetaId);
+            } else {
+                Log.e(TAG, "ID de receta inválido");
+                Toast.makeText(this, "Error: ID de receta inválido", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        } else {
+            Log.e(TAG, "No se recibió ID de receta");
+            Toast.makeText(this, "Error: No se encontró la receta", Toast.LENGTH_SHORT).show();
+            finish();
         }
 
-
-        actions();
+        // Configurar listeners
+        setupListeners();
     }
 
-    public void actions() {
-        SessionManager sessionManager = SessionManager.getInstance(this);
-        ImageView like = findViewById(R.id.btn_likes_favoritos);
-        ImageView comentarios = findViewById(R.id.btn_comentarios_favoritos);
-        ImageView imgFavorito = findViewById(R.id.imgFavorito);
-
-
-        like.setOnClickListener(v -> {
-            String token = "Bearer " + sessionManager.getAuthToken();
-
-            RecetasService recetasService = ApiConfig.getClient(getApplicationContext()).create(RecetasService.class);
-            recetasService.sendLike(recetaActual.getIdReceta(), token).enqueue(new Callback<>() {
-                @Override
-                public void onResponse(Call<LikeResponse> call, Response<LikeResponse> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        if (response.body().isLiked()) {
-                            like.setImageTintList(ColorStateList.valueOf(
-                                    ContextCompat.getColor(getApplicationContext(), android.R.color.holo_red_dark)
-                            ));
-                        } else {
-                            like.setImageTintList(ColorStateList.valueOf(
-                                    ContextCompat.getColor(getApplicationContext(), android.R.color.darker_gray)
-                            ));
-                        }
-
-                        TextView likes_favoritos = findViewById(R.id.likes_favoritos);
-                        likes_favoritos.setText(""+response.body().getTotalLikes());
-
-                    }
-                }
-                @Override
-                public void onFailure(Call<LikeResponse> call, Throwable t) {
-                    t.printStackTrace();
-                }
-
-            });
-        });
-
-        comentarios.setOnClickListener(v -> {
-            abrirSeccionComentarios();
-            /*JSONObject cache = ReaccionCache.getReacciones(Integer.parseInt(sessionManager.getUserId()));
-            JSONArray comentarios = new JSONArray();
-            if (cache != null && cache.has("comentarios")) {
-                comentarios = cache.optJSONArray("comentarios");
-            }
-
-            ComentariosBottomSheetFragment modal = ComentariosBottomSheetFragment.newInstance(comentarios, recetaActual.getId_receta());
-            modal.setComentariosListener(() -> {
-                // Al cerrar el modal, recargamos reacciones
-                //adapter.actualizarReacciones(null);
-            });
-            modal.show(getSupportFragmentManager(), "ComentariosBottomSheet");*/
-        });
-
-
-        imgFavorito.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setFavorito(recetaActual.getIdReceta());
-            }
-        });
-
+    private void initViews() {
+        btnLikes = findViewById(R.id.btn_likes_favoritos);
+        btnComentarios = findViewById(R.id.btn_comentarios_favoritos);
+        imgFavorito = findViewById(R.id.imgFavorito);
+        likesCount = findViewById(R.id.likes_favoritos);
+        comentariosCount = findViewById(R.id.comentarios_favoritos);
     }
 
-    private void setFavorito(int recetaId){
-        SessionManager sessionManager = SessionManager.getInstance(this);
-        String token = "Bearer " + sessionManager.getAuthToken();
-        FavoritosService recetasService = ApiConfig.getClient(getApplicationContext()).create(FavoritosService.class);
-
-
-
-        recetasService.verificarFavorito(recetaId, token).enqueue(new Callback<>() {
-            @Override
-            public void onResponse(Call<VerificarFavoritoResponse> call, Response<VerificarFavoritoResponse> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    ImageView imgFavorito = findViewById(R.id.imgFavorito);
-
-                    if (response.body().isEsFavorito()) {
-                        recetasService.deleteFavorito(recetaId, token).enqueue(new Callback<>() {
-                            @Override
-                            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-                                if (response.isSuccessful() && response.body() != null) {
-                                    ApiResponse favorito = response.body();
-                                    Toast.makeText(getApplicationContext(), "Favoritos actualizado", Toast.LENGTH_SHORT).show();
-
-                                    imgFavorito.setImageTintList(ColorStateList.valueOf(
-                                            ContextCompat.getColor(getApplicationContext(), android.R.color.darker_gray)
-                                    ));
-                                } else {
-                                    Toast.makeText(getApplicationContext(), "Error enviar favorito", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<ApiResponse> call, Throwable t) {
-                                t.printStackTrace();
-                            }
-                        });
-                    }else {
-                        recetasService.setFavorito(recetaId, token).enqueue(new Callback<>() {
-                            @Override
-                            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-                                if (response.isSuccessful() && response.body() != null) {
-                                    ApiResponse favorito = response.body();
-                                    Toast.makeText(getApplicationContext(), "Favoritos actualizado", Toast.LENGTH_SHORT).show();
-
-                                    imgFavorito.setImageTintList(ColorStateList.valueOf(
-                                            ContextCompat.getColor(getApplicationContext(), android.R.color.holo_orange_light)
-                                    ));
-                                } else {
-                                    Toast.makeText(getApplicationContext(), "Error enviar favorito", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<ApiResponse> call, Throwable t) {
-                                t.printStackTrace();
-                            }
-                        });
-                    }
-                } else {
-                    Toast.makeText(getApplicationContext(), "Error validar favorito", Toast.LENGTH_SHORT).show();
-                }
+    private void setupListeners() {
+        // Listener para likes
+        btnLikes.setOnClickListener(v -> {
+            if (recetaActual != null) {
+                toggleLike(recetaActual.getIdReceta());
+            } else {
+                Toast.makeText(this, "Receta no cargada", Toast.LENGTH_SHORT).show();
             }
-            @Override
-            public void onFailure(Call<VerificarFavoritoResponse> call, Throwable t) {
-                t.printStackTrace();
+        });
+
+        // Listener para comentarios
+        btnComentarios.setOnClickListener(v -> {
+            if (recetaActual != null) {
+                abrirSeccionComentarios();
+            } else {
+                Toast.makeText(this, "Receta no cargada", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Listener para favoritos
+        imgFavorito.setOnClickListener(v -> {
+            if (recetaActual != null) {
+                toggleFavorito(recetaActual.getIdReceta());
+            } else {
+                Toast.makeText(this, "Receta no cargada", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void getRecetaById(int recetaId){
-        SessionManager sessionManager = SessionManager.getInstance(this);
-        String token = "Bearer " + sessionManager.getAuthToken();
+    private void getRecetaById(int recetaId) {
+        Log.d(TAG, "Obteniendo receta con ID: " + recetaId);
 
+        String token = sessionManager.getAuthToken();
+        if (token == null || token.isEmpty()) {
+            Toast.makeText(this, "Error de autenticación", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        String authHeader = "Bearer " + token;
         RecetasService recetasService = ApiConfig.getClient(getApplicationContext()).create(RecetasService.class);
-        recetasService.getRecetaById(recetaId, token).enqueue(new Callback<>() {
+
+        recetasService.getRecetaById(recetaId, authHeader).enqueue(new Callback<Receta>() {
             @Override
             public void onResponse(Call<Receta> call, Response<Receta> response) {
+                Log.d(TAG, "Respuesta de getRecetaById: " + response.code());
+
                 if (response.isSuccessful() && response.body() != null) {
-                    Receta favorito = response.body();
-                    Toast.makeText(getApplicationContext(), "Favoritos obtenidos", Toast.LENGTH_SHORT).show();
-                    //biildRecyclerviewFavoritos(favoritos.getFavoritos());
-                    recetaActual = favorito;
+                    recetaActual = response.body();
+                    Log.d(TAG, "Receta obtenida: " + recetaActual.getTitulo());
 
-                    recetasService.getReaccionesRecetaById(recetaId, token).enqueue(new Callback<>() {
-                        @Override
-                        public void onResponse(Call<ReaccionesResponse> call, Response<ReaccionesResponse> response) {
-                            ReaccionesResponse favorito = response.body();
-                            Toast.makeText(getApplicationContext(), "Favoritos obtenidos", Toast.LENGTH_SHORT).show();
-                            if (response.isSuccessful() && response.body() != null) {
-                                ReaccionesResponse _reaccionesResponse = response.body();
-                                Toast.makeText(getApplicationContext(), "Reacciones", Toast.LENGTH_SHORT).show();
-                                reaccionesResponse = _reaccionesResponse;
-                                mostrarDetallesReceta(recetaActual);
-                            } else {
-                                Toast.makeText(getApplicationContext(), "Error al obtener favoritos", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                        @Override
-                        public void onFailure(Call<ReaccionesResponse> call, Throwable t) {
-                            t.printStackTrace();
-                        }
-                    });
-
+                    // Cargar reacciones de la receta
+                    getReaccionesReceta(recetaId, authHeader);
                 } else {
-                    Toast.makeText(getApplicationContext(), "Error al obtener favoritos", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Error al obtener receta: " + response.code() + " - " + response.message());
+                    Toast.makeText(getApplicationContext(), "Error al cargar la receta", Toast.LENGTH_SHORT).show();
+                    finish();
                 }
             }
+
             @Override
             public void onFailure(Call<Receta> call, Throwable t) {
-                t.printStackTrace();
+                Log.e(TAG, "Error de conexión al obtener receta: ", t);
+                Toast.makeText(getApplicationContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
     }
 
+    private void getReaccionesReceta(int recetaId, String authHeader) {
+        Log.d(TAG, "Obteniendo reacciones para receta: " + recetaId);
+
+        RecetasService recetasService = ApiConfig.getClient(getApplicationContext()).create(RecetasService.class);
+
+        recetasService.getReaccionesRecetaById(recetaId, authHeader).enqueue(new Callback<ReaccionesResponse>() {
+            @Override
+            public void onResponse(Call<ReaccionesResponse> call, Response<ReaccionesResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    reaccionesResponse = response.body();
+                    Log.d(TAG, "Reacciones obtenidas - Likes: " + reaccionesResponse.getLikes().getTotal() +
+                            ", Comentarios: " + reaccionesResponse.getTotal_comentarios());
+
+                    // Mostrar todos los detalles de la receta
+                    mostrarDetallesReceta(recetaActual);
+
+                    // Cargar estado inicial del favorito
+                    cargarEstadoInicialFavorito(recetaId);
+                } else {
+                    Log.e(TAG, "Error al obtener reacciones: " + response.code());
+                    // Mostrar la receta sin reacciones
+                    mostrarDetallesReceta(recetaActual);
+                    cargarEstadoInicialFavorito(recetaId);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ReaccionesResponse> call, Throwable t) {
+                Log.e(TAG, "Error de conexión al obtener reacciones: ", t);
+                // Mostrar la receta sin reacciones
+                mostrarDetallesReceta(recetaActual);
+                cargarEstadoInicialFavorito(recetaId);
+            }
+        });
+    }
 
     private void mostrarDetallesReceta(Receta receta) {
+        Log.d(TAG, "Mostrando detalles de la receta: " + receta.getTitulo());
+
+        // Logo
         ImageView logo = findViewById(R.id.logo_image);
         Glide.with(this).load(R.drawable.logo_cocinarte).into(logo);
 
+        // Nombre de la receta
         TextView nombreReceta = findViewById(R.id.recipe_name);
         nombreReceta.setText(receta.getTitulo());
 
+        // Información nutricional
         TextView kcl = findViewById(R.id.nutrition_kcl);
         TextView p = findViewById(R.id.nutrition_p);
         TextView c = findViewById(R.id.nutrition_c);
         TextView gt = findViewById(R.id.nutrition_gt);
 
-        kcl.setText(String.valueOf(receta.getCalorias()));
-        p.setText(String.valueOf(receta.getProteinas()));
-        c.setText(String.valueOf(receta.getCarbohidratos()));
-        gt.setText(String.valueOf(receta.getGrasas()));
+        kcl.setText(String.valueOf((int) receta.getCalorias()));
+        p.setText(String.valueOf((int) receta.getProteinas()));
+        c.setText(String.valueOf((int) receta.getCarbohidratos()));
+        gt.setText(String.valueOf((int) receta.getGrasas()));
 
+        // Imagen de la receta
         ImageView imagenReceta = findViewById(R.id.photoImageDetails);
-        if (receta.getImagen() != null && !receta.getImagen().isEmpty()) {
+        if (receta.getImagen() != null && !receta.getImagen().isEmpty() && !receta.getImagen().equals("null")) {
+            RequestOptions options = new RequestOptions()
+                    .placeholder(R.drawable.logo_cocinarte)
+                    .error(R.drawable.logo_cocinarte)
+                    .centerCrop();
+
             Glide.with(getApplicationContext())
                     .load(receta.getImagen())
+                    .apply(options)
                     .into(imagenReceta);
+        } else {
+            imagenReceta.setImageResource(R.drawable.logo_cocinarte);
         }
 
+        // Tiempo y dificultad
         TextView tiempo = findViewById(R.id.tv_tiempo);
         TextView dificultad = findViewById(R.id.tv_dificultad);
 
-        tiempo.setText(receta.getTiempoPreparacion());
-        dificultad.setText(receta.getDificultad());
+        tiempo.setText(receta.getTiempoPreparacion() != null ? receta.getTiempoPreparacion() : "No especificado");
+        dificultad.setText(receta.getDificultad() != null ? receta.getDificultad() : "No especificada");
 
+        // Ingredientes
+        mostrarIngredientes(receta);
 
+        // Pasos de preparación
+        mostrarPasosPreparacion(receta);
+
+        // Reacciones (likes y comentarios)
+        mostrarReacciones();
+    }
+
+    private void mostrarIngredientes(Receta receta) {
         com.google.android.flexbox.FlexboxLayout contenedorIngredientes = findViewById(R.id.lista_ingredientes);
         contenedorIngredientes.removeAllViews();
 
         List<String> ingredientes = new ArrayList<>();
         if (receta.getIngredientes() != null) {
-            for (Ingrediente ingrediente : receta.getIngredientes())
-            {
+            for (Ingrediente ingrediente : receta.getIngredientes()) {
                 ingredientes.add(ingrediente.getNombreIngrediente());
             }
         }
@@ -298,52 +282,234 @@ public class DetalleRecetaActivity extends AppCompatActivity {
                 agregarChipIngrediente(contenedorIngredientes, ingrediente.trim());
             }
         }
+    }
 
+    private void mostrarPasosPreparacion(Receta receta) {
         LinearLayout contenedorPasos = findViewById(R.id.lista_pasos);
         contenedorPasos.removeAllViews();
 
-        int pasoNum = 1;
-        ArrayList<String> pasos = new ArrayList<>(Arrays.asList(receta.getDescripcion().split("\n")));
+        if (receta.getDescripcion() != null && !receta.getDescripcion().isEmpty()) {
+            int pasoNum = 1;
+            ArrayList<String> pasos = new ArrayList<>(Arrays.asList(receta.getDescripcion().split("\n")));
 
-        for (String paso : pasos ) {
-            TextView tvPaso = new TextView(getApplicationContext());
-            tvPaso.setText(String.format("%d. %s", pasoNum++, paso));
-            tvPaso.setTextSize(16);
-            tvPaso.setTextColor(ContextCompat.getColor(getApplicationContext(), android.R.color.black));
-            tvPaso.setLayoutParams(new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            ));
-            tvPaso.setPadding(0, 0, 0, 16);
-            contenedorPasos.addView(tvPaso);
+            for (String paso : pasos) {
+                if (!paso.trim().isEmpty()) {
+                    TextView tvPaso = new TextView(getApplicationContext());
+                    tvPaso.setText(String.format("%d. %s", pasoNum++, paso.trim()));
+                    tvPaso.setTextSize(16);
+                    tvPaso.setTextColor(ContextCompat.getColor(getApplicationContext(), android.R.color.black));
+                    tvPaso.setLayoutParams(new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT
+                    ));
+                    tvPaso.setPadding(0, 0, 0, 16);
+                    contenedorPasos.addView(tvPaso);
+                }
+            }
         }
+    }
 
+    private void mostrarReacciones() {
+        if (reaccionesResponse != null) {
+            // Mostrar contadores
+            likesCount.setText(String.valueOf(reaccionesResponse.getLikes().getTotal()));
+            comentariosCount.setText(String.valueOf(reaccionesResponse.getTotal_comentarios()));
 
-        //Reacciones
-
-        TextView likes_favoritos = findViewById(R.id.likes_favoritos);
-        TextView comentarios_favoritos = findViewById(R.id.comentarios_favoritos);
-
-        likes_favoritos.setText(""+reaccionesResponse.getLikes().getTotal() );
-        comentarios_favoritos.setText(""+reaccionesResponse.getTotal_comentarios());
-
-
-        ImageView like = findViewById(R.id.btn_likes_favoritos);
-        if (reaccionesResponse.getLikes().isUser_liked()) {
-            like.setImageTintList(ColorStateList.valueOf(
-                    ContextCompat.getColor(getApplicationContext(), android.R.color.holo_red_dark)
-            ));
+            // Actualizar estado visual del botón de like
+            if (reaccionesResponse.getLikes().isUser_liked()) {
+                btnLikes.setImageTintList(ColorStateList.valueOf(
+                        ContextCompat.getColor(getApplicationContext(), android.R.color.holo_red_dark)
+                ));
+            } else {
+                btnLikes.setImageTintList(ColorStateList.valueOf(
+                        ContextCompat.getColor(getApplicationContext(), android.R.color.darker_gray)
+                ));
+            }
         } else {
-            like.setImageTintList(ColorStateList.valueOf(
+            // Valores por defecto si no hay reacciones
+            likesCount.setText("0");
+            comentariosCount.setText("0");
+            btnLikes.setImageTintList(ColorStateList.valueOf(
                     ContextCompat.getColor(getApplicationContext(), android.R.color.darker_gray)
             ));
         }
     }
 
+    private void toggleLike(int recetaId) {
+        Log.d(TAG, "Toggle like para receta: " + recetaId);
+
+        String token = "Bearer " + sessionManager.getAuthToken();
+        RecetasService recetasService = ApiConfig.getClient(getApplicationContext()).create(RecetasService.class);
+
+        recetasService.sendLike(recetaId, token).enqueue(new Callback<LikeResponse>() {
+            @Override
+            public void onResponse(Call<LikeResponse> call, Response<LikeResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    LikeResponse likeResponse = response.body();
+                    Log.d(TAG, "Like actualizado - Liked: " + likeResponse.isLiked() +
+                            ", Total: " + likeResponse.getTotalLikes());
+
+                    // Actualizar UI
+                    if (likeResponse.isLiked()) {
+                        btnLikes.setImageTintList(ColorStateList.valueOf(
+                                ContextCompat.getColor(getApplicationContext(), android.R.color.holo_red_dark)
+                        ));
+                    } else {
+                        btnLikes.setImageTintList(ColorStateList.valueOf(
+                                ContextCompat.getColor(getApplicationContext(), android.R.color.darker_gray)
+                        ));
+                    }
+
+                    likesCount.setText(String.valueOf(likeResponse.getTotalLikes()));
+                } else {
+                    Log.e(TAG, "Error al dar like: " + response.code());
+                    Toast.makeText(getApplicationContext(), "Error al dar like", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<LikeResponse> call, Throwable t) {
+                Log.e(TAG, "Error de conexión al dar like: ", t);
+                Toast.makeText(getApplicationContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void toggleFavorito(int recetaId) {
+        Log.d(TAG, "Toggle favorito para receta: " + recetaId);
+
+        String token = "Bearer " + sessionManager.getAuthToken();
+        FavoritosService favoritosService = ApiConfig.getClient(getApplicationContext()).create(FavoritosService.class);
+
+        // Primero verificar el estado actual
+        favoritosService.verificarFavorito(recetaId, token).enqueue(new Callback<VerificarFavoritoResponse>() {
+            @Override
+            public void onResponse(Call<VerificarFavoritoResponse> call, Response<VerificarFavoritoResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    boolean esFavorito = response.body().isEsFavorito();
+                    Log.d(TAG, "Estado actual favorito: " + esFavorito);
+
+                    if (esFavorito) {
+                        // Quitar de favoritos
+                        quitarDeFavoritos(recetaId, favoritosService, token);
+                    } else {
+                        // Agregar a favoritos
+                        agregarAFavoritos(recetaId, favoritosService, token);
+                    }
+                } else {
+                    Log.e(TAG, "Error al verificar favorito: " + response.code());
+                    Toast.makeText(getApplicationContext(), "Error al verificar favorito", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<VerificarFavoritoResponse> call, Throwable t) {
+                Log.e(TAG, "Error de conexión al verificar favorito: ", t);
+                Toast.makeText(getApplicationContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void agregarAFavoritos(int recetaId, FavoritosService service, String token) {
+        service.setFavorito(recetaId, token).enqueue(new Callback<ApiResponse>() {
+            @Override
+            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.d(TAG, "Agregado a favoritos exitosamente");
+                    Toast.makeText(getApplicationContext(), "Agregado a favoritos", Toast.LENGTH_SHORT).show();
+
+                    // Actualizar UI - favorito activo
+                    imgFavorito.setImageTintList(ColorStateList.valueOf(
+                            ContextCompat.getColor(getApplicationContext(), android.R.color.holo_orange_light)
+                    ));
+                } else {
+                    Log.e(TAG, "Error al agregar favorito: " + response.code());
+                    Toast.makeText(getApplicationContext(), "Error al agregar favorito", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse> call, Throwable t) {
+                Log.e(TAG, "Error de conexión al agregar favorito: ", t);
+                Toast.makeText(getApplicationContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void quitarDeFavoritos(int recetaId, FavoritosService service, String token) {
+        service.deleteFavorito(recetaId, token).enqueue(new Callback<ApiResponse>() {
+            @Override
+            public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    Log.d(TAG, "Removido de favoritos exitosamente");
+                    Toast.makeText(getApplicationContext(), "Removido de favoritos", Toast.LENGTH_SHORT).show();
+
+                    // Actualizar UI - favorito inactivo
+                    imgFavorito.setImageTintList(ColorStateList.valueOf(
+                            ContextCompat.getColor(getApplicationContext(), android.R.color.darker_gray)
+                    ));
+                } else {
+                    Log.e(TAG, "Error al remover favorito: " + response.code());
+                    Toast.makeText(getApplicationContext(), "Error al remover favorito", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ApiResponse> call, Throwable t) {
+                Log.e(TAG, "Error de conexión al remover favorito: ", t);
+                Toast.makeText(getApplicationContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void cargarEstadoInicialFavorito(int recetaId) {
+        Log.d(TAG, "Cargando estado inicial del favorito para receta: " + recetaId);
+
+        String token = "Bearer " + sessionManager.getAuthToken();
+        FavoritosService favoritosService = ApiConfig.getClient(getApplicationContext()).create(FavoritosService.class);
+
+        favoritosService.verificarFavorito(recetaId, token).enqueue(new Callback<VerificarFavoritoResponse>() {
+            @Override
+            public void onResponse(Call<VerificarFavoritoResponse> call, Response<VerificarFavoritoResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    boolean esFavorito = response.body().isEsFavorito();
+                    Log.d(TAG, "Estado inicial favorito: " + esFavorito);
+
+                    // Actualizar UI según el estado
+                    if (esFavorito) {
+                        imgFavorito.setImageTintList(ColorStateList.valueOf(
+                                ContextCompat.getColor(getApplicationContext(), android.R.color.holo_orange_light)
+                        ));
+                    } else {
+                        imgFavorito.setImageTintList(ColorStateList.valueOf(
+                                ContextCompat.getColor(getApplicationContext(), android.R.color.darker_gray)
+                        ));
+                    }
+                } else {
+                    Log.e(TAG, "Error al cargar estado favorito: " + response.code());
+                    // Estado por defecto
+                    imgFavorito.setImageTintList(ColorStateList.valueOf(
+                            ContextCompat.getColor(getApplicationContext(), android.R.color.darker_gray)
+                    ));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<VerificarFavoritoResponse> call, Throwable t) {
+                Log.e(TAG, "Error de conexión al cargar estado favorito: ", t);
+                // Estado por defecto
+                imgFavorito.setImageTintList(ColorStateList.valueOf(
+                        ContextCompat.getColor(getApplicationContext(), android.R.color.darker_gray)
+                ));
+            }
+        });
+    }
 
     private void abrirSeccionComentarios() {
         if (recetaActual != null) {
-            ReaccionApi api =  ApiConfig.getClient(getApplicationContext()).create(ReaccionApi.class);
+            Log.d(TAG, "Abriendo sección de comentarios para receta: " + recetaActual.getIdReceta());
+
+            ReaccionApi api = ApiConfig.getClient(getApplicationContext()).create(ReaccionApi.class);
             api.getReaccionesPorReceta(recetaActual.getIdReceta()).enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
@@ -353,19 +519,26 @@ public class DetalleRecetaActivity extends AppCompatActivity {
                             JSONObject obj = new JSONObject(json);
                             JSONArray comentariosArray = obj.getJSONArray("comentarios");
 
-                            ComentariosBottomSheetFragment modal = ComentariosBottomSheetFragment.newInstance(comentariosArray, recetaActual.getIdReceta());
-                            modal.show(getSupportFragmentManager(), modal.getTag());
+                            Log.d(TAG, "Comentarios obtenidos: " + comentariosArray.length());
+
+                            ComentariosBottomSheetFragment modal = ComentariosBottomSheetFragment.newInstance(
+                                    comentariosArray,
+                                    recetaActual.getIdReceta()
+                            );
+                            modal.show(getSupportFragmentManager(), "ComentariosBottomSheet");
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            Log.e(TAG, "Error al procesar comentarios: ", e);
                             Toast.makeText(getApplicationContext(), "Error al procesar comentarios", Toast.LENGTH_SHORT).show();
                         }
                     } else {
+                        Log.e(TAG, "Error al obtener comentarios: " + response.code());
                         Toast.makeText(getApplicationContext(), "No se pudieron obtener los comentarios", Toast.LENGTH_SHORT).show();
                     }
                 }
 
                 @Override
                 public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                    Log.e(TAG, "Error de red al cargar comentarios: ", t);
                     Toast.makeText(getApplicationContext(), "Error de red al cargar comentarios", Toast.LENGTH_SHORT).show();
                 }
             });
@@ -380,10 +553,22 @@ public class DetalleRecetaActivity extends AppCompatActivity {
         tvIngrediente.setPadding(30, 20, 30, 20);
         tvIngrediente.setBackgroundResource(R.drawable.bg_chip);
 
-        ViewGroup.MarginLayoutParams params = new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        ViewGroup.MarginLayoutParams params = new ViewGroup.MarginLayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
         params.setMargins(10, 10, 10, 10);
         tvIngrediente.setLayoutParams(params);
 
         contenedor.addView(tvIngrediente);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Recargar estado del favorito cuando se regresa a la actividad
+        if (recetaActual != null) {
+            cargarEstadoInicialFavorito(recetaActual.getIdReceta());
+        }
     }
 }

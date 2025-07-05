@@ -41,6 +41,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class InstruccionesFragmentReceta extends Fragment {
+    private static final String TAG = "InstruccionesFragment";
 
     private EditText etPaso;
     private ImageButton btnAgregarPaso;
@@ -72,75 +73,13 @@ public class InstruccionesFragmentReceta extends Fragment {
         btnPublicar.setOnClickListener(v -> {
             Bundle datos = getArguments();
             if (datos != null) {
-                if (listaPasos.getChildCount() == 0) {
-                    Toast.makeText(getContext(), "Agrega al menos un paso para la receta", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                List<String> pasos = new ArrayList<>();
-                for (int i = 0; i < listaPasos.getChildCount(); i++) {
-                    TextView tv = (TextView) listaPasos.getChildAt(i);
-                    String texto = tv.getText().toString();
-                    String contenido = texto.substring(texto.indexOf(".") + 1).trim();
-                    pasos.add(contenido);
-                }
-
-                String pasosFormateados = String.join("\n", pasos); // ✅ Formato correcto
-
-                String ingredientesString = datos.getString("ingredientes", "");
-                imagePath = datos.getString("imagenUri");
-
-                if (imagePath == null || imagePath.isEmpty()) {
-                    Toast.makeText(getContext(), "No se ha seleccionado una imagen válida", Toast.LENGTH_LONG).show();
-                    Log.e("|||Error", "imagePath es nulo o vacío");
-                    return;
-                }
-
-                RecetaRequest receta = new RecetaRequest();
-                LoginManager loginManager = new LoginManager(requireContext());
-
-                receta.setIdUsuario(loginManager.getUsuario().getIdUsuario());
-                receta.setTitulo(datos.getString("nombreReceta"));
-                receta.setDescripcion(pasosFormateados); // ✅ Los pasos ahora son la descripción
-                receta.setTiempoPreparacion(datos.getString("tiempo"));
-                receta.setDificultad(datos.getString("dificultad"));
-
-                int idCategoria = datos.getInt("categoriaId", 1); // usa 1 por defecto si no se pasa
-                receta.setIdCategoria(idCategoria);
-
-
-                receta.setCalorias(Integer.parseInt(datos.getString("kcal", "0")));
-                receta.setProteinas(Integer.parseInt(datos.getString("proteinas", "0")));
-                receta.setCarbohidratos(Integer.parseInt(datos.getString("carbohidratos", "0")));
-                receta.setGrasas(Integer.parseInt(datos.getString("grasas", "0")));
-                receta.setIngredientes(ingredientesString);
-                receta.setPasos(pasos);
-                receta.setPreparacion(pasosFormateados);
-                receta.setSeccion("comunidad");
-                receta.setFechaCreacion(String.valueOf(new Date()));
-
-                try {
-                    guardarReceta(receta);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    Toast.makeText(getContext(), "Error inesperado: " + e.getMessage(), Toast.LENGTH_LONG).show();
-                }
+                publicarReceta(datos);
             } else {
                 Toast.makeText(getContext(), "No se recibieron los datos necesarios", Toast.LENGTH_LONG).show();
             }
         });
 
         return view;
-    }
-
-    private int obtenerIdCategoriaDesdeNombre(String nombre) {
-        String[] categorias = getResources().getStringArray(R.array.categorias);
-        for (int i = 1; i < categorias.length; i++) {
-            if (categorias[i].equalsIgnoreCase(nombre.trim())) {
-                return i;
-            }
-        }
-        return 1;
     }
 
     private void agregarPaso(String textoPaso) {
@@ -180,23 +119,90 @@ public class InstruccionesFragmentReceta extends Fragment {
         etPaso.setHint(siguientePaso + ". Agrega los pasos de tu receta");
     }
 
-    private void guardarReceta(RecetaRequest receta) throws IOException {
+    // ✅ MÉTODO PRINCIPAL PARA PUBLICAR LA RECETA
+    private void publicarReceta(Bundle datos) {
+        // Validar que hay pasos
+        if (listaPasos.getChildCount() == 0) {
+            Toast.makeText(getContext(), "Agrega al menos un paso para la receta", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Validar imagen
+        imagePath = datos.getString("imagenUri");
+        if (imagePath == null || imagePath.isEmpty()) {
+            Toast.makeText(getContext(), "No se ha seleccionado una imagen válida", Toast.LENGTH_LONG).show();
+            Log.e(TAG, "imagePath es nulo o vacío");
+            return;
+        }
+
+        // ✅ EXTRAER PASOS DE LA INTERFAZ
+        List<String> pasos = new ArrayList<>();
+        for (int i = 0; i < listaPasos.getChildCount(); i++) {
+            TextView tv = (TextView) listaPasos.getChildAt(i);
+            String texto = tv.getText().toString();
+            String contenido = texto.substring(texto.indexOf(".") + 1).trim();
+            pasos.add(contenido);
+        }
+
+        // ✅ CREAR DESCRIPCIÓN/PREPARACIÓN UNIENDO LOS PASOS
+        String pasosFormateados = String.join("\n", pasos);
+
+        Log.d(TAG, "📝 Preparando receta con " + pasos.size() + " pasos");
+
+        // ✅ CREAR INSTANCIA DE LOGINMANAGER
+        LoginManager loginManager = new LoginManager(requireContext());
+        Log.d(TAG, "👤 Usuario: " + loginManager.getUsuario().getNombreUsuario());
+
+        // ✅ CREAR OBJETO RECETA CON DATOS CORRECTOS
+        RecetaRequest receta = new RecetaRequest();
+
+        receta.setIdUsuario(loginManager.getUsuario().getIdUsuario());
+        receta.setTitulo(datos.getString("nombreReceta"));
+        receta.setDescripcion(pasosFormateados);  // ✅ Los pasos como descripción
+        receta.setTiempoPreparacion(datos.getString("tiempo"));
+        receta.setDificultad(datos.getString("dificultad"));
+        receta.setIdCategoria(datos.getInt("categoriaId", 1));
+        receta.setIngredientes(datos.getString("ingredientes"));
+        receta.setPasos(pasos);
+        receta.setPreparacion(pasosFormateados);  // ✅ También como preparación
+        receta.setSeccion("comunidad");  // ✅ IMPORTANTE: Para que aparezca en comunidad
+        receta.setFechaCreacion(String.valueOf(new Date()));
+
+        // ✅ VALORES NUTRICIONALES (se calcularán automáticamente en el backend)
+        receta.setCalorias(0);
+        receta.setProteinas(0);
+        receta.setCarbohidratos(0);
+        receta.setGrasas(0);
+
+        try {
+            enviarRecetaAlServidor(receta);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Toast.makeText(getContext(), "Error inesperado: " + e.getMessage(), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    // ✅ MÉTODO PARA ENVIAR LA RECETA AL SERVIDOR
+    private void enviarRecetaAlServidor(RecetaRequest receta) throws IOException {
+        Log.d(TAG, "🚀 Enviando receta al servidor...");
+
         LoginManager loginManager = new LoginManager(requireContext());
         String tokenGuardado = loginManager.getToken();
 
+        // ✅ PREPARAR ARCHIVO DE IMAGEN
         Uri imageUri = Uri.parse(imagePath);
         File file = createTempFileFromUri(imageUri);
         if (file == null) {
             Toast.makeText(getContext(), "Error al procesar la imagen", Toast.LENGTH_LONG).show();
-            Log.e("|||Error", "No se pudo convertir la URI en archivo");
+            Log.e(TAG, "No se pudo convertir la URI en archivo");
             return;
         }
 
+        // ✅ CREAR MULTIPART BODY PARTS
         RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), file);
         MultipartBody.Part imagenPart = MultipartBody.Part.createFormData("foto", file.getName(), requestFile);
 
-        RecetaApi recetaApi = ApiClient.getClient(getContext()).create(RecetaApi.class);
-
+        // ✅ CREAR REQUEST BODIES PARA CADA CAMPO
         RequestBody _nombre = RequestBody.create(MediaType.parse("text/plain"), receta.getTitulo());
         RequestBody _categoria = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(receta.getIdCategoria()));
         RequestBody _seccion = RequestBody.create(MediaType.parse("text/plain"), receta.getSeccion());
@@ -205,6 +211,19 @@ public class InstruccionesFragmentReceta extends Fragment {
         RequestBody _descripcion = RequestBody.create(MediaType.parse("text/plain"), receta.getDescripcion());
         RequestBody _dificultad = RequestBody.create(MediaType.parse("text/plain"), receta.getDificultad());
         RequestBody _ingredientes = RequestBody.create(MediaType.parse("text/plain"), receta.getIngredientes());
+
+        // ✅ LOG DE DATOS ENVIADOS
+        Log.d(TAG, "📊 Datos de la receta:");
+        Log.d(TAG, "   - Título: " + receta.getTitulo());
+        Log.d(TAG, "   - Categoría: " + receta.getIdCategoria());
+        Log.d(TAG, "   - Sección: " + receta.getSeccion());
+        Log.d(TAG, "   - Tiempo: " + receta.getTiempoPreparacion());
+        Log.d(TAG, "   - Dificultad: " + receta.getDificultad());
+        Log.d(TAG, "   - Ingredientes: " + receta.getIngredientes());
+        Log.d(TAG, "   - Descripción: " + receta.getDescripcion().substring(0, Math.min(50, receta.getDescripcion().length())) + "...");
+
+        // ✅ HACER LA LLAMADA AL API
+        RecetaApi recetaApi = ApiClient.getClient(getContext()).create(RecetaApi.class);
 
         recetaApi.createReceta(
                 imagenPart,
@@ -221,38 +240,64 @@ public class InstruccionesFragmentReceta extends Fragment {
             @Override
             public void onResponse(Call<Receta> call, Response<Receta> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(getContext(), "Receta publicada correctamente", Toast.LENGTH_SHORT).show();
-                    Navigation.findNavController(requireView()).navigate(R.id.action_instruccionesFragmentReceta_to_navegar_comunidad_mis_recetas);
+                    Log.d(TAG, "✅ Receta publicada exitosamente");
+
+                    Toast.makeText(getContext(), "¡Receta publicada correctamente!", Toast.LENGTH_SHORT).show();
+
+                    // ✅ NAVEGAR A MIS RECETAS DESPUÉS DE CREAR
+                    Navigation.findNavController(requireView())
+                            .navigate(R.id.action_instruccionesFragmentReceta_to_navegar_comunidad_mis_recetas);
+
                 } else {
-                    try {
-                        String errorBody = response.errorBody() != null ? response.errorBody().string() : "Respuesta vacía";
-                        Log.e("|||Error", "Código: " + response.code() + "\n" + errorBody);
-
-                        String mensajeClaro;
-                        if (response.code() == 400) {
-                            mensajeClaro = "Faltan campos obligatorios o hay datos inválidos:\n" + errorBody;
-                        } else if (response.code() == 500 && errorBody.contains("Named bind parameter")) {
-                            mensajeClaro = "Error interno al crear la receta: falta un parámetro en la base de datos.\nRevisa si estás enviando todos los campos necesarios.";
-                        } else {
-                            mensajeClaro = "Error del servidor:\n" + errorBody;
-                        }
-
-                        Toast.makeText(getContext(), mensajeClaro, Toast.LENGTH_LONG).show();
-                    } catch (IOException e) {
-                        Log.e("|||IOException", "Error al leer cuerpo del error", e);
-                        Toast.makeText(getContext(), "Error al interpretar la respuesta del servidor", Toast.LENGTH_LONG).show();
-                    }
+                    manejarErrorRespuesta(response);
                 }
             }
 
             @Override
             public void onFailure(Call<Receta> call, Throwable t) {
-                Log.e("|||Failure", "Fallo en la conexión: " + t.getMessage());
-                Toast.makeText(getContext(), "Error de red: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                Log.e(TAG, "❌ Error de conexión: " + t.getMessage());
+                Toast.makeText(getContext(), "Error de conexión: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
+    // ✅ MÉTODO PARA MANEJAR ERRORES DE RESPUESTA
+    private void manejarErrorRespuesta(Response<Receta> response) {
+        try {
+            String errorBody = response.errorBody() != null ? response.errorBody().string() : "Respuesta vacía";
+            Log.e(TAG, "❌ Error HTTP " + response.code() + ": " + errorBody);
+
+            String mensajeClaro;
+            switch (response.code()) {
+                case 400:
+                    mensajeClaro = "Datos inválidos o incompletos. Verifica todos los campos.";
+                    break;
+                case 401:
+                    mensajeClaro = "Error de autenticación. Inicia sesión nuevamente.";
+                    break;
+                case 413:
+                    mensajeClaro = "La imagen es demasiado grande. Usa una imagen más pequeña.";
+                    break;
+                case 500:
+                    if (errorBody.contains("Named bind parameter")) {
+                        mensajeClaro = "Error interno del servidor. Faltan parámetros requeridos.";
+                    } else {
+                        mensajeClaro = "Error interno del servidor. Intenta nuevamente.";
+                    }
+                    break;
+                default:
+                    mensajeClaro = "Error del servidor (código " + response.code() + "). Intenta nuevamente.";
+            }
+
+            Toast.makeText(getContext(), mensajeClaro, Toast.LENGTH_LONG).show();
+
+        } catch (IOException e) {
+            Log.e(TAG, "❌ Error al leer respuesta de error", e);
+            Toast.makeText(getContext(), "Error al interpretar la respuesta del servidor", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    // ✅ MÉTODO PARA CREAR ARCHIVO TEMPORAL DESDE URI
     private File createTempFileFromUri(Uri uri) {
         try {
             InputStream inputStream = getContext().getContentResolver().openInputStream(uri);
@@ -268,11 +313,12 @@ public class InstruccionesFragmentReceta extends Fragment {
 
             outputStream.close();
             inputStream.close();
+
+            Log.d(TAG, "✅ Archivo temporal creado: " + tempFile.getAbsolutePath() + " (" + tempFile.length() + " bytes)");
             return tempFile;
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "❌ Error al crear archivo temporal", e);
             return null;
         }
     }
 }
-
