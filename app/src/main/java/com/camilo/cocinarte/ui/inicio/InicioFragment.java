@@ -101,7 +101,7 @@ public class InicioFragment extends Fragment {
         menuButton = root.findViewById(R.id.menu_button);
         searchButton = root.findViewById(R.id.search_button);
         searchEditText = root.findViewById(R.id.search_edit_text);
-        welcomeMessage = root.findViewById(R.id.welcomemessage);
+        welcomeMessage = root.findViewById(R.id.welcome_message);
 
         // ✅ NO HAY PROGRESSBAR EN EL LAYOUT - No inicializar
         progressBar = null;
@@ -129,19 +129,20 @@ public class InicioFragment extends Fragment {
     }
 
     private void setupRecyclerView() {
-        // Configurar el adapter
+        // ✅ CONFIGURAR EL ADAPTER CON EL FLAG DE INICIO (CAMBIO PRINCIPAL)
         webRecipesAdapter = new RecetasAdapter(getContext(), todasLasRecetas, new RecetasAdapter.OnRecetaClickListener() {
             @Override
             public void onRecetaClick(Receta receta) {
                 abrirDetalleReceta(receta);
             }
-        });
+        }, true); // ✅ TRUE = ES PANTALLA DE INICIO
 
         // ✅ USAR LINEARLAYOUTMANAGER PARA FEED ESTILO INSTAGRAM
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         webRecipesRecycler.setLayoutManager(layoutManager);
 
         webRecipesRecycler.setAdapter(webRecipesAdapter);
+        webRecipesRecycler.setHasFixedSize(true);
     }
 
     private void setupListeners() {
@@ -215,6 +216,11 @@ public class InicioFragment extends Fragment {
             progressBar.setVisibility(View.VISIBLE);
         }
 
+        if (getContext() == null) {
+            Log.e(TAG, "❌ Context es null, no se puede cargar");
+            return;
+        }
+
         try {
             // ✅ USAR EL NUEVO ENDPOINT ESPECÍFICO PARA INICIO (SIN TOKEN REQUERIDO)
             RecetaApi recetaApi = ApiClient.getClient(getContext()).create(RecetaApi.class);
@@ -225,24 +231,27 @@ public class InicioFragment extends Fragment {
             call.enqueue(new Callback<List<Receta>>() {
                 @Override
                 public void onResponse(@NonNull Call<List<Receta>> call, @NonNull Response<List<Receta>> response) {
+                    // ✅ VERIFICAR SI EL FRAGMENT SIGUE ACTIVO
+                    if (getContext() == null || !isAdded()) {
+                        Log.w(TAG, "Fragment no está activo, cancelando actualización");
+                        return;
+                    }
+
                     if (response.isSuccessful() && response.body() != null) {
                         List<Receta> recetas = response.body();
                         Log.d(TAG, "✅ Recetas de INICIO obtenidas: " + recetas.size());
 
-                        if (getActivity() != null) {
-                            getActivity().runOnUiThread(() -> {
-                                mostrarRecetasEnPantalla(recetas);
-                            });
-                        }
+                        // ✅ ACTUALIZAR EN EL HILO PRINCIPAL
+                        requireActivity().runOnUiThread(() -> {
+                            mostrarRecetasEnPantalla(recetas);
+                        });
                     } else {
                         Log.e(TAG, "❌ Error en respuesta: " + response.code());
                         Log.e(TAG, "❌ Mensaje: " + response.message());
 
-                        if (getActivity() != null) {
-                            getActivity().runOnUiThread(() -> {
-                                mostrarMensajeError("No se pudieron cargar las recetas");
-                            });
-                        }
+                        requireActivity().runOnUiThread(() -> {
+                            mostrarMensajeError("No se pudieron cargar las recetas (Código: " + response.code() + ")");
+                        });
                     }
                 }
 
@@ -250,11 +259,15 @@ public class InicioFragment extends Fragment {
                 public void onFailure(@NonNull Call<List<Receta>> call, @NonNull Throwable t) {
                     Log.e(TAG, "❌ Error de conexión al cargar recetas de INICIO: " + t.getMessage());
 
-                    if (getActivity() != null) {
-                        getActivity().runOnUiThread(() -> {
-                            mostrarMensajeError("Error de conexión. Verifica tu internet.");
-                        });
+                    // ✅ VERIFICAR SI EL FRAGMENT SIGUE ACTIVO
+                    if (getContext() == null || !isAdded()) {
+                        Log.w(TAG, "Fragment no está activo, cancelando manejo de error");
+                        return;
                     }
+
+                    requireActivity().runOnUiThread(() -> {
+                        mostrarMensajeError("Error de conexión. Verifica tu internet.");
+                    });
                 }
             });
 
@@ -275,13 +288,26 @@ public class InicioFragment extends Fragment {
 
         Log.d(TAG, "📱 Mostrando " + recetas.size() + " recetas de administradores en INICIO");
 
+        // ✅ FILTRAR SOLO RECETAS DE ADMINISTRADORES (EXTRA SEGURIDAD)
+        List<Receta> recetasAdmin = new ArrayList<>();
+        for (Receta receta : recetas) {
+            // Verificar si es de administrador
+            if (receta.esDeAdministrador()) {
+                recetasAdmin.add(receta);
+                Log.d(TAG, "✅ Receta de admin añadida: " + receta.getTitulo());
+            } else {
+                Log.d(TAG, "⚠️ Receta de usuario regular filtrada: " + receta.getTitulo());
+            }
+        }
+
         // Actualizar la lista de recetas
         todasLasRecetas.clear();
-        todasLasRecetas.addAll(recetas);
+        todasLasRecetas.addAll(recetasAdmin); // Usar la lista filtrada
 
         // Notificar al adapter
         if (webRecipesAdapter != null) {
             webRecipesAdapter.notifyDataSetChanged();
+            Log.d(TAG, "🔄 Adapter notificado con " + todasLasRecetas.size() + " recetas");
         }
 
         // Ocultar indicadores de carga
@@ -290,7 +316,7 @@ public class InicioFragment extends Fragment {
         }
 
         // Mostrar mensaje de éxito
-        Toast.makeText(getContext(), "Recetas cargadas: " + recetas.size(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Recetas cargadas: " + recetasAdmin.size(), Toast.LENGTH_SHORT).show();
     }
 
     // ✅ MÉTODOS AUXILIARES
@@ -303,6 +329,8 @@ public class InicioFragment extends Fragment {
         if (progressBar != null) {
             progressBar.setVisibility(View.GONE);
         }
+
+        Log.e(TAG, "Error mostrado al usuario: " + mensaje);
     }
 
     private void mostrarMensajeVacio() {
@@ -315,9 +343,17 @@ public class InicioFragment extends Fragment {
         if (progressBar != null) {
             progressBar.setVisibility(View.GONE);
         }
+
+        Log.w(TAG, "No hay recetas para mostrar en inicio");
     }
 
     private void displayWelcomeMessage() {
+        // ✅ VERIFICAR QUE WELCOMEMESSAGE NO SEA NULL
+        if (welcomeMessage == null) {
+            Log.w(TAG, "welcomeMessage es null, no se puede mostrar mensaje");
+            return;
+        }
+
         // Primero intentar con SessionManager
         if (sessionManager != null) {
             SessionManager.SessionData sessionData = sessionManager.getSessionData();
@@ -332,6 +368,11 @@ public class InicioFragment extends Fragment {
     }
 
     private void fetchAndDisplayUserName() {
+        if (welcomeMessage == null) {
+            Log.w(TAG, "welcomeMessage es null en fetchAndDisplayUserName");
+            return;
+        }
+
         if (sessionManager == null || sessionManager.getAuthToken() == null) {
             welcomeMessage.setText("¡Bienvenido de nuevo!");
             return;
@@ -343,6 +384,11 @@ public class InicioFragment extends Fragment {
         call.enqueue(new Callback<Usuario>() {
             @Override
             public void onResponse(@NonNull Call<Usuario> call, @NonNull Response<Usuario> response) {
+                // ✅ VERIFICAR SI EL FRAGMENT SIGUE ACTIVO
+                if (getContext() == null || !isAdded() || welcomeMessage == null) {
+                    return;
+                }
+
                 if (response.isSuccessful() && response.body() != null) {
                     Usuario usuario = response.body();
                     String nombreUsuario = usuario.getNombreUsuario();
@@ -372,7 +418,9 @@ public class InicioFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Call<Usuario> call, @NonNull Throwable t) {
                 Log.e(TAG, "Error de red al obtener perfil del usuario: ", t);
-                welcomeMessage.setText("¡Bienvenido de nuevo!");
+                if (welcomeMessage != null) {
+                    welcomeMessage.setText("¡Bienvenido de nuevo!");
+                }
             }
         });
     }
@@ -380,8 +428,29 @@ public class InicioFragment extends Fragment {
     private void performSearch(String query) {
         Log.d(TAG, "Realizando búsqueda: " + query);
 
-        // TODO: Implementar búsqueda en las recetas cargadas
-        Toast.makeText(getContext(), "Buscando: " + query, Toast.LENGTH_SHORT).show();
+        // ✅ IMPLEMENTAR BÚSQUEDA LOCAL EN LAS RECETAS CARGADAS
+        if (todasLasRecetas.isEmpty()) {
+            Toast.makeText(getContext(), "No hay recetas cargadas para buscar", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        List<Receta> resultados = new ArrayList<>();
+        for (Receta receta : todasLasRecetas) {
+            if (receta.getTitulo() != null &&
+                    receta.getTitulo().toLowerCase().contains(query.toLowerCase())) {
+                resultados.add(receta);
+            }
+        }
+
+        if (resultados.isEmpty()) {
+            Toast.makeText(getContext(), "No se encontraron recetas con: " + query, Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getContext(), "Encontradas " + resultados.size() + " recetas", Toast.LENGTH_SHORT).show();
+            // ✅ ACTUALIZAR ADAPTER CON RESULTADOS
+            if (webRecipesAdapter != null) {
+                webRecipesAdapter.updateRecetas(resultados);
+            }
+        }
 
         // Ocultar teclado
         if (getActivity() != null) {
@@ -393,11 +462,16 @@ public class InicioFragment extends Fragment {
         }
     }
 
+    // ✅ MÉTODO ACTUALIZADO: Añadir flag para indicar que viene de inicio
     private void abrirDetalleReceta(Receta receta) {
         Log.d(TAG, "Abriendo detalle de receta: " + receta.getTitulo());
 
         Intent intent = new Intent(getContext(), DetalleRecetaActivity.class);
         intent.putExtra("receta_id", receta.getIdReceta());
+
+        // ✅ AÑADIR FLAG PARA INDICAR QUE VIENE DE INICIO
+        intent.putExtra("from_inicio", true);
+
         startActivity(intent);
     }
 
@@ -406,8 +480,12 @@ public class InicioFragment extends Fragment {
         super.onResume();
         Log.d(TAG, "🔄 Fragment resumed - Recargando recetas de INICIO");
 
-        // Recargar recetas cada vez que el fragment se resume
-        cargarRecetasInicio();
+        // ✅ SOLO RECARGAR SI NO HAY RECETAS CARGADAS (EVITAR LLAMADAS EXCESIVAS)
+        if (todasLasRecetas.isEmpty()) {
+            cargarRecetasInicio();
+        } else {
+            Log.d(TAG, "📋 Ya hay " + todasLasRecetas.size() + " recetas cargadas, no recargando");
+        }
 
         // ✅ ACTUALIZAR DATOS DE REACCIONES cuando se regresa del detalle
         if (webRecipesAdapter != null) {
@@ -419,8 +497,15 @@ public class InicioFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         Log.d(TAG, "Fragment destroyed");
+
+        // ✅ LIMPIAR REFERENCIAS PARA EVITAR MEMORY LEAKS
+        webRecipesAdapter = null;
+        progressBar = null;
+        welcomeMessage = null;
     }
 }
+
+
 
 //package com.camilo.cocinarte.ui.inicio;
 //

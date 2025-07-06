@@ -1,0 +1,405 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".ui.banquetes.BanqueteDetalleActivity">
+
+    <!-- Progress Bar -->
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- ScrollView principal -->
+    <ScrollView
+        android:id="@+id/content_scroll_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Imagen principal del banquete -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="300dp">
+
+                <ImageView
+                    android:id="@+id/imagen_banquete"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:scaleType="centerCrop"
+                    android:src="@drawable/banquete_nuevo"
+                    android:contentDescription="Imagen del banquete" />
+
+                <!-- Overlay con título -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:background="@drawable/gradient_overlay"
+                    android:padding="16dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/text_nombre_banquete"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Nombre del banquete"
+                        android:textColor="@color/white"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:maxLines="2"
+                        android:ellipsize="end"
+                        android:shadowColor="@color/black"
+                        android:shadowDx="1"
+                        android:shadowDy="1"
+                        android:shadowRadius="2"
+                        tools:text="Banquete de Pasta con Pollo" />
+
+                    <TextView
+                        android:id="@+id/text_cantidad_personas"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Para 8 personas"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:layout_marginTop="4dp"
+                        tools:text="Para 8 personas" />
+
+                </LinearLayout>
+
+            </RelativeLayout>
+
+            <!-- Contenido principal -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <!-- Información básica -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp">
+
+                    <!-- Tiempo de preparación -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/label_tiempo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tiempo"
+                            android:textColor="@color/gris"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/text_tiempo_preparacion"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="2 horas"
+                            android:textColor="@color/negro"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            tools:text="2 horas" />
+
+                    </LinearLayout>
+
+                    <!-- Dificultad -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/label_dificultad"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Dificultad"
+                            android:textColor="@color/gris"
+                            android:textSize="12sp" />
+
+                        <TextView
+                            android:id="@+id/text_dificultad"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Media"
+                            android:textColor="@color/naranja"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            tools:text="Media" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <!-- Sección de estadísticas e interacción -->
+                <LinearLayout
+                    android:id="@+id/section_estadisticas"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="12dp"
+                    android:background="@drawable/rounded_background"
+                    android:layout_marginBottom="16dp">
+
+                    <!-- Botón Like -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginEnd="16dp">
+
+                        <ImageView
+                            android:id="@+id/btn_like"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/love"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:padding="2dp"
+                            app:tint="@color/like_red"
+                            android:contentDescription="Like" />
+
+                        <TextView
+                            android:id="@+id/text_total_likes"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="@color/negro"
+                            android:textSize="14sp"
+                            android:layout_marginStart="4dp"
+                            tools:text="24" />
+
+                    </LinearLayout>
+
+                    <!-- Comentarios -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginEnd="16dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/chat"
+                            app:tint="@color/verde_oscuro"
+                            android:contentDescription="Comentarios" />
+
+                        <TextView
+                            android:id="@+id/text_total_comentarios"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="@color/negro"
+                            android:textSize="14sp"
+                            android:layout_marginStart="4dp"
+                            tools:text="8" />
+
+                    </LinearLayout>
+
+                    <!-- Espaciador -->
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1" />
+
+                    <!-- Botón Favorito -->
+                    <ImageView
+                        android:id="@+id/btn_favorito"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/favoritos"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:padding="4dp"
+                        app:tint="@color/verde_claro"
+                        android:contentDescription="Favorito"
+                        android:layout_marginEnd="8dp" />
+
+                    <!-- Botón Compartir -->
+                    <ImageView
+                        android:id="@+id/btn_compartir"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:src="@drawable/btn_com"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:padding="4dp"
+                        app:tint="@color/verde_oscuro"
+                        android:contentDescription="Compartir" />
+
+                </LinearLayout>
+
+                <!-- Descripción/Preparación -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:id="@+id/label_descripcion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Descripción"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/verde"
+                        android:layout_marginBottom="8dp" />
+
+                    <TextView
+                        android:id="@+id/text_descripcion_preparacion"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Descripción del banquete..."
+                        android:textColor="@color/negro"
+                        android:textSize="14sp"
+                        android:lineSpacingExtra="2dp"
+                        tools:text="Este delicioso banquete incluye una variedad de platillos perfectos para cualquier ocasión especial." />
+
+                </LinearLayout>
+
+                <!-- Sección de Platillos -->
+                <LinearLayout
+                    android:id="@+id/section_platillos"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:id="@+id/label_platillos"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Platillos"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/verde"
+                        android:layout_marginBottom="8dp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycler_platillos"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"
+                        tools:listitem="@layout/item_platillo_banquete"
+                        tools:itemCount="3" />
+
+                    <TextView
+                        android:id="@+id/text_no_platillos"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="No hay platillos registrados"
+                        android:textColor="@color/gris"
+                        android:textSize="14sp"
+                        android:gravity="center"
+                        android:padding="16dp"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+                <!-- Sección de Ingredientes -->
+                <LinearLayout
+                    android:id="@+id/section_ingredientes"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:id="@+id/label_ingredientes"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ingredientes"
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/verde"
+                        android:layout_marginBottom="8dp" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recycler_ingredientes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:nestedScrollingEnabled="false"
+                        tools:listitem="@layout/item_ingrediente_banquete"
+                        tools:itemCount="5" />
+
+                    <TextView
+                        android:id="@+id/text_no_ingredientes"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="No hay ingredientes registrados"
+                        android:textColor="@color/gris"
+                        android:textSize="14sp"
+                        android:gravity="center"
+                        android:padding="16dp"
+                        android:visibility="gone" />
+
+                </LinearLayout>
+
+                <!-- Información del creador -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="12dp"
+                    android:background="@drawable/rounded_background_light"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:id="@+id/text_creador"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Creado por Admin"
+                        android:textColor="@color/gris"
+                        android:textSize="13sp"
+                        tools:text="Creado por Chef María" />
+
+                    <TextView
+                        android:id="@+id/text_fecha_creacion"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="15 de diciembre de 2024"
+                        android:textColor="@color/gris"
+                        android:textSize="12sp"
+                        android:layout_marginTop="2dp"
+                        tools:text="15 de diciembre de 2024" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

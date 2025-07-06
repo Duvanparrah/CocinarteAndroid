@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -43,7 +42,6 @@ public class ComunidadFragment extends Fragment {
 
     private FragmentComunidadBinding binding;
     private ListView listView;
-    private FrameLayout loadingContainer;
     private AdapterComunidad adapter;
     private Handler handler = new Handler();
     private DrawerLayout drawerLayout;
@@ -66,7 +64,6 @@ public class ComunidadFragment extends Fragment {
         }
 
         listView = view.findViewById(R.id.contenedor_recetas);
-        loadingContainer = view.findViewById(R.id.loading_container);
 
         setupClickListeners();
         cargarRecetasUsuariosConReacciones(); // ✅ CAMBIO PRINCIPAL
@@ -92,7 +89,7 @@ public class ComunidadFragment extends Fragment {
         // ✅ USAR EL ENDPOINT ESPECÍFICO PARA USUARIOS SOLAMENTE
         recetaApi.getRecetasUsuarios("Bearer " + tokenGuardado).enqueue(new Callback<List<Receta>>() {
             @Override
-            public void onResponse(Call<List<Receta>> call, Response<List<Receta>> response) {
+            public void onResponse(@NonNull Call<List<Receta>> call, @NonNull Response<List<Receta>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Receta> recetas = response.body();
 
@@ -147,7 +144,7 @@ public class ComunidadFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<List<Receta>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<Receta>> call, @NonNull Throwable t) {
                 Log.e(TAG, "❌ Error de conexión al cargar recetas de usuarios: " + t.getMessage());
 
                 // Como fallback, intentar el endpoint general
@@ -171,7 +168,7 @@ public class ComunidadFragment extends Fragment {
 
         recetaApi.getRecetas("Bearer " + tokenGuardado).enqueue(new Callback<List<Receta>>() {
             @Override
-            public void onResponse(Call<List<Receta>> call, Response<List<Receta>> response) {
+            public void onResponse(@NonNull Call<List<Receta>> call, @NonNull Response<List<Receta>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Receta> todasLasRecetas = response.body();
 
@@ -201,7 +198,7 @@ public class ComunidadFragment extends Fragment {
             }
 
             @Override
-            public void onFailure(Call<List<Receta>> call, Throwable t) {
+            public void onFailure(@NonNull Call<List<Receta>> call, @NonNull Throwable t) {
                 Log.e(TAG, "❌ Error de conexión: " + t.getMessage());
                 mostrarCargando(false);
                 Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
@@ -253,20 +250,32 @@ public class ComunidadFragment extends Fragment {
 
                 @Override
                 public void onComentariosClick(Receta receta) {
-                    JSONObject cache = ReaccionCache.getReacciones(receta.getIdReceta());
-                    JSONArray comentarios = new JSONArray();
-                    if (cache != null && cache.has("comentarios")) {
-                        comentarios = cache.optJSONArray("comentarios");
-                    }
-
-                    ComentariosBottomSheetFragment modal = ComentariosBottomSheetFragment.newInstance(comentarios, receta.getIdReceta());
-                    modal.setComentariosListener(() -> {
-                        // Al cerrar el modal, recargamos reacciones
-                        if (adapter != null) {
-                            adapter.actualizarReacciones(null);
+                    // ✅ USAR TU IMPLEMENTACIÓN COMPLETA DE COMENTARIOS
+                    try {
+                        JSONObject cache = ReaccionCache.getReacciones(receta.getIdReceta());
+                        JSONArray comentarios = new JSONArray();
+                        if (cache != null && cache.has("comentarios")) {
+                            comentarios = cache.optJSONArray("comentarios");
                         }
-                    });
-                    modal.show(getParentFragmentManager(), "ComentariosBottomSheet");
+
+                        // ✅ USAR TU ComentariosBottomSheetFragment DE FAVORITOS
+                        com.camilo.cocinarte.ui.favoritos.ComentariosBottomSheetFragment modal =
+                                com.camilo.cocinarte.ui.favoritos.ComentariosBottomSheetFragment.newInstance(comentarios, receta.getIdReceta());
+
+                        modal.setComentariosListener(new com.camilo.cocinarte.ui.favoritos.ComentariosBottomSheetFragment.ComentariosListener() {
+                            @Override
+                            public void onComentariosCerrados() {
+                                // Al cerrar el modal, recargamos reacciones
+                                if (adapter != null) {
+                                    adapter.actualizarReacciones(null);
+                                }
+                            }
+                        });
+                        modal.show(getParentFragmentManager(), "ComentariosBottomSheet");
+                    } catch (Exception e) {
+                        Log.e(TAG, "Error al abrir comentarios: " + e.getMessage());
+                        Toast.makeText(getContext(), "Error al cargar comentarios", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
         } catch (Exception e) {
@@ -275,10 +284,13 @@ public class ComunidadFragment extends Fragment {
         }
     }
 
+    // ✅ MÉTODO DE CARGA SIMPLE (solo usa Toast)
     private void mostrarCargando(boolean mostrar) {
-        if (loadingContainer != null) {
-            loadingContainer.setVisibility(mostrar ? View.VISIBLE : View.GONE);
+        // Usar Toast como indicador de carga simple
+        if (mostrar && getContext() != null) {
+            Toast.makeText(getContext(), "Cargando recetas...", Toast.LENGTH_SHORT).show();
         }
+        // No hacer nada cuando mostrar=false, ya que el Toast desaparece automáticamente
     }
 
     private void setupClickListeners() {
@@ -343,7 +355,7 @@ public class ComunidadFragment extends Fragment {
             // Usar búsqueda y filtrar resultados
             recetaApi.buscarRecetas(query, "Bearer " + tokenGuardado).enqueue(new Callback<List<Receta>>() {
                 @Override
-                public void onResponse(Call<List<Receta>> call, Response<List<Receta>> response) {
+                public void onResponse(@NonNull Call<List<Receta>> call, @NonNull Response<List<Receta>> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         List<Receta> resultados = response.body();
 
@@ -375,7 +387,7 @@ public class ComunidadFragment extends Fragment {
                 }
 
                 @Override
-                public void onFailure(Call<List<Receta>> call, Throwable t) {
+                public void onFailure(@NonNull Call<List<Receta>> call, @NonNull Throwable t) {
                     mostrarCargando(false);
                     Toast.makeText(getContext(), "Error de conexión en búsqueda", Toast.LENGTH_SHORT).show();
                 }

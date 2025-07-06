@@ -25,4 +25,15 @@
     <color name="like_red">#E53935</color>
     <color name="like_red_dark">#C62828</color>
 
+
+
+    <!-- Colores adicionales para banquetes -->
+    <color name="naranja">#FF8A65</color>
+    <color name="azul">#42A5F5</color>
+    <color name="rojo">#E53935</color>
+
+    <!-- Colores adicionales si los necesitas -->
+    <color name="amarillo">#FFEB3B</color>
+    <color name="morado">#9C27B0</color>
+    <color name="rosa">#E91E63</color>
 </resources>

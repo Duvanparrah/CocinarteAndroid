@@ -17,6 +17,20 @@
         android:theme="@style/Theme.Cocinarte"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
+
+        <!-- Actividad de detalle de banquete -->
+        <activity
+            android:name=".ui.banquetes.BanqueteDetalleActivity"
+            android:exported="false"
+            android:label="Detalle del Banquete"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.Cocinarte">
+            <!-- Compatibilidad con versiones antiguas -->
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".MainActivity" />
+        </activity>
+
         <activity
             android:name=".DetalleRecetaActivity"
             android:exported="false" />

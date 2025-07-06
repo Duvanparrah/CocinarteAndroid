@@ -66,7 +66,7 @@ public class Receta implements Serializable {
         this.categoria = categoria;
     }
 
-    // ✅ GETTERS Y SETTERS BÁSICOS
+
     public int getIdReceta() { return idReceta; }
     public void setIdReceta(int idReceta) { this.idReceta = idReceta; }
 

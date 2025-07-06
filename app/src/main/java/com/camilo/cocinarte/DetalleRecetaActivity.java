@@ -51,6 +51,10 @@ public class DetalleRecetaActivity extends AppCompatActivity {
     private ReaccionesResponse reaccionesResponse;
     private SessionManager sessionManager;
 
+    // ✅ NUEVAS VARIABLES PARA CONTROLAR MODO
+    private boolean isFromInicio = false;
+    private boolean hasAuthentication = false;
+
     // Views principales
     private ImageView imgFavorito;
     private ImageView btnLikes;
@@ -70,14 +74,24 @@ public class DetalleRecetaActivity extends AppCompatActivity {
         // Inicializar vistas
         initViews();
 
+        // ✅ VERIFICAR ORIGEN Y AUTENTICACIÓN
+        checkAuthenticationAndOrigin();
+
         // Obtener ID de la receta del intent
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("receta_id")) {
             int recetaId = intent.getIntExtra("receta_id", -1);
             Log.d(TAG, "Recibido receta_id: " + recetaId);
+            Log.d(TAG, "Viene de inicio: " + isFromInicio);
+            Log.d(TAG, "Tiene autenticación: " + hasAuthentication);
 
             if (recetaId != -1) {
-                getRecetaById(recetaId);
+                // ✅ CARGAR RECETA SEGÚN EL MODO
+                if (hasAuthentication) {
+                    getRecetaByIdConAuth(recetaId);
+                } else {
+                    getRecetaByIdSinAuth(recetaId);
+                }
             } else {
                 Log.e(TAG, "ID de receta inválido");
                 Toast.makeText(this, "Error: ID de receta inválido", Toast.LENGTH_SHORT).show();
@@ -93,6 +107,20 @@ public class DetalleRecetaActivity extends AppCompatActivity {
         setupListeners();
     }
 
+    // ✅ NUEVO MÉTODO: Verificar autenticación y origen
+    private void checkAuthenticationAndOrigin() {
+        Intent intent = getIntent();
+        isFromInicio = intent.getBooleanExtra("from_inicio", false);
+
+        String token = sessionManager.getAuthToken();
+        hasAuthentication = (token != null && !token.isEmpty());
+
+        Log.d(TAG, "🔍 Verificación de autenticación:");
+        Log.d(TAG, "   - Viene de inicio: " + isFromInicio);
+        Log.d(TAG, "   - Token presente: " + hasAuthentication);
+        Log.d(TAG, "   - Modo: " + (hasAuthentication ? "CON AUTH" : "SIN AUTH"));
+    }
+
     private void initViews() {
         btnLikes = findViewById(R.id.btn_likes_favoritos);
         btnComentarios = findViewById(R.id.btn_comentarios_favoritos);
@@ -105,7 +133,12 @@ public class DetalleRecetaActivity extends AppCompatActivity {
         // Listener para likes
         btnLikes.setOnClickListener(v -> {
             if (recetaActual != null) {
-                toggleLike(recetaActual.getIdReceta());
+                if (hasAuthentication) {
+                    toggleLike(recetaActual.getIdReceta());
+                } else {
+                    // ✅ MOSTRAR MENSAJE PARA USUARIOS SIN AUTH
+                    Toast.makeText(this, "Inicia sesión para dar like", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 Toast.makeText(this, "Receta no cargada", Toast.LENGTH_SHORT).show();
             }
@@ -114,7 +147,12 @@ public class DetalleRecetaActivity extends AppCompatActivity {
         // Listener para comentarios
         btnComentarios.setOnClickListener(v -> {
             if (recetaActual != null) {
-                abrirSeccionComentarios();
+                if (hasAuthentication) {
+                    abrirSeccionComentarios();
+                } else {
+                    // ✅ MOSTRAR MENSAJE PARA USUARIOS SIN AUTH
+                    Toast.makeText(this, "Inicia sesión para ver comentarios", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 Toast.makeText(this, "Receta no cargada", Toast.LENGTH_SHORT).show();
             }
@@ -123,39 +161,39 @@ public class DetalleRecetaActivity extends AppCompatActivity {
         // Listener para favoritos
         imgFavorito.setOnClickListener(v -> {
             if (recetaActual != null) {
-                toggleFavorito(recetaActual.getIdReceta());
+                if (hasAuthentication) {
+                    toggleFavorito(recetaActual.getIdReceta());
+                } else {
+                    // ✅ MOSTRAR MENSAJE PARA USUARIOS SIN AUTH
+                    Toast.makeText(this, "Inicia sesión para guardar en favoritos", Toast.LENGTH_SHORT).show();
+                }
             } else {
                 Toast.makeText(this, "Receta no cargada", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void getRecetaById(int recetaId) {
-        Log.d(TAG, "Obteniendo receta con ID: " + recetaId);
+    // ✅ NUEVO MÉTODO: Cargar receta CON autenticación (original)
+    private void getRecetaByIdConAuth(int recetaId) {
+        Log.d(TAG, "🔐 Cargando receta CON autenticación - ID: " + recetaId);
 
         String token = sessionManager.getAuthToken();
-        if (token == null || token.isEmpty()) {
-            Toast.makeText(this, "Error de autenticación", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
-
         String authHeader = "Bearer " + token;
         RecetasService recetasService = ApiConfig.getClient(getApplicationContext()).create(RecetasService.class);
 
         recetasService.getRecetaById(recetaId, authHeader).enqueue(new Callback<Receta>() {
             @Override
             public void onResponse(Call<Receta> call, Response<Receta> response) {
-                Log.d(TAG, "Respuesta de getRecetaById: " + response.code());
+                Log.d(TAG, "Respuesta de getRecetaById CON AUTH: " + response.code());
 
                 if (response.isSuccessful() && response.body() != null) {
                     recetaActual = response.body();
-                    Log.d(TAG, "Receta obtenida: " + recetaActual.getTitulo());
+                    Log.d(TAG, "✅ Receta obtenida CON AUTH: " + recetaActual.getTitulo());
 
                     // Cargar reacciones de la receta
-                    getReaccionesReceta(recetaId, authHeader);
+                    getReaccionesRecetaConAuth(recetaId, authHeader);
                 } else {
-                    Log.e(TAG, "Error al obtener receta: " + response.code() + " - " + response.message());
+                    Log.e(TAG, "❌ Error al obtener receta CON AUTH: " + response.code() + " - " + response.message());
                     Toast.makeText(getApplicationContext(), "Error al cargar la receta", Toast.LENGTH_SHORT).show();
                     finish();
                 }
@@ -163,15 +201,74 @@ public class DetalleRecetaActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<Receta> call, Throwable t) {
-                Log.e(TAG, "Error de conexión al obtener receta: ", t);
+                Log.e(TAG, "❌ Error de conexión al obtener receta CON AUTH: ", t);
                 Toast.makeText(getApplicationContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
     }
 
-    private void getReaccionesReceta(int recetaId, String authHeader) {
-        Log.d(TAG, "Obteniendo reacciones para receta: " + recetaId);
+    // ✅ NUEVO MÉTODO: Cargar receta SIN autenticación
+    private void getRecetaByIdSinAuth(int recetaId) {
+        Log.d(TAG, "🌐 Cargando receta SIN autenticación - ID: " + recetaId);
+
+        RecetasService recetasService = ApiConfig.getClient(getApplicationContext()).create(RecetasService.class);
+
+        // ✅ LLAMAR SIN TOKEN (usando el método original pero sin auth header)
+        recetasService.getRecetaById(recetaId, "").enqueue(new Callback<Receta>() {
+            @Override
+            public void onResponse(Call<Receta> call, Response<Receta> response) {
+                Log.d(TAG, "Respuesta de getRecetaById SIN AUTH: " + response.code());
+
+                if (response.isSuccessful() && response.body() != null) {
+                    recetaActual = response.body();
+                    Log.d(TAG, "✅ Receta obtenida SIN AUTH: " + recetaActual.getTitulo());
+
+                    // ✅ MOSTRAR RECETA SIN CARGAR REACCIONES
+                    mostrarDetallesReceta(recetaActual);
+
+                    // ✅ CONFIGURAR UI PARA MODO SIN AUTH
+                    configurarUISinAuth();
+                } else {
+                    Log.e(TAG, "❌ Error al obtener receta SIN AUTH: " + response.code() + " - " + response.message());
+                    Toast.makeText(getApplicationContext(), "Error al cargar la receta", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Receta> call, Throwable t) {
+                Log.e(TAG, "❌ Error de conexión al obtener receta SIN AUTH: ", t);
+                Toast.makeText(getApplicationContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
+    }
+
+    // ✅ NUEVO MÉTODO: Configurar UI para modo sin autenticación
+    private void configurarUISinAuth() {
+        Log.d(TAG, "🎨 Configurando UI para modo SIN AUTH");
+
+        // Mostrar valores por defecto para reacciones
+        likesCount.setText("0");
+        comentariosCount.setText("0");
+
+        // Configurar iconos en estado inactivo
+        btnLikes.setImageTintList(ColorStateList.valueOf(
+                ContextCompat.getColor(getApplicationContext(), android.R.color.darker_gray)
+        ));
+
+        imgFavorito.setImageTintList(ColorStateList.valueOf(
+                ContextCompat.getColor(getApplicationContext(), android.R.color.darker_gray)
+        ));
+
+        // Mostrar mensaje informativo
+        Toast.makeText(this, "💡 Inicia sesión para dar like, comentar y guardar favoritos", Toast.LENGTH_LONG).show();
+    }
+
+    // ✅ MÉTODO ORIGINAL: Cargar reacciones con autenticación
+    private void getReaccionesRecetaConAuth(int recetaId, String authHeader) {
+        Log.d(TAG, "🔄 Obteniendo reacciones CON AUTH para receta: " + recetaId);
 
         RecetasService recetasService = ApiConfig.getClient(getApplicationContext()).create(RecetasService.class);
 
@@ -180,7 +277,7 @@ public class DetalleRecetaActivity extends AppCompatActivity {
             public void onResponse(Call<ReaccionesResponse> call, Response<ReaccionesResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     reaccionesResponse = response.body();
-                    Log.d(TAG, "Reacciones obtenidas - Likes: " + reaccionesResponse.getLikes().getTotal() +
+                    Log.d(TAG, "✅ Reacciones obtenidas - Likes: " + reaccionesResponse.getLikes().getTotal() +
                             ", Comentarios: " + reaccionesResponse.getTotal_comentarios());
 
                     // Mostrar todos los detalles de la receta
@@ -189,7 +286,7 @@ public class DetalleRecetaActivity extends AppCompatActivity {
                     // Cargar estado inicial del favorito
                     cargarEstadoInicialFavorito(recetaId);
                 } else {
-                    Log.e(TAG, "Error al obtener reacciones: " + response.code());
+                    Log.e(TAG, "⚠️ Error al obtener reacciones: " + response.code());
                     // Mostrar la receta sin reacciones
                     mostrarDetallesReceta(recetaActual);
                     cargarEstadoInicialFavorito(recetaId);
@@ -198,7 +295,7 @@ public class DetalleRecetaActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ReaccionesResponse> call, Throwable t) {
-                Log.e(TAG, "Error de conexión al obtener reacciones: ", t);
+                Log.e(TAG, "❌ Error de conexión al obtener reacciones: ", t);
                 // Mostrar la receta sin reacciones
                 mostrarDetallesReceta(recetaActual);
                 cargarEstadoInicialFavorito(recetaId);
@@ -206,8 +303,9 @@ public class DetalleRecetaActivity extends AppCompatActivity {
         });
     }
 
+    // ✅ MÉTODO ORIGINAL SIN CAMBIOS (el resto del código permanece igual)
     private void mostrarDetallesReceta(Receta receta) {
-        Log.d(TAG, "Mostrando detalles de la receta: " + receta.getTitulo());
+        Log.d(TAG, "📱 Mostrando detalles de la receta: " + receta.getTitulo());
 
         // Logo
         ImageView logo = findViewById(R.id.logo_image);
@@ -257,8 +355,10 @@ public class DetalleRecetaActivity extends AppCompatActivity {
         // Pasos de preparación
         mostrarPasosPreparacion(receta);
 
-        // Reacciones (likes y comentarios)
-        mostrarReacciones();
+        // ✅ MOSTRAR REACCIONES SOLO SI HAY AUTENTICACIÓN
+        if (hasAuthentication) {
+            mostrarReacciones();
+        }
     }
 
     private void mostrarIngredientes(Receta receta) {
@@ -463,6 +563,12 @@ public class DetalleRecetaActivity extends AppCompatActivity {
     }
 
     private void cargarEstadoInicialFavorito(int recetaId) {
+        // ✅ SOLO CARGAR FAVORITO SI HAY AUTENTICACIÓN
+        if (!hasAuthentication) {
+            Log.d(TAG, "⚠️ Sin autenticación, no cargando estado de favorito");
+            return;
+        }
+
         Log.d(TAG, "Cargando estado inicial del favorito para receta: " + recetaId);
 
         String token = "Bearer " + sessionManager.getAuthToken();
@@ -566,8 +672,8 @@ public class DetalleRecetaActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // Recargar estado del favorito cuando se regresa a la actividad
-        if (recetaActual != null) {
+        // ✅ SOLO RECARGAR FAVORITO SI HAY AUTENTICACIÓN
+        if (recetaActual != null && hasAuthentication) {
             cargarEstadoInicialFavorito(recetaActual.getIdReceta());
         }
     }

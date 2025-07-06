@@ -1,6 +1,7 @@
 package com.camilo.cocinarte.api;
 
 import com.camilo.cocinarte.models.ApiResponse;
+import com.camilo.cocinarte.models.FotoResponse;  // ✅ ADD THIS IMPORT
 import com.camilo.cocinarte.models.LikeResponse;
 import com.camilo.cocinarte.models.ReaccionesResponse;
 import com.camilo.cocinarte.models.Receta;
@@ -106,9 +107,9 @@ public interface RecetaApi {
 
     @Multipart
     @POST("recetas/upload/image")
-    Call<FotoResponse> subirFotoReceta(
-            @Part MultipartBody.Part image,
-            @Header("Authorization") String token
+    Call<FotoResponse> subirFotoReceta(  // ✅ REMOVED 'default' keyword
+                                         @Part MultipartBody.Part image,
+                                         @Header("Authorization") String token
     );
 
     // --- Reacciones (likes, comentarios) ---

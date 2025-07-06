@@ -211,4 +211,151 @@
     </string-array>
 
 
+
+    <!-- ✅ AGREGAR ESTOS STRINGS AL ARCHIVO strings.xml EXISTENTE -->
+
+    <!-- Banquetes - Textos generales -->
+    <string name="banquetes">Banquetes</string>
+    <string name="banquete">Banquete</string>
+    <string name="detalle_banquete">Detalle del Banquete</string>
+    <string name="buscar_banquete">Buscar banquete...</string>
+    <string name="que_banquete_gustaria_hoy">¿Qué banquete te gustaría preparar hoy?</string>
+
+    <!-- Banquetes - Información básica -->
+    <string name="para_personas">Para %d personas</string>
+    <string name="creado_por">Creado por %s</string>
+    <string name="creado_el">Creado el %s</string>
+    <string name="tiempo_preparacion">Tiempo de preparación</string>
+    <string name="dificultad">Dificultad</string>
+
+    <!-- Banquetes - Contadores -->
+    <string name="platillos_count">%d platillos</string>
+    <string name="ingredientes_count">%d ingredientes</string>
+    <string name="platillos_count_with_label">Platillos (%d)</string>
+    <string name="ingredientes_count_with_label">Ingredientes (%d)</string>
+
+    <!-- Banquetes - Dificultades -->
+    <string name="dificultad_facil">Fácil</string>
+    <string name="dificultad_media">Media</string>
+    <string name="dificultad_dificil">Difícil</string>
+
+    <!-- Banquetes - Secciones -->
+    <string name="seccion_platillos">Platillos del Banquete</string>
+    <string name="seccion_ingredientes">Ingredientes Necesarios</string>
+    <string name="seccion_preparacion">Organización del Banquete</string>
+    <string name="seccion_estadisticas">Estadísticas</string>
+
+    <!-- Banquetes - Estados vacíos -->
+    <string name="no_banquetes_encontrados">No se encontraron banquetes</string>
+    <string name="no_platillos_disponibles">No hay platillos registrados para este banquete</string>
+    <string name="no_ingredientes_disponibles">No hay ingredientes registrados para este banquete</string>
+    <string name="no_descripcion_disponible">No hay descripción disponible para este banquete</string>
+
+    <!-- Banquetes - Búsqueda y filtros -->
+    <string name="buscar_banquetes">Buscar banquetes</string>
+    <string name="filtrar_banquetes">Filtrar banquetes</string>
+    <string name="resultados_busqueda">%d resultado(s) encontrado(s)</string>
+    <string name="sin_resultados_busqueda">No se encontraron resultados para \"%s\"</string>
+    <string name="todos_los_banquetes">Todos los banquetes</string>
+
+    <!-- Banquetes - Acciones -->
+    <string name="ver_detalle">Ver detalle</string>
+    <string name="agregar_favoritos">Agregar a favoritos</string>
+    <string name="quitar_favoritos">Quitar de favoritos</string>
+    <string name="compartir_banquete">Compartir banquete</string>
+    <string name="dar_like">Me gusta</string>
+    <string name="quitar_like">Quitar me gusta</string>
+    <string name="comentar">Comentar</string>
+
+    <!-- Banquetes - Mensajes de feedback -->
+    <string name="banquete_agregado_favoritos">Banquete agregado a favoritos</string>
+    <string name="banquete_quitado_favoritos">Banquete quitado de favoritos</string>
+    <string name="like_agregado">Me gusta agregado</string>
+    <string name="like_quitado">Me gusta quitado</string>
+    <string name="banquete_compartido">Banquete compartido exitosamente</string>
+
+    <!-- Banquetes - Errores -->
+    <string name="error_cargar_banquetes">Error al cargar banquetes</string>
+    <string name="error_cargar_banquete_detalle">Error al cargar detalle del banquete</string>
+    <string name="error_buscar_banquetes">Error al buscar banquetes</string>
+    <string name="error_conexion_banquetes">Error de conexión. Verifica tu internet.</string>
+    <string name="error_banquete_no_encontrado">Banquete no encontrado</string>
+    <string name="error_sin_autenticacion">Debes iniciar sesión para realizar esta acción</string>
+
+    <!-- Banquetes - Loading -->
+    <string name="cargando_banquetes">Cargando banquetes...</string>
+    <string name="cargando_detalle_banquete">Cargando detalle del banquete...</string>
+    <string name="buscando_banquetes">Buscando banquetes...</string>
+    <string name="procesando">Procesando...</string>
+
+    <!-- Banquetes - Navegación -->
+    <string name="volver_banquetes">Volver a banquetes</string>
+    <string name="siguiente_banquete">Siguiente banquete</string>
+    <string name="anterior_banquete">Anterior banquete</string>
+
+    <!-- Banquetes - Información detallada -->
+    <string name="informacion_general">Información General</string>
+    <string name="cantidad_personas_detalle">Cantidad de personas: %d</string>
+    <string name="tiempo_estimado">Tiempo estimado: %s</string>
+    <string name="nivel_dificultad">Nivel de dificultad: %s</string>
+    <string name="fecha_creacion_detalle">Fecha de creación: %s</string>
+
+    <!-- Banquetes - Ingredientes con cantidades -->
+    <string name="cantidad_ingrediente">Cantidad: %s</string>
+    <string name="categoria_ingrediente">Categoría: %s</string>
+    <string name="sin_cantidad_especificada">Sin cantidad especificada</string>
+
+    <!-- Banquetes - Estadísticas -->
+    <string name="total_likes">%d me gusta</string>
+    <string name="total_comentarios">%d comentarios</string>
+    <string name="total_favoritos">%d favoritos</string>
+    <string name="estadisticas_banquete">Estadísticas del banquete</string>
+
+    <!-- Banquetes - Opciones del menú contextual -->
+    <string name="opciones_banquete">Opciones del banquete</string>
+    <string name="ver_detalles">Ver detalles</string>
+    <string name="agregar_a_favoritos">Agregar a favoritos</string>
+    <string name="compartir">Compartir</string>
+    <string name="cancelar">Cancelar</string>
+
+    <!-- Banquetes - Confirmaciones -->
+    <string name="confirmar_quitar_favorito">¿Quitar este banquete de favoritos?</string>
+    <string name="confirmar_accion">Confirmar acción</string>
+    <string name="si">Sí</string>
+    <string name="no">No</string>
+
+    <!-- Banquetes - Tooltips y ayuda -->
+    <string name="ayuda_busqueda_banquetes">Busca banquetes por nombre, ingredientes o tipo de ocasión</string>
+    <string name="ayuda_filtros_banquetes">Filtra por dificultad, tiempo de preparación o cantidad de personas</string>
+    <string name="ayuda_favoritos_banquetes">Guarda tus banquetes favoritos para acceso rápido</string>
+
+    <!-- Banquetes - Placeholders -->
+    <string name="placeholder_nombre_banquete">Nombre del banquete</string>
+    <string name="placeholder_descripcion_banquete">Descripción del banquete</string>
+
+    <!-- Banquetes - Contenido descriptivo -->
+    <string name="descripcion_imagen_banquete">Imagen del banquete</string>
+    <string name="descripcion_icono_personas">Icono de personas</string>
+    <string name="descripcion_icono_tiempo">Icono de tiempo</string>
+    <string name="descripcion_icono_dificultad">Icono de dificultad</string>
+    <string name="descripcion_icono_platillos">Icono de platillos</string>
+    <string name="descripcion_icono_ingredientes">Icono de ingredientes</string>
+    <string name="descripcion_icono_like">Icono de me gusta</string>
+    <string name="descripcion_icono_comentario">Icono de comentario</string>
+    <string name="descripcion_icono_favorito">Icono de favorito</string>
+    <string name="descripcion_icono_compartir">Icono de compartir</string>
+
+    <!-- Banquetes - Mensajes de estado -->
+    <string name="banquetes_actualizados">Banquetes actualizados</string>
+    <string name="ultima_actualizacion">Última actualización: %s</string>
+    <string name="sincronizando_banquetes">Sincronizando banquetes...</string>
+    <string name="banquetes_disponibles">%d banquetes disponibles</string>
+
+    <!-- Banquetes - Funcionalidades futuras -->
+    <string name="funcion_proximamente">Función próximamente disponible</string>
+    <string name="comentarios_proximamente">Comentarios próximamente disponibles</string>
+    <string name="valoraciones_proximamente">Valoraciones próximamente disponibles</string>
+
+
+
 </resources>

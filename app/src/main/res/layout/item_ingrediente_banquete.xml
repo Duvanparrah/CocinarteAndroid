@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical">
+
+        <!-- Imagen del ingrediente (opcional) -->
+        <ImageView
+            android:id="@+id/imagenIngrediente"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginEnd="12dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/logo_cocinarte"
+            android:background="@drawable/borde_dashed"
+            android:contentDescription="Imagen del ingrediente" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <!-- Nombre del ingrediente -->
+            <TextView
+                android:id="@+id/textNombreIngrediente"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="@color/negro"
+                android:text="Nombre del ingrediente" />
+
+            <!-- Cantidad y categoría -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="2dp">
+
+                <!-- Cantidad -->
+                <TextView
+                    android:id="@+id/textCantidadIngrediente"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="13sp"
+                    android:textColor="@color/verde"
+                    android:textStyle="bold"
+                    android:text="1 unidad" />
+
+                <!-- Separador -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:textSize="13sp"
+                    android:textColor="@color/gris"
+                    android:text="•" />
+
+                <!-- Categoría -->
+                <TextView
+                    android:id="@+id/textCategoriaIngrediente"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="13sp"
+                    android:textColor="@color/gris"
+                    android:text="Categoría"
+                    android:maxLines="1"
+                    android:ellipsize="end" />
+
+            </LinearLayout>
+
+            <!-- Información nutricional (opcional) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp"
+                android:visibility="gone">
+
+                <!-- Calorías -->
+                <TextView
+                    android:id="@+id/textCalorias"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="11sp"
+                    android:textColor="@color/gris"
+                    android:background="@drawable/chip_background"
+                    android:padding="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:text="0 kcal" />
+
+                <!-- Proteínas -->
+                <TextView
+                    android:id="@+id/textProteinas"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="11sp"
+                    android:textColor="@color/gris"
+                    android:background="@drawable/chip_background"
+                    android:padding="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:text="P: 0g" />
+
+                <!-- Carbohidratos -->
+                <TextView
+                    android:id="@+id/textCarbohidratos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="11sp"
+                    android:textColor="@color/gris"
+                    android:background="@drawable/chip_background"
+                    android:padding="4dp"
+                    android:layout_marginEnd="4dp"
+                    android:text="C: 0g" />
+
+                <!-- Grasas -->
+                <TextView
+                    android:id="@+id/textGrasas"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="11sp"
+                    android:textColor="@color/gris"
+                    android:background="@drawable/chip_background"
+                    android:padding="4dp"
+                    android:text="G: 0g" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

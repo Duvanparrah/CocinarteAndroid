@@ -151,17 +151,18 @@ public class MainActivity extends AppCompatActivity {
         navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupWithNavController(navView, navController);
 
-        // ✅ Configurar listener para el bottom navigation con IDs correctos del menú
+        // ✅ CONFIGURAR LISTENER CON IDs QUE COINCIDAN ENTRE MENU Y NAVIGATION
         navView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
 
-            if (itemId == R.id.nav_inicio) {
+            // ✅ USAR LOS IDs QUE COINCIDEN EN AMBOS ARCHIVOS
+            if (itemId == R.id.navigation_inicio) {
                 navController.navigate(R.id.navigation_inicio);
                 return true;
-            } else if (itemId == R.id.nav_banquetes) {
+            } else if (itemId == R.id.navigation_banquetes) {  // ✅ MISMO ID EN MENU Y NAVIGATION
                 navController.navigate(R.id.navigation_banquetes);
                 return true;
-            } else if (itemId == R.id.nav_nutricion) {
+            } else if (itemId == R.id.navigation_nutricion) {
                 navController.navigate(R.id.navigation_nutricion);
                 return true;
             } else if (itemId == R.id.navegar_comunidad) {
@@ -169,7 +170,8 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
 
-            return false;
+            // ✅ FALLBACK: Usar NavigationUI por defecto si no coincide ningún ID
+            return NavigationUI.onNavDestinationSelected(item, navController);
         });
 
         Log.d(TAG, "Navegación inicializada correctamente");

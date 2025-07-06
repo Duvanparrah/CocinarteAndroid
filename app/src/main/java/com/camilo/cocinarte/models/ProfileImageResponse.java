@@ -26,7 +26,7 @@ public class ProfileImageResponse {
         return user;
     }
 
-    // Clase interna Usuario
+
     public static class Usuario {
 
         @SerializedName("id")

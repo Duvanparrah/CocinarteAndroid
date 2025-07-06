@@ -216,6 +216,7 @@
                     android:background="@drawable/borde_dashed"
                     />
 
+                <!-- ✅ SECCIÓN DE ICONOS CORREGIDA CON TODOS LOS IDs NECESARIOS -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -223,51 +224,72 @@
                     android:paddingTop="15dp"
                     android:gravity="center_vertical">
 
-                    <!-- Corazón -->
+                    <!-- Like con contador -->
                     <ImageView
+                        android:id="@+id/icon_like"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/love"
+                        android:src="@drawable/ic_heart_outline"
+                        android:contentDescription="Like"
                         app:tint="@android:color/black"
-                        android:layout_marginEnd="16dp"/>
+                        android:layout_marginEnd="8dp"/>
 
-                    <!-- Comentario -->
+                    <TextView
+                        android:id="@+id/text_like_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@android:color/black"
+                        android:textSize="14sp"
+                        android:layout_marginEnd="16dp" />
+
+                    <!-- Comentario con contador -->
                     <ImageView
+                        android:id="@+id/icon_comentario"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/chat_bot"
-                        android:layout_marginStart="20dp"
+                        android:contentDescription="Comentario"
                         app:tint="@android:color/black"
-                        android:layout_marginEnd="16dp"/>
+                        android:layout_marginEnd="8dp"/>
+
+                    <TextView
+                        android:id="@+id/text_coments_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@android:color/black"
+                        android:textSize="14sp"
+                        android:layout_marginEnd="16dp" />
 
                     <!-- Compartir -->
                     <ImageView
+                        android:id="@+id/icon_compartir"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/btn_com"
-                        android:layout_marginStart="20dp"
+                        android:contentDescription="Compartir"
                         app:tint="@android:color/black"
-                        android:layout_marginRight="16dp"/>
-
-
-
+                        android:layout_marginEnd="16dp"/>
 
                     <!-- Guardar -->
                     <ImageView
+                        android:id="@+id/icon_guardar"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
-                        android:src="@drawable/marcador"
-                        android:layout_marginStart="20dp"
-                        app:tint="@android:color/black"/>
+                        android:src="@drawable/ic_bookmark_outline"
+                        android:contentDescription="Guardar"
+                        app:tint="@android:color/black"
+                        android:layout_marginEnd="16dp"/>
 
+                    <!-- Eliminar -->
                     <ImageView
                         android:id="@+id/btn_delete_recipe"
                         android:layout_width="24dp"
                         android:layout_height="24dp"
                         android:src="@drawable/delete_bt"
-                        android:layout_marginStart="100dp"
-                        app:tint="@color/negro"
-                        android:layout_marginEnd="16dp"/>
+                        android:contentDescription="Eliminar"
+                        app:tint="@color/negro" />
 
                 </LinearLayout>
             </LinearLayout>

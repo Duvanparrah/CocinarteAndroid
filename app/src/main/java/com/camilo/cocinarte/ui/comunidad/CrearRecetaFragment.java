@@ -505,7 +505,10 @@ public class CrearRecetaFragment extends Fragment {
         return null;
     }
 
+    // ✅ MÉTODO CORREGIDO: Cargar ingredientes usando el método correcto
     private void cargarIngredientesDesdeAPI() {
+        Log.d(TAG, "🥕 Cargando ingredientes desde la API...");
+
         // ✅ OBTENER TOKEN DE FORMA ROBUSTA
         String token = obtenerToken();
 
@@ -517,21 +520,48 @@ public class CrearRecetaFragment extends Fragment {
 
         IngredientesService service = ApiClient.getClient(getContext()).create(IngredientesService.class);
 
+        // ✅ USAR EL MÉTODO CORRECTO QUE ACABAMOS DE AGREGAR
         service.obtenerTodosLosIngredientes("Bearer " + token).enqueue(new Callback<IngredientesByCategoriaResponse>() {
             @Override
-            public void onResponse(Call<IngredientesByCategoriaResponse> call, Response<IngredientesByCategoriaResponse> response) {
+            public void onResponse(@NonNull Call<IngredientesByCategoriaResponse> call, @NonNull Response<IngredientesByCategoriaResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
-                    _ingredientes.clear();
-                    _ingredientes.addAll(response.body().getIngredientes());
-                    Log.d(TAG, "✅ Ingredientes cargados: " + _ingredientes.size());
+                    IngredientesByCategoriaResponse responseBody = response.body();
+
+                    if (responseBody.hasIngredientes()) {
+                        _ingredientes.clear();
+                        _ingredientes.addAll(responseBody.getIngredientes());
+                        Log.d(TAG, "✅ Ingredientes cargados exitosamente: " + _ingredientes.size());
+
+                        // Mostrar mensaje de éxito
+                        Toast.makeText(getContext(), "Ingredientes cargados: " + _ingredientes.size(), Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.w(TAG, "⚠️ No se encontraron ingredientes");
+                        Toast.makeText(getContext(), "No se encontraron ingredientes", Toast.LENGTH_SHORT).show();
+                    }
                 } else {
-                    Log.e("API", "Error al obtener ingredientes: código " + response.code());
+                    Log.e(TAG, "❌ Error al obtener ingredientes: código " + response.code());
+                    String errorMsg = "Error al cargar ingredientes";
+                    if (response.code() == 401) {
+                        errorMsg = "Error de autenticación. Inicia sesión nuevamente.";
+                    } else if (response.code() == 404) {
+                        errorMsg = "Endpoint de ingredientes no encontrado";
+                    }
+                    Toast.makeText(getContext(), errorMsg, Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
-            public void onFailure(Call<IngredientesByCategoriaResponse> call, Throwable t) {
-                Log.e("Fallo de red", t.toString());
+            public void onFailure(@NonNull Call<IngredientesByCategoriaResponse> call, @NonNull Throwable t) {
+                Log.e(TAG, "❌ Error de conexión al cargar ingredientes: " + t.getMessage());
+                String errorMsg = "Error de conexión";
+                if (t.getMessage() != null) {
+                    if (t.getMessage().contains("Unable to resolve host")) {
+                        errorMsg = "Sin conexión a internet";
+                    } else if (t.getMessage().contains("timeout")) {
+                        errorMsg = "Tiempo de espera agotado";
+                    }
+                }
+                Toast.makeText(getContext(), errorMsg, Toast.LENGTH_LONG).show();
             }
         });
     }

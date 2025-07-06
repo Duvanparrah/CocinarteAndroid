@@ -31,6 +31,8 @@ import com.camilo.cocinarte.api.ReaccionApi;
 import com.camilo.cocinarte.api.RecetaApi;
 import com.camilo.cocinarte.models.Ingrediente;
 import com.camilo.cocinarte.models.Receta;
+// ✅ IMPORTACIÓN CORREGIDA: Usar la clase de favoritos
+import com.camilo.cocinarte.ui.favoritos.ComentariosBottomSheetFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -84,52 +86,61 @@ public class DetalleRecetaFragment extends Fragment {
 
         cargarDatosUsuario(view);
 
+        // ✅ CONFIGURAR ICONOS DE INTERACCIÓN - AHORA CON IDs CORRECTOS
         ImageView iconComentario = view.findViewById(R.id.icon_comentario);
-        iconComentario.setOnClickListener(v -> abrirSeccionComentarios());
+        if (iconComentario != null) {
+            iconComentario.setOnClickListener(v -> abrirSeccionComentarios());
+        }
 
         ImageView iconCompartir = view.findViewById(R.id.icon_compartir);
-        iconCompartir.setOnClickListener(v -> {
-            if (recetaActual != null) {
-                int id = recetaActual.getIdReceta();
-                String url = "https://cocinarte-frontend.vercel.app/receta/" + id;
+        if (iconCompartir != null) {
+            iconCompartir.setOnClickListener(v -> {
+                if (recetaActual != null) {
+                    int id = recetaActual.getIdReceta();
+                    String url = "https://cocinarte-frontend.vercel.app/receta/" + id;
 
-                Intent intent = new Intent(Intent.ACTION_SEND);
-                intent.setType("text/plain");
-                intent.putExtra(Intent.EXTRA_TEXT, "¡Mira esta receta en Cocinarte! 🍽️\n" + url);
+                    Intent intent = new Intent(Intent.ACTION_SEND);
+                    intent.setType("text/plain");
+                    intent.putExtra(Intent.EXTRA_TEXT, "¡Mira esta receta en Cocinarte! 🍽️\n" + url);
 
-                startActivity(Intent.createChooser(intent, "Compartir receta con..."));
-            } else {
-                Toast.makeText(getContext(), "Espera a que se cargue la receta", Toast.LENGTH_SHORT).show();
-            }
-        });
+                    startActivity(Intent.createChooser(intent, "Compartir receta con..."));
+                } else {
+                    Toast.makeText(getContext(), "Espera a que se cargue la receta", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
 
         iconGuardar = view.findViewById(R.id.icon_guardar);
 
-        iconGuardar.setOnClickListener(v -> {
-            recetaGuardada = !recetaGuardada;
+        if (iconGuardar != null) {
+            iconGuardar.setOnClickListener(v -> {
+                recetaGuardada = !recetaGuardada;
 
-            if (recetaActual != null) {
-                prefsGuardado.edit()
-                        .putBoolean(String.valueOf(recetaActual.getIdReceta()), recetaGuardada)
-                        .apply();
-            }
+                if (recetaActual != null) {
+                    prefsGuardado.edit()
+                            .putBoolean(String.valueOf(recetaActual.getIdReceta()), recetaGuardada)
+                            .apply();
+                }
 
-            actualizarIconoGuardar();
-            Toast.makeText(getContext(),
-                    recetaGuardada ? "Receta guardada" : "Guardado eliminado",
-                    Toast.LENGTH_SHORT).show();
+                actualizarIconoGuardar();
+                Toast.makeText(getContext(),
+                        recetaGuardada ? "Receta guardada" : "Guardado eliminado",
+                        Toast.LENGTH_SHORT).show();
 
-            animarIcono(iconGuardar);
-        });
+                animarIcono(iconGuardar);
+            });
+        }
 
         iconLike = view.findViewById(R.id.icon_like);
         textLikeCount = view.findViewById(R.id.text_like_count);
 
-        iconLike.setOnClickListener(v -> {
-            if (recetaActual != null && likeInicializado) {
-                toggleLike(recetaActual.getIdReceta());
-            }
-        });
+        if (iconLike != null) {
+            iconLike.setOnClickListener(v -> {
+                if (recetaActual != null && likeInicializado) {
+                    toggleLike(recetaActual.getIdReceta());
+                }
+            });
+        }
 
         if (getArguments() != null) {
             int idReceta = getArguments().getInt("id_receta", -1);
@@ -157,6 +168,7 @@ public class DetalleRecetaFragment extends Fragment {
         }
     }
 
+    // ✅ MÉTODO CORREGIDO: Usar la clase de favoritos con la interfaz correcta
     private void abrirSeccionComentarios() {
         if (recetaActual != null) {
             ReaccionApi api = ApiClient.getClient(requireContext()).create(ReaccionApi.class);
@@ -169,7 +181,18 @@ public class DetalleRecetaFragment extends Fragment {
                             JSONObject obj = new JSONObject(json);
                             JSONArray comentariosArray = obj.getJSONArray("comentarios");
 
+                            // ✅ USAR LA CLASE DE FAVORITOS CON INTERFAZ CORRECTA
                             ComentariosBottomSheetFragment modal = ComentariosBottomSheetFragment.newInstance(comentariosArray, recetaActual.getIdReceta());
+
+                            // ✅ CONFIGURAR EL LISTENER CORRECTO
+                            modal.setComentariosListener(new ComentariosBottomSheetFragment.ComentariosListener() {
+                                @Override
+                                public void onComentariosCerrados() {
+                                    // Al cerrar el modal, actualizar las reacciones
+                                    actualizarComentariosAlCerrarModal();
+                                }
+                            });
+
                             modal.show(getChildFragmentManager(), modal.getTag());
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -231,11 +254,14 @@ public class DetalleRecetaFragment extends Fragment {
 
     private void verificarCargaCompleta() {
         if (recetaCargada && reaccionesCargadas) {
-            View loading = requireView().findViewById(R.id.loading_container);
-            View contenido = requireView().findViewById(R.id.contenido_receta);
+            // ✅ TU LAYOUT NO TIENE loading_container NI contenido_receta
+            // Solo registrar que la carga se completó
+            Log.d("DETALLE", "✅ Receta y reacciones cargadas completamente");
 
-            loading.setVisibility(View.GONE);
-            contenido.setVisibility(View.VISIBLE);
+            // Opcional: Mostrar toast de confirmación
+            if (getContext() != null) {
+                Toast.makeText(getContext(), "Receta cargada", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
@@ -256,12 +282,16 @@ public class DetalleRecetaFragment extends Fragment {
                     mostrarDetallesReceta(recetaActual);
                     recetaCargada = true;
                     verificarCargaCompleta();
+                } else {
+                    Log.e("DETALLE_ERROR", "Error HTTP: " + response.code());
+                    Toast.makeText(getContext(), "Error al cargar la receta", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<Receta> call, Throwable t) {
                 Log.e("DETALLE_ERROR", "Error al obtener receta: " + t.getMessage());
+                Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -283,18 +313,25 @@ public class DetalleRecetaFragment extends Fragment {
 
                         comentariosArray = obj.getJSONArray("comentarios");
                         int totalComentarios = obj.getInt("total_comentarios");
+
+                        // ✅ USAR EL ID CORRECTO QUE AGREGAMOS AL LAYOUT
                         TextView textCommentCount = requireView().findViewById(R.id.text_coments_count);
-                        textCommentCount.setText(String.valueOf(totalComentarios));
+                        if (textCommentCount != null) {
+                            textCommentCount.setText(String.valueOf(totalComentarios));
+                        } else {
+                            Log.d("DETALLE", "Total comentarios: " + totalComentarios);
+                        }
 
                         reaccionesCargadas = true;
                         verificarCargaCompleta();
 
                     } catch (IOException | JSONException e) {
+                        Log.e("REACCIONES", "Error al procesar respuesta: " + e.getMessage());
                         e.printStackTrace();
                     }
 
                 } else {
-                    Log.e("REACCIONES", "Error en respuesta");
+                    Log.e("REACCIONES", "Error en respuesta: " + response.code());
                 }
             }
 
@@ -365,7 +402,11 @@ public class DetalleRecetaFragment extends Fragment {
             iconLike.setImageResource(iconRes);
             iconLike.setVisibility(View.VISIBLE);
         }
-        textLikeCount.setText(String.valueOf(totalLikes));
+        if (textLikeCount != null) {
+            textLikeCount.setText(String.valueOf(totalLikes));
+        } else {
+            Log.d("DETALLE", "Likes: " + totalLikes + (userLiked ? " (me gusta)" : ""));
+        }
     }
 
     private void cargarDatosUsuario(View view) {
@@ -374,83 +415,101 @@ public class DetalleRecetaFragment extends Fragment {
         TextView userName = view.findViewById(R.id.user_name);
 
         if ("comunidad".equals(origen)) {
-            userProfileImage.setVisibility(View.GONE);
-            userEmail.setVisibility(View.GONE);
-            userName.setVisibility(View.GONE);
+            if (userProfileImage != null) userProfileImage.setVisibility(View.GONE);
+            if (userEmail != null) userEmail.setVisibility(View.GONE);
+            if (userName != null) userName.setVisibility(View.GONE);
             return;
         }
 
-        SharedPreferences preferences = requireContext().getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
-        String photoUriString = preferences.getString("profile_image_uri", null);
+        try {
+            SharedPreferences preferences = requireContext().getSharedPreferences("user_prefs", Context.MODE_PRIVATE);
+            String photoUriString = preferences.getString("profile_image_uri", null);
 
-        LoginManager loginManager = new LoginManager(requireContext());
-        String correo = loginManager.getUsuario().getCorreo();
-        String nombreUsuario = loginManager.getUsuario().getNombreUsuario();
+            LoginManager loginManager = new LoginManager(requireContext());
+            if (loginManager.getUsuario() != null) {
+                String correo = loginManager.getUsuario().getCorreo();
+                String nombreUsuario = loginManager.getUsuario().getNombreUsuario();
 
-        userEmail.setText(correo);
-        userName.setText(nombreUsuario);
+                if (userEmail != null) userEmail.setText(correo != null ? correo : "");
+                if (userName != null) userName.setText(nombreUsuario != null ? nombreUsuario : "");
 
-        if (photoUriString != null && !photoUriString.isEmpty()) {
-            Glide.with(this)
-                    .load(Uri.parse(photoUriString))
-                    .circleCrop()
-                    .placeholder(R.drawable.perfil)
-                    .into(userProfileImage);
-        } else {
-            userProfileImage.setImageResource(R.drawable.perfil);
+                if (userProfileImage != null) {
+                    if (photoUriString != null && !photoUriString.isEmpty()) {
+                        Glide.with(this)
+                                .load(Uri.parse(photoUriString))
+                                .circleCrop()
+                                .placeholder(R.drawable.perfil)
+                                .into(userProfileImage);
+                    } else {
+                        userProfileImage.setImageResource(R.drawable.perfil);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            Log.e("DETALLE", "Error al cargar datos de usuario: " + e.getMessage());
         }
     }
 
     private void mostrarDetallesReceta(Receta receta) {
+        if (getView() == null) return;
+
         TextView nombreReceta = getView().findViewById(R.id.recipe_name);
-        nombreReceta.setText(receta.getTitulo());
+        if (nombreReceta != null) nombreReceta.setText(receta.getTitulo());
 
         TextView kcl = getView().findViewById(R.id.nutrition_kcl);
         TextView p = getView().findViewById(R.id.nutrition_p);
         TextView c = getView().findViewById(R.id.nutrition_c);
         TextView gt = getView().findViewById(R.id.nutrition_gt);
 
-        kcl.setText(String.valueOf(receta.getCalorias()));
-        p.setText(String.valueOf(receta.getProteinas()));
-        c.setText(String.valueOf(receta.getCarbohidratos()));
-        gt.setText(String.valueOf(receta.getGrasas()));
+        if (kcl != null) kcl.setText(String.valueOf(receta.getCalorias()));
+        if (p != null) p.setText(String.valueOf(receta.getProteinas()));
+        if (c != null) c.setText(String.valueOf(receta.getCarbohidratos()));
+        if (gt != null) gt.setText(String.valueOf(receta.getGrasas()));
 
         ImageView imagenReceta = getView().findViewById(R.id.photoImageDetails);
-        Glide.with(requireContext()).load(receta.getImagen()).into(imagenReceta);
+        if (imagenReceta != null) {
+            Glide.with(requireContext()).load(receta.getImagen()).into(imagenReceta);
+        }
 
         TextView tiempo = getView().findViewById(R.id.tv_tiempo);
         TextView dificultad = getView().findViewById(R.id.tv_dificultad);
-        tiempo.setText(receta.getTiempoPreparacion());
-        dificultad.setText(receta.getDificultad());
+        if (tiempo != null) tiempo.setText(receta.getTiempoPreparacion());
+        if (dificultad != null) dificultad.setText(receta.getDificultad());
 
         com.google.android.flexbox.FlexboxLayout contenedorIngredientes = getView().findViewById(R.id.lista_ingredientes);
-        contenedorIngredientes.removeAllViews();
-        for (Ingrediente ingrediente : receta.getIngredientes()) {
-            agregarChipIngrediente(contenedorIngredientes, ingrediente.getNombreIngrediente());
+        if (contenedorIngredientes != null) {
+            contenedorIngredientes.removeAllViews();
+            if (receta.getIngredientes() != null) {
+                for (Ingrediente ingrediente : receta.getIngredientes()) {
+                    agregarChipIngrediente(contenedorIngredientes, ingrediente.getNombreIngrediente());
+                }
+            }
         }
 
         LinearLayout contenedorPasos = getView().findViewById(R.id.lista_pasos);
-        contenedorPasos.removeAllViews();
+        if (contenedorPasos != null) {
+            contenedorPasos.removeAllViews();
 
-        // ✅ CORRECCIÓN: Usar getDescripcion() en lugar de getPreparacion()
-        List<String> pasos;
-        if (receta.getDescripcion() != null && !receta.getDescripcion().isEmpty()) {
-            pasos = Arrays.asList(receta.getDescripcion().split("\n"));
-        } else {
-            pasos = Arrays.asList("No hay pasos de preparación disponibles");
-        }
+            // ✅ CORRECCIÓN: Usar getDescripcion() en lugar de getPreparacion()
+            List<String> pasos;
+            if (receta.getDescripcion() != null && !receta.getDescripcion().isEmpty()) {
+                pasos = Arrays.asList(receta.getDescripcion().split("\n"));
+            } else {
+                pasos = Arrays.asList("No hay pasos de preparación disponibles");
+            }
 
-        int pasoNum = 1;
-        for (String paso : pasos) {
-            // Evitar pasos vacíos
-            if (paso.trim().isEmpty()) continue;
+            int pasoNum = 1;
+            for (String paso : pasos) {
+                // Evitar pasos vacíos
+                if (paso.trim().isEmpty()) continue;
 
-            TextView tvPaso = new TextView(getContext());
-            tvPaso.setText(String.format("%d. %s", pasoNum++, paso.trim()));
-            tvPaso.setTextSize(16);
-            tvPaso.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
-            tvPaso.setPadding(0, 0, 0, 16);
-            contenedorPasos.addView(tvPaso);
+                TextView tvPaso = new TextView(getContext());
+                tvPaso.setText(String.format("%d. %s", pasoNum++, paso.trim()));
+                tvPaso.setTextSize(16);
+                tvPaso.setTextColor(ContextCompat.getColor(getContext(), android.R.color.black));
+                tvPaso.setPadding(0, 0, 0, 16);
+                contenedorPasos.addView(tvPaso);
+            }
         }
     }
 
@@ -478,6 +537,8 @@ public class DetalleRecetaFragment extends Fragment {
     }
 
     private void eliminarReceta() {
+        if (recetaActual == null) return;
+
         RecetaApi recetaApi = ApiClient.getClient(getContext()).create(RecetaApi.class);
         LoginManager loginManager = new LoginManager(requireContext());
         String tokenGuardado = loginManager.getToken();
@@ -486,14 +547,27 @@ public class DetalleRecetaFragment extends Fragment {
             @Override
             public void onResponse(Call<Void> call, Response<Void> response) {
                 if (response.isSuccessful()) {
+                    Toast.makeText(getContext(), "Receta eliminada correctamente", Toast.LENGTH_SHORT).show();
                     requireActivity().getSupportFragmentManager().popBackStack();
+                } else {
+                    Toast.makeText(getContext(), "Error al eliminar la receta", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<Void> call, Throwable t) {
                 Log.e("ELIMINAR_ERROR", "Error en conexión: " + t.getMessage());
+                Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        // Limpiar handlers para evitar memory leaks
+        if (pollingHandler != null && pollingRunnable != null) {
+            pollingHandler.removeCallbacks(pollingRunnable);
+        }
     }
 }
