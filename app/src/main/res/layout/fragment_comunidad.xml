@@ -214,5 +214,24 @@
 
         </LinearLayout>
     </LinearLayout>
+    <FrameLayout
+        android:id="@+id/loading_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@android:color/white"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
+        <ImageView
+            android:id="@+id/custom_spinner"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_gravity="center"
+            android:src="@drawable/spinner_loader"
+            android:contentDescription="Cargando..." />
+    </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

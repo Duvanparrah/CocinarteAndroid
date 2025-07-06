@@ -155,13 +155,13 @@ public class MainActivity extends AppCompatActivity {
         navView.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
 
-            if (itemId == R.id.nav_inicio) {
+            if (itemId == R.id.navigation_inicio) {
                 navController.navigate(R.id.navigation_inicio);
                 return true;
             } else if (itemId == R.id.nav_banquetes) {
                 navController.navigate(R.id.navigation_banquetes);
                 return true;
-            } else if (itemId == R.id.nav_nutricion) {
+            } else if (itemId == R.id.navigation_nutricion) {
                 navController.navigate(R.id.navigation_nutricion);
                 return true;
             } else if (itemId == R.id.navegar_comunidad) {
