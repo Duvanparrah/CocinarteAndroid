@@ -8,18 +8,25 @@
     android:background="@android:color/white"
     android:padding="10dp">
 
+
+
+
     <ScrollView
-        android:id="@+id/scrollView"
+        android:id="@+id/contenido_receta"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:fillViewport="true"
         android:scrollbars="none"
+        android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+
+
         <LinearLayout
+            android:id="@+id/detalle_contenido"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -216,6 +223,11 @@
                     android:background="@drawable/borde_dashed"
                     />
 
+
+
+
+
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -223,53 +235,89 @@
                     android:paddingTop="15dp"
                     android:gravity="center_vertical">
 
-                    <!-- Corazón -->
+                    <!-- Corazón directamente clickeable -->
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/love"
-                        app:tint="@android:color/black"
+                        android:id="@+id/icon_like"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_heart_outline"
+                        android:contentDescription="Like"
+                        android:background="?attr/selectableItemBackgroundBorderless"
+                        android:clickable="true"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:id="@+id/text_like_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@android:color/black"
+                        android:textSize="16sp"
                         android:layout_marginEnd="16dp"/>
 
                     <!-- Comentario -->
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:id="@+id/icon_comentario"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="12dp"
                         android:src="@drawable/chat_bot"
-                        android:layout_marginStart="20dp"
+                        android:contentDescription="Comentario"
                         app:tint="@android:color/black"
+                        android:layout_marginEnd="16dp"/>
+
+                    <TextView
+                        android:id="@+id/text_coments_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="@android:color/black"
+                        android:textSize="16sp"
                         android:layout_marginEnd="16dp"/>
 
                     <!-- Compartir -->
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:id="@+id/icon_compartir"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="12dp"
                         android:src="@drawable/btn_com"
-                        android:layout_marginStart="20dp"
-                        app:tint="@android:color/black"
-                        android:layout_marginRight="16dp"/>
-
-
+                        android:contentDescription="Compartir"
+                        android:layout_marginEnd="16dp"
+                        app:tint="@android:color/black" />
 
 
                     <!-- Guardar -->
                     <ImageView
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:src="@drawable/marcador"
-                        android:layout_marginStart="20dp"
-                        app:tint="@android:color/black"/>
+                        android:id="@+id/icon_guardar"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:padding="12dp"
+                        android:src="@drawable/ic_bookmark_outline"
+                        android:contentDescription="Guardar"
+                        app:tint="@null" />
 
+
+                    <!-- Eliminar -->
                     <ImageView
                         android:id="@+id/btn_delete_recipe"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:padding="12dp"
                         android:src="@drawable/delete_bt"
-                        android:layout_marginStart="100dp"
-                        app:tint="@color/negro"
-                        android:layout_marginEnd="16dp"/>
-
+                        android:layout_marginStart="32dp"
+                        android:contentDescription="Eliminar receta"
+                        app:tint="@color/negro"/>
                 </LinearLayout>
+
+
+
+
+
+
+
+
             </LinearLayout>
 
             <!-- Información de tiempo y dificultad -->
@@ -403,4 +451,29 @@
             </LinearLayout>
         </LinearLayout>
     </ScrollView>
+
+
+    <FrameLayout
+        android:id="@+id/loading_container"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@android:color/white"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/custom_spinner"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_gravity="center"
+            android:src="@drawable/spinner_loader"
+            android:contentDescription="Cargando..." />
+    </FrameLayout>
+
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

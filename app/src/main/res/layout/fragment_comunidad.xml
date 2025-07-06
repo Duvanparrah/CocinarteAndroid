@@ -226,6 +226,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+
         <ImageView
             android:id="@+id/custom_spinner"
             android:layout_width="35dp"
