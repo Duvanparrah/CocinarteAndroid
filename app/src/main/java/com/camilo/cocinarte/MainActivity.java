@@ -86,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private boolean isValidSession() {
         try {
-            // Verificar en LoginManager primero
+            // Verificar si LoginManager tiene sesión activa válida
             boolean loginManagerValid = loginManager.hasActiveSession();
 
             if (loginManagerValid) {
@@ -94,26 +94,55 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
 
-            // Si LoginManager no tiene sesión, verificar SessionManager
+            // Si LoginManager no tiene sesión válida, verificar SessionManager
             boolean sessionManagerValid = sessionManager.isLoggedIn() &&
                     sessionManager.hasValidToken() &&
                     !sessionManager.isSessionExpired();
 
             if (sessionManagerValid) {
                 Log.d(TAG, "✅ Sesión válida en SessionManager, migrando a LoginManager...");
-                // Migrar datos de SessionManager a LoginManager
                 loginManager.migrarDesdeSessionManager(this);
-                return true;
+
+                // Verificar nuevamente si la migración fue exitosa
+                if (loginManager.hasActiveSession()) {
+                    Log.d(TAG, "✅ Migración exitosa, sesión válida en LoginManager");
+                    return true;
+                } else {
+                    Log.w(TAG, "⚠️ Migración fallida, sesión inválida tras migrar");
+                    clearSessions();
+                    return false;
+                }
             }
 
-            Log.w(TAG, "⚠️ No hay sesión válida en ningún manager");
+            // Si no hay sesión válida en ninguno
+            Log.w(TAG, "⚠️ No hay sesión válida en LoginManager ni en SessionManager");
+            clearSessions();
             return false;
 
         } catch (Exception e) {
-            Log.e(TAG, "❌ Error al validar sesión: " + e.getMessage());
+            Log.e(TAG, "❌ Error al validar sesión: " + e.getMessage(), e);
+            clearSessions();
             return false;
         }
     }
+
+    /**
+     * Limpia las sesiones en ambos managers y logs para debug.
+     */
+    private void clearSessions() {
+        Log.d(TAG, "🧹 Limpiando datos de sesión en LoginManager y SessionManager...");
+        try {
+            loginManager.clear();
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error limpiando LoginManager: " + e.getMessage(), e);
+        }
+        try {
+            sessionManager.logout();
+        } catch (Exception e) {
+            Log.e(TAG, "❌ Error limpiando SessionManager: " + e.getMessage(), e);
+        }
+    }
+
 
     /**
      * ✅ MÉTODO PARA REDIRIGIR AL LOGIN
@@ -205,6 +234,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "Cerrando sesión...");
                     sessionManager.logout();
                     loginManager.clear();
+                    getSharedPreferences("auth", MODE_PRIVATE).edit().clear().apply(); // Limpieza directa del LoginManager
                     intent = new Intent(this, InicioSesionActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 } else {

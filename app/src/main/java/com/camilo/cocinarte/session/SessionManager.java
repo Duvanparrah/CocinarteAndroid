@@ -70,11 +70,16 @@ public class SessionManager {
             editor = prefs.edit();
 
         } catch (GeneralSecurityException | IOException e) {
-            // Fallback a SharedPreferences normales si hay error
             android.util.Log.e(TAG, "Error creating encrypted preferences", e);
-            prefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+
+            // Borra todo lo que había antes (¡sólo útil para debug o errores!)
+            SharedPreferences legacyPrefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
+            legacyPrefs.edit().clear().apply();
+
+            prefs = legacyPrefs;
             editor = prefs.edit();
         }
+
     }
 
     /**
