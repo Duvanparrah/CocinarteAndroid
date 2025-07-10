@@ -35,6 +35,8 @@ import com.camilo.cocinarte.models.Ingrediente;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -69,7 +71,13 @@ public class DetalleRecetaActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detalle_receta);
 
         // Inicializar SessionManager
-        sessionManager = SessionManager.getInstance(this);
+        try {
+            sessionManager = SessionManager.getInstance(this);
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         // Inicializar vistas
         initViews();

@@ -84,15 +84,30 @@ dependencies {
     //authentication
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
 
-//    cargar imagenes perfil
-    implementation ("com.github.bumptech.glide:glide:4.16.0")
+    //cargar imagenes perfil
+    implementation("com.github.bumptech.glide:glide:4.16.0")
     androidTestImplementation(platform(libs.compose.bom))
     androidTestImplementation(libs.ui.test.junit4)
-    annotationProcessor ("com.github.bumptech.glide:compiler:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
     debugImplementation(libs.ui.tooling)
     debugImplementation(libs.ui.test.manifest)
 
     // Flexbox
     implementation("com.google.android.flexbox:flexbox:3.0.0")
 
+    // ============================================
+    // 🆕 DEPENDENCIAS PARA FORMULARIO DINÁMICO 7
+    // ============================================
+
+    // 🌐 VOLLEY para requests HTTP dinámicos
+    implementation("com.android.volley:volley:1.2.1")
+
+    // 📦 CardView para UI de ingredientes
+    implementation("androidx.cardview:cardview:1.0.0")
+
+    // 🎨 RecyclerView para listas optimizadas
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+
+    // 🔄 SwipeRefreshLayout para pull-to-refresh
+    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
 }

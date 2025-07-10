@@ -23,7 +23,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:src="@drawable/logo_cocinarte"
+                android:src="@drawable/banquete_nuevo"
                 android:contentDescription="Imagen de la receta" />
 
             <!-- Título superpuesto en la imagen -->
@@ -53,6 +53,114 @@
             </LinearLayout>
 
         </RelativeLayout>
+
+        <!-- ✅ NUEVA SECCIÓN: Tabla nutricional -->
+        <LinearLayout
+            android:id="@+id/nutrition_table"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:background="@android:color/darker_gray"
+            android:orientation="horizontal"
+            android:padding="1dp">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="2"
+                android:layout_height="32dp"
+                android:orientation="horizontal"
+                android:background="@android:color/white"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:text="Por porción"
+                    android:textColor="@android:color/black"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="32dp"
+                android:orientation="horizontal"
+                android:background="@android:color/white"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/nutrition_kcl"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textColor="@android:color/black"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:text="0 kcal" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="32dp"
+                android:orientation="horizontal"
+                android:background="@android:color/white"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/nutrition_p"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textColor="@android:color/black"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:text="0 P" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="32dp"
+                android:orientation="horizontal"
+                android:background="@android:color/white"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/nutrition_c"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textColor="@android:color/black"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:text="0 C" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="32dp"
+                android:orientation="horizontal"
+                android:background="@android:color/white"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/nutrition_gt"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textColor="@android:color/black"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:text="0 GT" />
+            </LinearLayout>
+        </LinearLayout>
 
         <!-- Botones de interacción con fondo blanco -->
         <LinearLayout

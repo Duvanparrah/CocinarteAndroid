@@ -12,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -36,7 +37,13 @@ public class BanqueteManager {
     private BanqueteManager(Context context) {
         this.context = context.getApplicationContext();
         this.banqueteApi = ApiClient.getClient(this.context).create(BanqueteApi.class);
-        this.sessionManager = SessionManager.getInstance(this.context);
+        try {
+            this.sessionManager = SessionManager.getInstance(this.context);
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         Log.d(TAG, "🏗️ BanqueteManager inicializado");
     }

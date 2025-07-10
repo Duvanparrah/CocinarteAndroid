@@ -4,24 +4,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
+    android:layout_margin="4dp"
     app:cardCornerRadius="8dp"
-    app:cardElevation="4dp">
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:padding="16dp">
+        android:padding="12dp"
+        android:gravity="center_vertical">
 
         <!-- Imagen del platillo (opcional) -->
         <ImageView
             android:id="@+id/imagenPlatillo"
             android:layout_width="60dp"
             android:layout_height="60dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="12dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/logo_cocinarte"
+            android:src="@drawable/banquete_nuevo"
             android:background="@drawable/borde_dashed"
             android:contentDescription="Imagen del platillo" />
 
@@ -41,19 +43,101 @@
                 android:textColor="@color/negro"
                 android:text="Nombre del platillo" />
 
-            <!-- Descripción/preparación del platillo -->
+            <!-- Descripción del platillo -->
             <TextView
                 android:id="@+id/textDescripcionPlatillo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textSize="14sp"
+                android:textSize="13sp"
                 android:textColor="@color/gris"
-                android:maxLines="3"
-                android:ellipsize="end"
-                android:text="Descripción de la preparación del platillo" />
+                android:text="Descripción del platillo"
+                android:layout_marginTop="2dp"
+                android:maxLines="2"
+                android:ellipsize="end" />
+
+            <!-- Información adicional -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp">
+
+                <!-- Tiempo de preparación -->
+                <TextView
+                    android:id="@+id/textTiempoPreparacion"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="@color/verde"
+                    android:text="⏱️ 30 min"
+                    android:drawablePadding="4dp" />
+
+                <!-- Separador -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:textSize="12sp"
+                    android:textColor="@color/gris"
+                    android:text="•" />
+
+                <!-- Porciones -->
+                <TextView
+                    android:id="@+id/textPorciones"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:textColor="@color/gris"
+                    android:text="👥 4 porciones" />
+
+                <!-- Separador -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:textSize="12sp"
+                    android:textColor="@color/gris"
+                    android:text="•" />
+
+                <!-- Dificultad -->
+                <TextView
+                    android:id="@+id/textDificultad"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:textSize="12sp"
+                    android:textColor="@color/gris"
+                    android:text="📊 Media" />
+
+            </LinearLayout>
+
+            <!-- Categoría del platillo -->
+            <TextView
+                android:id="@+id/textCategoriaPlatillo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="11sp"
+                android:textColor="@color/white"
+                android:background="@drawable/chip_background"
+                android:padding="4dp"
+                android:layout_marginTop="4dp"
+                android:text="🏷️ Categoría"
+                android:visibility="gone" />
 
         </LinearLayout>
+
+        <!-- Icono de más opciones -->
+        <ImageView
+            android:id="@+id/iconoMasOpciones"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_edit"
+            android:contentDescription="Más opciones"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:visibility="gone" />
 
     </LinearLayout>
 

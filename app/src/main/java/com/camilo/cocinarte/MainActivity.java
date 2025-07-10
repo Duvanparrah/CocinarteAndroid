@@ -22,6 +22,9 @@ import com.camilo.cocinarte.utils.NavigationHeaderHelper;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
@@ -45,7 +48,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // ✅ INICIALIZAR AMBOS MANAGERS
-        sessionManager = SessionManager.getInstance(this);
+        try {
+            sessionManager = SessionManager.getInstance(this);
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         loginManager = new LoginManager(this);
 
         // ✅ DEBUG: Mostrar información disponible
@@ -209,6 +218,9 @@ public class MainActivity extends AppCompatActivity {
     /**
      * ✅ CONFIGURAR LISTENERS DEL DRAWER
      */
+    // ✅ MÉTODO CORREGIDO: setupDrawerListeners()
+// Reemplaza solo este método en tu MainActivity.java
+
     private void setupDrawerListeners() {
         if (navigationView != null) {
             navigationView.setNavigationItemSelectedListener(menuItem -> {
@@ -218,15 +230,12 @@ public class MainActivity extends AppCompatActivity {
                 if (id == R.id.nav_favorites) {
                     Log.d(TAG, "Navegando a Favoritos");
                     intent = new Intent(this, FavoritosActivity.class);
-                } else if (id == R.id.nav_recipes) {
-                    Log.d(TAG, "Navegando a Mis Recetas");
-                    intent = new Intent(this, MisRecetasActivity.class);
-                } else if (id == R.id.nav_notifications) {
-                    Log.d(TAG, "Navegando a Notificaciones");
-                    intent = new Intent(this, NotificacionesActivity.class);
                 } else if (id == R.id.nav_account) {
                     Log.d(TAG, "Navegando a Cuenta y configuración");
                     intent = new Intent(this, CuentaConfiguracionActivity.class);
+                } else if (id == R.id.nav_notifications) {
+                    Log.d(TAG, "Navegando a Notificaciones");
+                    intent = new Intent(this, NotificacionesActivity.class);
                 } else if (id == R.id.nav_support) {
                     Log.d(TAG, "Navegando a Soporte");
                     intent = new Intent(this, SoporteActivity.class);
@@ -234,11 +243,11 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "Cerrando sesión...");
                     sessionManager.logout();
                     loginManager.clear();
-                    getSharedPreferences("auth", MODE_PRIVATE).edit().clear().apply(); // Limpieza directa del LoginManager
+                    getSharedPreferences("auth", MODE_PRIVATE).edit().clear().apply();
                     intent = new Intent(this, InicioSesionActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                 } else {
-                    Log.d(TAG, "Elemento desconocido seleccionado");
+                    Log.d(TAG, "Elemento del menú no manejado: " + id);
                 }
 
                 if (intent != null) {
@@ -251,7 +260,6 @@ public class MainActivity extends AppCompatActivity {
             });
         }
     }
-
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);

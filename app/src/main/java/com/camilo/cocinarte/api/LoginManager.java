@@ -16,9 +16,47 @@ public class LoginManager {
         prefs = context.getSharedPreferences("auth", Context.MODE_PRIVATE);
     }
 
+    // ✅ NUEVO: Guardar token y refresh token
+    public void saveTokens(String accessToken, String refreshToken) {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("token", accessToken);
+        editor.putString("refresh_token", refreshToken);
+        editor.putLong("token_timestamp", System.currentTimeMillis());
+        editor.apply();
+        Log.d(TAG, "✅ Tokens guardados exitosamente");
+    }
+
+    // ✅ MANTENER compatibilidad con método anterior
     public void saveToken(String token) {
-        prefs.edit().putString("token", token).apply();
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("token", token);
+        editor.putLong("token_timestamp", System.currentTimeMillis()); // ✅ AGREGAR ESTA LÍNEA
+        editor.apply();
         Log.d(TAG, "Token guardado exitosamente");
+    }
+
+    // ✅ NUEVO: Obtener refresh token
+    public String getRefreshToken() {
+        String refreshToken = prefs.getString("refresh_token", null);
+        Log.d(TAG, "Refresh token: " + (refreshToken != null ? "presente" : "ausente"));
+        return refreshToken;
+    }
+
+    // ✅ NUEVO: Verificar si el token está expirado (aproximadamente)
+    public boolean isTokenExpired() {
+        long tokenTimestamp = prefs.getLong("token_timestamp", 0);
+        if (tokenTimestamp == 0) {
+            Log.d(TAG, "No hay timestamp del token");
+            return true;
+        }
+
+        long currentTime = System.currentTimeMillis();
+        long tokenAge = currentTime - tokenTimestamp;
+        long sevenDays = 7 * 24 * 60 * 60 * 1000L; // ✅ CAMBIAR A 7 DÍAS
+
+        boolean expired = tokenAge > sevenDays;
+        Log.d(TAG, "Token expirado: " + expired + " (edad: " + (tokenAge / 1000 / 60 / 60) + " horas)");
+        return expired;
     }
 
     // ✅ MÉTODO CORREGIDO: Guardar datos del usuario con campos consistentes
@@ -68,13 +106,22 @@ public class LoginManager {
         return token;
     }
 
-    // ✅ MÉTODO ADICIONAL: Verificar si hay sesión activa
+    // ✅ MÉTODO MEJORADO: Verificar si hay sesión activa Y token válido
     public boolean hasActiveSession() {
         String token = getToken();
         Usuario usuario = getUsuario();
-        boolean hasSession = token != null && usuario != null;
+        boolean hasSession = token != null && usuario != null && !isTokenExpired();
         Log.d(TAG, "Sesión activa: " + hasSession);
         return hasSession;
+    }
+
+    // ✅ NUEVO: Verificar si necesita renovar token
+    public boolean needsTokenRefresh() {
+        String token = getToken();
+        String refreshToken = getRefreshToken();
+        boolean needsRefresh = token != null && refreshToken != null && isTokenExpired();
+        Log.d(TAG, "Necesita renovar token: " + needsRefresh);
+        return needsRefresh;
     }
 
     // ✅ MÉTODO ADICIONAL: Obtener ID del usuario actual
@@ -94,7 +141,7 @@ public class LoginManager {
             // ✅ USAR MÉTODOS CORRECTOS DE SessionManager
             String email = sessionManager.getEmail();
             String nombre = sessionManager.getUserName();
-            String userId = sessionManager.getUserId();
+            String userId = String.valueOf(sessionManager.getUserId());
             String token = sessionManager.getAuthToken();
             String foto = sessionManager.getUserPhoto();
             String tipo = sessionManager.getUserType();
@@ -102,7 +149,7 @@ public class LoginManager {
             if (email != null && nombre != null && userId != null && token != null) {
                 Log.d(TAG, "🔄 Migrando datos desde SessionManager...");
 
-                // Guardar token
+                // Guardar token (sin refresh token porque SessionManager no lo tiene)
                 saveToken(token);
 
                 // Crear y guardar usuario
@@ -135,7 +182,7 @@ public class LoginManager {
             Log.d(TAG, "🔍 LoginManager vacío, verificando SessionManager...");
             try {
                 SessionManager sessionManager = SessionManager.getInstance(context);
-                if (sessionManager.getUserId() != null && sessionManager.getAuthToken() != null) {
+                if (sessionManager.getUserId() != -1 && sessionManager.getAuthToken() != null) {
                     Log.d(TAG, "🔄 Datos encontrados en SessionManager, migrando automáticamente...");
                     migrarDesdeSessionManager(context);
                 }
@@ -143,6 +190,16 @@ public class LoginManager {
                 Log.e(TAG, "❌ Error en auto-sincronización: " + e.getMessage());
             }
         }
+    }
+
+    // ✅ NUEVO: Limpiar solo tokens (mantener datos de usuario)
+    public void clearTokens() {
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.remove("token");
+        editor.remove("refresh_token");
+        editor.remove("token_timestamp");
+        editor.apply();
+        Log.d(TAG, "✅ Tokens eliminados");
     }
 
     public void clear() {
@@ -154,6 +211,8 @@ public class LoginManager {
     public void debugPrintUserData() {
         Log.d(TAG, "=== DATOS GUARDADOS EN SHARED PREFERENCES ===");
         Log.d(TAG, "Token: " + prefs.getString("token", "NO ENCONTRADO"));
+        Log.d(TAG, "Refresh Token: " + prefs.getString("refresh_token", "NO ENCONTRADO"));
+        Log.d(TAG, "Token Timestamp: " + prefs.getLong("token_timestamp", 0));
         Log.d(TAG, "ID Usuario: " + prefs.getString("id_usuario", "NO ENCONTRADO"));
         Log.d(TAG, "Correo: " + prefs.getString("correo", "NO ENCONTRADO"));
         Log.d(TAG, "Nombre Usuario: " + prefs.getString("nombre_usuario", "NO ENCONTRADO"));

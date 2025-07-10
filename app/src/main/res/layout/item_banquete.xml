@@ -54,7 +54,89 @@
                 android:layout_marginTop="4dp"
                 android:textSize="14sp" />
 
-            <!-- Views opcionales (si los necesitas) -->
+            <!-- Botones de interacción -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingTop="16dp"
+                android:gravity="center_vertical">
+
+                <!-- Like con contador -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:id="@+id/like_button"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/love"
+                        android:contentDescription="Me gusta" />
+
+                    <TextView
+                        android:id="@+id/likes_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="150 mil"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:layout_marginStart="8dp" />
+                </LinearLayout>
+
+                <!-- Comentarios con contador -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="24dp">
+
+                    <ImageView
+                        android:id="@+id/comment_button"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:src="@drawable/chat"
+                        android:contentDescription="Comentarios" />
+
+                    <TextView
+                        android:id="@+id/comments_count"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="105"
+                        android:textColor="@color/black"
+                        android:textSize="14sp"
+                        android:layout_marginStart="8dp" />
+                </LinearLayout>
+
+                <!-- Compartir -->
+                <ImageView
+                    android:id="@+id/share_button"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="24dp"
+                    android:src="@drawable/compartir"
+                    android:contentDescription="Compartir" />
+
+                <!-- Espaciador -->
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1" />
+
+                <!-- Guardar -->
+                <ImageView
+                    android:id="@+id/save_button"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/favoritos"
+                    android:contentDescription="Guardar" />
+            </LinearLayout>
+
+            <!-- Elementos ocultos opcionales -->
             <TextView
                 android:id="@+id/total_platillos"
                 android:layout_width="match_parent"
@@ -86,35 +168,6 @@
                 android:layout_marginTop="4dp"
                 android:textSize="12sp"
                 android:visibility="gone" />
-
-            <!-- Estadísticas (opcionales) -->
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginTop="8dp"
-                android:visibility="gone">
-
-                <ImageView
-                    android:id="@+id/icono_favorito"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_marginEnd="8dp"
-                    android:src="@drawable/ic_bookmark_outline" />
-
-                <TextView
-                    android:id="@+id/total_likes"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginEnd="16dp"
-                    android:textSize="12sp" />
-
-                <TextView
-                    android:id="@+id/total_comentarios"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textSize="12sp" />
-            </LinearLayout>
         </LinearLayout>
     </LinearLayout>
 </androidx.cardview.widget.CardView>

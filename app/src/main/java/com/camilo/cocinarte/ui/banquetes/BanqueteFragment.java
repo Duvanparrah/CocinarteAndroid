@@ -28,6 +28,8 @@ import com.camilo.cocinarte.api.BanqueteApi;
 import com.camilo.cocinarte.models.Banquete;
 import com.camilo.cocinarte.session.SessionManager;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,7 +96,7 @@ public class BanqueteFragment extends Fragment implements BanqueteAdapter.OnBanq
 
     private void initViews(View root) {
         menuButton = root.findViewById(R.id.menu_button);
-        filterButton = root.findViewById(R.id.filter_button);
+
         searchEditText = root.findViewById(R.id.search_edit_text);
         banquetesRecyclerView = root.findViewById(R.id.banquetesRecyclerView);
         swipeRefreshLayout = root.findViewById(R.id.swipeRefreshLayout);
@@ -108,7 +110,13 @@ public class BanqueteFragment extends Fragment implements BanqueteAdapter.OnBanq
 
     private void setupApi() {
         banqueteApi = ApiClient.getClient(requireContext()).create(BanqueteApi.class);
-        sessionManager = SessionManager.getInstance(requireContext());
+        try {
+            sessionManager = SessionManager.getInstance(requireContext());
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void checkAuthentication() {
@@ -455,7 +463,7 @@ public class BanqueteFragment extends Fragment implements BanqueteAdapter.OnBanq
 
         // Actualizar adapter si hay autenticación (para reacciones)
         if (banqueteAdapter != null && hasAuthentication) {
-            banqueteAdapter.actualizarDatos();
+            banqueteAdapter.notifyDataSetChanged();
         }
     }
 

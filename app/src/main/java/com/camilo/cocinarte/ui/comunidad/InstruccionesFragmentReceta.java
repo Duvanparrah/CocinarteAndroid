@@ -183,11 +183,22 @@ public class InstruccionesFragmentReceta extends Fragment {
     }
 
     // ✅ MÉTODO PARA ENVIAR LA RECETA AL SERVIDOR
+// ✅ MÉTODO PARA ENVIAR LA RECETA AL SERVIDOR - CORREGIDO
     private void enviarRecetaAlServidor(RecetaRequest receta) throws IOException {
-        Log.d(TAG, "🚀 Enviando receta al servidor...");
+        Log.d(TAG, "🚀 Enviando receta de usuario regular al servidor...");
 
         LoginManager loginManager = new LoginManager(requireContext());
         String tokenGuardado = loginManager.getToken();
+
+        // ✅ VALIDAR QUE SEA USUARIO REGULAR
+        if (loginManager.getUsuario() != null) {
+            String tipoUsuario = loginManager.getUsuario().getTipoUsuario();
+            if (!"usuario".equals(tipoUsuario)) {
+                Log.w(TAG, "❌ Usuario tipo '" + tipoUsuario + "' no puede crear recetas en comunidad");
+                Toast.makeText(getContext(), "Solo usuarios regulares pueden crear recetas en comunidad", Toast.LENGTH_LONG).show();
+                return;
+            }
+        }
 
         // ✅ PREPARAR ARCHIVO DE IMAGEN
         Uri imageUri = Uri.parse(imagePath);
@@ -202,10 +213,8 @@ public class InstruccionesFragmentReceta extends Fragment {
         RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), file);
         MultipartBody.Part imagenPart = MultipartBody.Part.createFormData("foto", file.getName(), requestFile);
 
-        // ✅ CREAR REQUEST BODIES PARA CADA CAMPO
+        // ✅ CREAR REQUEST BODIES PARA CADA CAMPO (ESPECÍFICO PARA USUARIOS)
         RequestBody _nombre = RequestBody.create(MediaType.parse("text/plain"), receta.getTitulo());
-        RequestBody _categoria = RequestBody.create(MediaType.parse("text/plain"), String.valueOf(receta.getIdCategoria()));
-        RequestBody _seccion = RequestBody.create(MediaType.parse("text/plain"), receta.getSeccion());
         RequestBody _preparacion = RequestBody.create(MediaType.parse("text/plain"), receta.getPreparacion());
         RequestBody _tiempo = RequestBody.create(MediaType.parse("text/plain"), receta.getTiempoPreparacion());
         RequestBody _descripcion = RequestBody.create(MediaType.parse("text/plain"), receta.getDescripcion());
@@ -213,23 +222,21 @@ public class InstruccionesFragmentReceta extends Fragment {
         RequestBody _ingredientes = RequestBody.create(MediaType.parse("text/plain"), receta.getIngredientes());
 
         // ✅ LOG DE DATOS ENVIADOS
-        Log.d(TAG, "📊 Datos de la receta:");
+        Log.d(TAG, "📊 Datos de la receta de usuario regular:");
         Log.d(TAG, "   - Título: " + receta.getTitulo());
-        Log.d(TAG, "   - Categoría: " + receta.getIdCategoria());
-        Log.d(TAG, "   - Sección: " + receta.getSeccion());
+        Log.d(TAG, "   - Usuario: " + loginManager.getUsuario().getNombreUsuario());
+        Log.d(TAG, "   - Tipo: " + loginManager.getUsuario().getTipoUsuario());
         Log.d(TAG, "   - Tiempo: " + receta.getTiempoPreparacion());
         Log.d(TAG, "   - Dificultad: " + receta.getDificultad());
         Log.d(TAG, "   - Ingredientes: " + receta.getIngredientes());
-        Log.d(TAG, "   - Descripción: " + receta.getDescripcion().substring(0, Math.min(50, receta.getDescripcion().length())) + "...");
+        Log.d(TAG, "   - Destino: SOLO COMUNIDAD");
 
-        // ✅ HACER LA LLAMADA AL API
+        // ✅ HACER LA LLAMADA AL API USANDO EL MÉTODO ESPECÍFICO PARA USUARIOS
         RecetaApi recetaApi = ApiClient.getClient(getContext()).create(RecetaApi.class);
 
-        recetaApi.createReceta(
+        recetaApi.crearRecetaUsuario(
                 imagenPart,
                 _nombre,
-                _categoria,
-                _seccion,
                 _ingredientes,
                 _preparacion,
                 _tiempo,
@@ -239,10 +246,24 @@ public class InstruccionesFragmentReceta extends Fragment {
         ).enqueue(new Callback<Receta>() {
             @Override
             public void onResponse(Call<Receta> call, Response<Receta> response) {
-                if (response.isSuccessful()) {
-                    Log.d(TAG, "✅ Receta publicada exitosamente");
+                if (response.isSuccessful() && response.body() != null) {
+                    Receta recetaCreada = response.body();
 
-                    Toast.makeText(getContext(), "¡Receta publicada correctamente!", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "✅ Receta de usuario regular publicada exitosamente:");
+                    Log.d(TAG, "   - ID: " + recetaCreada.getIdReceta());
+                    Log.d(TAG, "   - Título: " + recetaCreada.getTitulo());
+                    Log.d(TAG, "   - Calorías calculadas: " + recetaCreada.getCalorias());
+
+                    // ✅ VERIFICAR QUE SE CREÓ CORRECTAMENTE
+                    if (recetaCreada.getCreador() != null) {
+                        String tipoCreador = recetaCreada.getCreador().getTipo_usuario();
+                        if (!"usuario".equals(tipoCreador)) {
+                            Log.w(TAG, "⚠️ ADVERTENCIA: Receta creada con tipo incorrecto: " + tipoCreador);
+                        }
+                    }
+
+                    // ✅ MOSTRAR MENSAJE DE ÉXITO CON INFORMACIÓN NUTRICIONAL
+                    mostrarMensajeExito(recetaCreada);
 
                     // ✅ NAVEGAR A MIS RECETAS DESPUÉS DE CREAR
                     Navigation.findNavController(requireView())
@@ -255,13 +276,31 @@ public class InstruccionesFragmentReceta extends Fragment {
 
             @Override
             public void onFailure(Call<Receta> call, Throwable t) {
-                Log.e(TAG, "❌ Error de conexión: " + t.getMessage());
+                Log.e(TAG, "❌ Error de conexión al crear receta de usuario", t);
                 Toast.makeText(getContext(), "Error de conexión: " + t.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
-    // ✅ MÉTODO PARA MANEJAR ERRORES DE RESPUESTA
+    // ✅ NUEVO MÉTODO: Mostrar mensaje de éxito con información nutricional
+    private void mostrarMensajeExito(Receta recetaCreada) {
+        String mensaje = "🎉 ¡Receta publicada en la comunidad!\n";
+
+        if (recetaCreada.getCalorias() > 0) {
+            mensaje += String.format("📊 Nutrición calculada por IA:\n" +
+                            "🔥 %d kcal | 🥩 %.1fg P | 🍞 %.1fg C | 🥑 %.1fg G",
+                    recetaCreada.getCalorias(),
+                    recetaCreada.getProteinas(),
+                    recetaCreada.getCarbohidratos(),
+                    recetaCreada.getGrasas());
+        } else {
+            mensaje += "📊 Valores nutricionales se están calculando...";
+        }
+
+        Toast.makeText(getContext(), mensaje, Toast.LENGTH_LONG).show();
+    }
+
+    // ✅ MÉTODO ACTUALIZADO: Manejar errores de respuesta con casos específicos
     private void manejarErrorRespuesta(Response<Receta> response) {
         try {
             String errorBody = response.errorBody() != null ? response.errorBody().string() : "Respuesta vacía";
@@ -270,17 +309,31 @@ public class InstruccionesFragmentReceta extends Fragment {
             String mensajeClaro;
             switch (response.code()) {
                 case 400:
-                    mensajeClaro = "Datos inválidos o incompletos. Verifica todos los campos.";
+                    if (errorBody.contains("ingredientes")) {
+                        mensajeClaro = "Error con los ingredientes. Verifica que sean válidos.";
+                    } else if (errorBody.contains("usuario")) {
+                        mensajeClaro = "Error: Solo usuarios regulares pueden crear recetas en comunidad.";
+                    } else {
+                        mensajeClaro = "Datos inválidos. Verifica todos los campos.";
+                    }
                     break;
                 case 401:
                     mensajeClaro = "Error de autenticación. Inicia sesión nuevamente.";
                     break;
+                case 403:
+                    mensajeClaro = "Sin permisos. Solo usuarios regulares pueden crear recetas.";
+                    break;
                 case 413:
-                    mensajeClaro = "La imagen es demasiado grande. Usa una imagen más pequeña.";
+                    mensajeClaro = "Imagen demasiado grande. Usa una imagen más pequeña.";
+                    break;
+                case 422:
+                    mensajeClaro = "Error al calcular valores nutricionales. Revisa los ingredientes.";
                     break;
                 case 500:
                     if (errorBody.contains("Named bind parameter")) {
                         mensajeClaro = "Error interno del servidor. Faltan parámetros requeridos.";
+                    } else if (errorBody.contains("nutricion") || errorBody.contains("IA")) {
+                        mensajeClaro = "Error en el cálculo nutricional. Intenta nuevamente.";
                     } else {
                         mensajeClaro = "Error interno del servidor. Intenta nuevamente.";
                     }

@@ -5,49 +5,41 @@
 
     <group android:checkableBehavior="single">
 
-        <!-- Favoritos -->
-        <item
-            android:id="@+id/nav_favorites"
-            android:icon="@drawable/ic_favoritos"
-            android:title="Favoritos" />
+        <!-- Sección de configuración -->
+        <item android:title="Configuración">
+            <menu>
 
-        <!-- Mis Recetas -->
-        <item
-            android:id="@+id/nav_recipes"
-            android:icon="@drawable/recetas_mias"
-            android:title="Mis Recetas" />
+                <!-- Favoritos -->
+                <item
+                    android:id="@+id/nav_favorites"
+                    android:icon="@drawable/ic_favoritos"
+                    android:title="Favoritos" />
+                <!-- Notificaciones -->
+                <item
+                    android:id="@+id/nav_notifications"
+                    android:icon="@drawable/ic_notificaciones"
+                    android:title="Notificaciones" />
 
-    </group>
+                <!-- Cuenta y configuración -->
+                <item
+                    android:id="@+id/nav_account"
+                    android:icon="@drawable/ic_cuenta_configuracion"
+                    android:title="Cuenta y configuración" />
 
-    <!-- Sección de configuración -->
-    <item android:title="Configuración">
-        <menu>
-            <!-- Notificaciones -->
-            <item
-                android:id="@+id/nav_notifications"
-                android:icon="@drawable/ic_notificaciones"
-                android:title="Notificaciones" />
+                <!-- Soporte -->
+                <item
+                    android:id="@+id/nav_support"
+                    android:icon="@drawable/ic_soporte"
+                    android:title="Soporte" />
 
-            <!-- Cuenta y configuración -->
-            <item
-                android:id="@+id/nav_account"
-                android:icon="@drawable/ic_cuenta_configuracion"
-                android:title="Cuenta y configuración" />
+                <!-- Cerrar sesión -->
+                <item
+                    android:id="@+id/nav_sign_out"
+                    android:icon="@drawable/ic_cerrar_sesion"
+                    android:title="Cerrar sesión" />
+            </menu>
+        </item>
 
-            <!-- Soporte -->
-            <item
-                android:id="@+id/nav_support"
-                android:icon="@drawable/ic_soporte"
-                android:title="Soporte" />
-        </menu>
-    </item>
-
-    <!-- Cerrar sesión -->
-    <group>
-        <item
-            android:id="@+id/nav_sign_out"
-            android:icon="@drawable/ic_cerrar_sesion"
-            android:title="Cerrar sesión" />
     </group>
 
 </menu>

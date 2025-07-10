@@ -30,6 +30,8 @@ import com.camilo.cocinarte.databinding.ActivityFavoritosBinding;
 import com.camilo.cocinarte.models.FavoritosResponse;
 import com.camilo.cocinarte.session.SessionManager;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.List;
 
 import retrofit2.Call;
@@ -69,7 +71,14 @@ public class FavoritosActivity extends AppCompatActivity {
     protected void getRecetasFavoritas() {
         Log.d(TAG, "Obteniendo recetas favoritas...");
 
-        SessionManager sessionManager = SessionManager.getInstance(this);
+        SessionManager sessionManager = null;
+        try {
+            sessionManager = SessionManager.getInstance(this);
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         String token = sessionManager.getAuthToken();
 
         if (token == null || token.isEmpty()) {

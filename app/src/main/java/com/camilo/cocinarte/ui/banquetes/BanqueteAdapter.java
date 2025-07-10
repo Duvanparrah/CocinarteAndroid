@@ -20,13 +20,13 @@ import com.camilo.cocinarte.R;
 import com.camilo.cocinarte.api.ApiClient;
 import com.camilo.cocinarte.api.BanqueteApi;
 import com.camilo.cocinarte.models.Banquete;
-import com.camilo.cocinarte.models.ApiResponse;
 import com.camilo.cocinarte.session.SessionManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.List;
 
 import okhttp3.ResponseBody;
@@ -34,7 +34,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-// ✅ CAMBIO: Nombre de clase corregido para coincidir con el archivo
 public class BanqueteAdapter extends RecyclerView.Adapter<BanqueteAdapter.BanqueteViewHolder> {
 
     private static final String TAG = "BanqueteAdapter";
@@ -42,21 +41,30 @@ public class BanqueteAdapter extends RecyclerView.Adapter<BanqueteAdapter.Banque
     private Context context;
     private List<Banquete> banquetes;
     private OnBanqueteClickListener listener;
-    private boolean hasAuthentication; // Flag para saber si hay autenticación
+    private boolean hasAuthentication;
     private SessionManager sessionManager;
 
     public interface OnBanqueteClickListener {
         void onBanqueteClick(Banquete banquete, int position);
     }
 
-    // Constructor principal
+    // ✅ CONSTRUCTOR CORREGIDO
     public BanqueteAdapter(Context context, List<Banquete> banquetes, OnBanqueteClickListener listener, boolean hasAuthentication) {
         this.context = context;
         this.banquetes = banquetes;
         this.listener = listener;
         this.hasAuthentication = hasAuthentication;
-        this.sessionManager = SessionManager.getInstance(context);
-        Log.d(TAG, "🏗️ Adapter creado con autenticación: " + hasAuthentication);
+
+        try {
+            this.sessionManager = SessionManager.getInstance(context);
+            Log.d(TAG, "✅ SessionManager inicializado correctamente");
+        } catch (GeneralSecurityException | IOException e) {
+            Log.e(TAG, "❌ Error inicializando SessionManager: " + e.getMessage(), e);
+            this.sessionManager = null;
+            this.hasAuthentication = false;
+        }
+
+        Log.d(TAG, "🏗️ Adapter creado con autenticación: " + this.hasAuthentication);
     }
 
     @NonNull
@@ -71,22 +79,17 @@ public class BanqueteAdapter extends RecyclerView.Adapter<BanqueteAdapter.Banque
         Banquete banquete = banquetes.get(position);
 
         Log.d(TAG, "📱 Binding banquete: " + banquete.getNombre());
-        Log.d(TAG, "   - hasAuthentication: " + hasAuthentication);
 
         // ✅ INFORMACIÓN BÁSICA DEL BANQUETE
-
-        // Nombre del banquete
         if (banquete.getNombre() != null) {
             holder.nombreBanquete.setText(banquete.getNombre());
         } else {
             holder.nombreBanquete.setText("Sin nombre");
         }
 
-        // Cantidad de personas
         String cantidadTexto = "Para " + banquete.getCantidadPersonas() + " personas";
         holder.cantidadPersonas.setText(cantidadTexto);
 
-        // Tiempo de preparación
         if (banquete.getTiempoPreparacion() != null && !banquete.getTiempoPreparacion().isEmpty()) {
             holder.tiempoPreparacion.setText("Tiempo: " + banquete.getTiempoPreparacion());
             holder.tiempoPreparacion.setVisibility(View.VISIBLE);
@@ -94,12 +97,10 @@ public class BanqueteAdapter extends RecyclerView.Adapter<BanqueteAdapter.Banque
             holder.tiempoPreparacion.setVisibility(View.GONE);
         }
 
-        // Dificultad con colores
         if (banquete.getDificultad() != null && !banquete.getDificultad().isEmpty()) {
             holder.dificultad.setText("Dificultad: " + banquete.getDificultad());
             holder.dificultad.setVisibility(View.VISIBLE);
 
-            // Aplicar color según dificultad
             switch (banquete.getDificultad().toLowerCase()) {
                 case "fácil":
                 case "facil":
@@ -121,30 +122,29 @@ public class BanqueteAdapter extends RecyclerView.Adapter<BanqueteAdapter.Banque
             holder.dificultad.setVisibility(View.GONE);
         }
 
-        // ✅ CARGAR IMAGEN DEL BANQUETE
+        // ✅ CARGAR IMAGEN
         cargarImagenBanquete(banquete, holder);
 
         // ✅ CONFIGURAR REACCIONES
-        if (hasAuthentication) {
-            Log.d(TAG, "🔐 Usuario autenticado: Cargando reacciones REALES para " + banquete.getNombre());
+        if (hasAuthentication && sessionManager != null) {
+            Log.d(TAG, "🔐 Usuario autenticado: Cargando reacciones REALES");
             cargarReaccionesReales(banquete.getIdBanquete(), holder);
         } else {
-            Log.d(TAG, "🌐 Usuario NO autenticado: Mostrando valores estáticos para " + banquete.getNombre());
+            Log.d(TAG, "🌐 Usuario NO autenticado: Mostrando valores estáticos");
             mostrarValoresEstaticos(holder);
         }
 
-        // Click listener para abrir detalle
+        // Click listener para detalle
         holder.itemView.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onBanqueteClick(banquete, position);
             }
         });
 
-        // ✅ CONFIGURAR CLICK LISTENERS DE BOTONES
+        // ✅ CONFIGURAR BOTONES
         setupButtonClickListeners(holder, banquete);
     }
 
-    // ✅ CARGAR IMAGEN DEL BANQUETE
     private void cargarImagenBanquete(Banquete banquete, BanqueteViewHolder holder) {
         if (banquete.tieneImagen()) {
             RequestOptions options = new RequestOptions()
@@ -161,14 +161,23 @@ public class BanqueteAdapter extends RecyclerView.Adapter<BanqueteAdapter.Banque
         }
     }
 
-    // ✅ CONFIGURAR CLICK LISTENERS DE BOTONES
+    // ✅ CONFIGURAR BOTONES CON IDs CORRECTOS
     private void setupButtonClickListeners(BanqueteViewHolder holder, Banquete banquete) {
-        // Estos campos están marcados como opcionales (visibility="gone") en el XML
-        // Solo configurar si existen en el layout actual
+        // Botón de like
+        if (holder.likeButton != null) {
+            holder.likeButton.setOnClickListener(v -> {
+                if (hasAuthentication && sessionManager != null) {
+                    performLikeAction(banquete.getIdBanquete(), holder);
+                } else {
+                    Toast.makeText(context, "Inicia sesión para dar like", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
 
-        if (holder.iconoFavorito != null) {
-            holder.iconoFavorito.setOnClickListener(v -> {
-                if (hasAuthentication) {
+        // Botón de favoritos (save)
+        if (holder.saveButton != null) {
+            holder.saveButton.setOnClickListener(v -> {
+                if (hasAuthentication && sessionManager != null) {
                     performFavoritoAction(banquete.getIdBanquete(), holder);
                 } else {
                     Toast.makeText(context, "Inicia sesión para guardar favoritos", Toast.LENGTH_SHORT).show();
@@ -176,51 +185,52 @@ public class BanqueteAdapter extends RecyclerView.Adapter<BanqueteAdapter.Banque
             });
         }
 
-        // Click en likes (si existe en el layout)
-        ImageView btnLike = holder.itemView.findViewById(R.id.btn_like);
-        if (btnLike != null) {
-            btnLike.setOnClickListener(v -> {
-                if (hasAuthentication) {
-                    performLikeAction(banquete.getIdBanquete(), holder);
-                } else {
-                    Toast.makeText(context, "Inicia sesión para dar like", Toast.LENGTH_SHORT).show();
-                }
+        // Botón de comentarios (solo mostrar mensaje por ahora)
+        if (holder.commentButton != null) {
+            holder.commentButton.setOnClickListener(v -> {
+                Toast.makeText(context, "Función de comentarios próximamente", Toast.LENGTH_SHORT).show();
+            });
+        }
+
+        // Botón de compartir
+        if (holder.shareButton != null) {
+            holder.shareButton.setOnClickListener(v -> {
+                Toast.makeText(context, "Función de compartir próximamente", Toast.LENGTH_SHORT).show();
             });
         }
     }
 
-    // ✅ MOSTRAR VALORES ESTÁTICOS PARA USUARIOS NO AUTENTICADOS
+    // ✅ VALORES ESTÁTICOS USANDO IDs CORRECTOS
     private void mostrarValoresEstaticos(BanqueteViewHolder holder) {
-        // Generar números aleatorios convincentes para banquetes
-        int likesAleatorios = (int) (Math.random() * 200) + 20; // Entre 20 y 220
-        int comentariosAleatorios = (int) (Math.random() * 30) + 2; // Entre 2 y 32
+        int likesAleatorios = (int) (Math.random() * 200) + 20;
+        int comentariosAleatorios = (int) (Math.random() * 30) + 2;
 
-        // Configurar contadores (si existen en el layout)
-        if (holder.totalLikes != null) {
-            holder.totalLikes.setText(String.valueOf(likesAleatorios));
+        if (holder.likesCount != null) {
+            holder.likesCount.setText(String.valueOf(likesAleatorios));
         }
 
-        if (holder.totalComentarios != null) {
-            holder.totalComentarios.setText(String.valueOf(comentariosAleatorios));
+        if (holder.commentsCount != null) {
+            holder.commentsCount.setText(String.valueOf(comentariosAleatorios));
         }
 
-        Log.d(TAG, "✅ Valores estáticos configurados: " + likesAleatorios + " likes, " + comentariosAleatorios + " comentarios");
+        Log.d(TAG, "✅ Valores estáticos: " + likesAleatorios + " likes, " + comentariosAleatorios + " comentarios");
     }
 
-    // ✅ CARGAR REACCIONES REALES PARA USUARIOS AUTENTICADOS
+    // ✅ CARGAR REACCIONES REALES
     private void cargarReaccionesReales(int banqueteId, BanqueteViewHolder holder) {
-        Log.d(TAG, "🌐 Cargando reacciones reales para banquete " + banqueteId);
+        if (sessionManager == null) {
+            mostrarValoresEstaticos(holder);
+            return;
+        }
 
         String token = sessionManager.getAuthToken();
         if (token == null) {
-            Log.w(TAG, "⚠️ No hay token, mostrando valores estáticos");
             mostrarValoresEstaticos(holder);
             return;
         }
 
         BanqueteApi banqueteApi = ApiClient.getClient(context).create(BanqueteApi.class);
 
-        // ✅ CAMBIO: Usar ResponseBody directamente
         banqueteApi.obtenerReaccionesBanquete(banqueteId, "Bearer " + token).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
@@ -229,7 +239,6 @@ public class BanqueteAdapter extends RecyclerView.Adapter<BanqueteAdapter.Banque
                         String json = response.body().string();
                         JSONObject obj = new JSONObject(json);
 
-                        // Obtener datos de likes
                         JSONObject likesObj = obj.optJSONObject("likes");
                         int totalLikes = 0;
                         boolean userLiked = false;
@@ -239,32 +248,26 @@ public class BanqueteAdapter extends RecyclerView.Adapter<BanqueteAdapter.Banque
                             userLiked = likesObj.optBoolean("user_liked", false);
                         }
 
-                        // Obtener total de comentarios
                         int totalComentarios = obj.optInt("total_comentarios", 0);
 
-                        Log.d(TAG, "✅ Reacciones reales obtenidas para banquete " + banqueteId +
-                                ": " + totalLikes + " likes (user_liked=" + userLiked + "), " +
-                                totalComentarios + " comentarios");
-
-                        // Actualizar UI en el hilo principal
-                        if (holder.totalLikes != null) {
-                            holder.totalLikes.setText(String.valueOf(totalLikes));
+                        // ✅ ACTUALIZAR UI CON IDs CORRECTOS
+                        if (holder.likesCount != null) {
+                            holder.likesCount.setText(String.valueOf(totalLikes));
                         }
 
-                        if (holder.totalComentarios != null) {
-                            holder.totalComentarios.setText(String.valueOf(totalComentarios));
+                        if (holder.commentsCount != null) {
+                            holder.commentsCount.setText(String.valueOf(totalComentarios));
                         }
 
-                        // Actualizar estado visual de like si existe el botón
-                        ImageView btnLike = holder.itemView.findViewById(R.id.btn_like);
-                        if (btnLike != null) {
+                        // Actualizar estado visual del like
+                        if (holder.likeButton != null) {
                             if (userLiked) {
-                                btnLike.setColorFilter(
+                                holder.likeButton.setColorFilter(
                                         ContextCompat.getColor(context, android.R.color.holo_red_dark),
                                         PorterDuff.Mode.SRC_IN
                                 );
                             } else {
-                                btnLike.setColorFilter(
+                                holder.likeButton.setColorFilter(
                                         ContextCompat.getColor(context, R.color.negro),
                                         PorterDuff.Mode.SRC_IN
                                 );
@@ -272,36 +275,37 @@ public class BanqueteAdapter extends RecyclerView.Adapter<BanqueteAdapter.Banque
                         }
 
                     } catch (IOException | JSONException e) {
-                        Log.e(TAG, "❌ Error al procesar reacciones para banquete " + banqueteId, e);
+                        Log.e(TAG, "❌ Error procesando reacciones", e);
                         mostrarValoresPorDefecto(holder);
                     }
                 } else {
-                    Log.w(TAG, "⚠️ Error al obtener reacciones para banquete " + banqueteId + ": " + response.code());
                     mostrarValoresPorDefecto(holder);
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                Log.e(TAG, "❌ Fallo al cargar reacciones para banquete " + banqueteId, t);
+                Log.e(TAG, "❌ Fallo cargando reacciones", t);
                 mostrarValoresPorDefecto(holder);
             }
         });
     }
 
-    // ✅ ACCIÓN DE FAVORITO - CORREGIDA
+    // ✅ ACCIÓN DE FAVORITO
     private void performFavoritoAction(int banqueteId, BanqueteViewHolder holder) {
+        if (sessionManager == null) {
+            Toast.makeText(context, "Error del sistema", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         String token = sessionManager.getAuthToken();
         if (token == null) {
             Toast.makeText(context, "Error de autenticación", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        Log.d(TAG, "⭐ Toggle favorito para banquete: " + banqueteId);
-
         BanqueteApi banqueteApi = ApiClient.getClient(context).create(BanqueteApi.class);
 
-        // ✅ CAMBIO: Usar ResponseBody para favori  tos
         banqueteApi.agregarBanqueteAFavoritos(banqueteId, "Bearer " + token).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
@@ -313,15 +317,15 @@ public class BanqueteAdapter extends RecyclerView.Adapter<BanqueteAdapter.Banque
                         String action = obj.optString("action", "");
                         String message = obj.optString("message", "Favorito actualizado");
 
-                        // Actualizar UI según la acción
-                        if (holder.iconoFavorito != null) {
+                        // ✅ ACTUALIZAR UI CON ID CORRECTO
+                        if (holder.saveButton != null) {
                             if ("added".equals(action)) {
-                                holder.iconoFavorito.setColorFilter(
+                                holder.saveButton.setColorFilter(
                                         ContextCompat.getColor(context, android.R.color.holo_orange_light),
                                         PorterDuff.Mode.SRC_IN
                                 );
                             } else {
-                                holder.iconoFavorito.setColorFilter(
+                                holder.saveButton.setColorFilter(
                                         ContextCompat.getColor(context, R.color.negro),
                                         PorterDuff.Mode.SRC_IN
                                 );
@@ -331,12 +335,9 @@ public class BanqueteAdapter extends RecyclerView.Adapter<BanqueteAdapter.Banque
                         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
 
                     } catch (IOException | JSONException e) {
-                        Log.e(TAG, "❌ Error al procesar respuesta de favorito", e);
+                        Log.e(TAG, "❌ Error procesando favorito", e);
                         Toast.makeText(context, "Error al procesar favorito", Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    Log.e(TAG, "❌ Error en favorito: " + response.code());
-                    Toast.makeText(context, "Error al gestionar favorito", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -348,19 +349,21 @@ public class BanqueteAdapter extends RecyclerView.Adapter<BanqueteAdapter.Banque
         });
     }
 
-    // ✅ ACCIÓN DE LIKE - CORREGIDA
+    // ✅ ACCIÓN DE LIKE
     private void performLikeAction(int banqueteId, BanqueteViewHolder holder) {
+        if (sessionManager == null) {
+            Toast.makeText(context, "Error del sistema", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         String token = sessionManager.getAuthToken();
         if (token == null) {
             Toast.makeText(context, "Error de autenticación", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        Log.d(TAG, "❤️ Toggle like para banquete: " + banqueteId);
-
         BanqueteApi banqueteApi = ApiClient.getClient(context).create(BanqueteApi.class);
 
-        // ✅ CAMBIO: Usar ResponseBody para likes
         banqueteApi.toggleLikeBanquete(banqueteId, "Bearer " + token).enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
@@ -372,22 +375,19 @@ public class BanqueteAdapter extends RecyclerView.Adapter<BanqueteAdapter.Banque
                         boolean isLiked = obj.optBoolean("isLiked", false);
                         int totalLikes = obj.optInt("totalLikes", 0);
 
-                        Log.d(TAG, "✅ Like actualizado: liked=" + isLiked + ", total=" + totalLikes);
-
-                        // Actualizar UI
-                        if (holder.totalLikes != null) {
-                            holder.totalLikes.setText(String.valueOf(totalLikes));
+                        // ✅ ACTUALIZAR UI CON IDs CORRECTOS
+                        if (holder.likesCount != null) {
+                            holder.likesCount.setText(String.valueOf(totalLikes));
                         }
 
-                        ImageView btnLike = holder.itemView.findViewById(R.id.btn_like);
-                        if (btnLike != null) {
+                        if (holder.likeButton != null) {
                             if (isLiked) {
-                                btnLike.setColorFilter(
+                                holder.likeButton.setColorFilter(
                                         ContextCompat.getColor(context, android.R.color.holo_red_dark),
                                         PorterDuff.Mode.SRC_IN
                                 );
                             } else {
-                                btnLike.setColorFilter(
+                                holder.likeButton.setColorFilter(
                                         ContextCompat.getColor(context, R.color.negro),
                                         PorterDuff.Mode.SRC_IN
                                 );
@@ -398,12 +398,8 @@ public class BanqueteAdapter extends RecyclerView.Adapter<BanqueteAdapter.Banque
                         Toast.makeText(context, mensaje, Toast.LENGTH_SHORT).show();
 
                     } catch (IOException | JSONException e) {
-                        Log.e(TAG, "❌ Error al procesar respuesta de like", e);
-                        Toast.makeText(context, "Error al procesar like", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "❌ Error procesando like", e);
                     }
-                } else {
-                    Log.e(TAG, "❌ Error en like: " + response.code());
-                    Toast.makeText(context, "Error al dar like", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -415,24 +411,18 @@ public class BanqueteAdapter extends RecyclerView.Adapter<BanqueteAdapter.Banque
         });
     }
 
-    // ✅ VALORES POR DEFECTO PARA ERRORES
+    // ✅ VALORES POR DEFECTO
     private void mostrarValoresPorDefecto(BanqueteViewHolder holder) {
-        if (holder.totalLikes != null) {
-            holder.totalLikes.setText("0");
+        if (holder.likesCount != null) {
+            holder.likesCount.setText("0");
         }
 
-        if (holder.totalComentarios != null) {
-            holder.totalComentarios.setText("0");
+        if (holder.commentsCount != null) {
+            holder.commentsCount.setText("0");
         }
     }
 
-    // ✅ MÉTODO PÚBLICO PARA ACTUALIZAR DATOS
-    public void actualizarDatos() {
-        Log.d(TAG, "🔄 Actualizando datos del adapter de banquetes");
-        notifyDataSetChanged();
-    }
-
-    // ✅ MÉTODOS ADICIONALES PARA GESTIÓN DE DATOS
+    // Métodos de gestión de datos
     public void updateBanquetes(List<Banquete> nuevosBanquetes) {
         if (this.banquetes != null) {
             this.banquetes.clear();
@@ -443,28 +433,12 @@ public class BanqueteAdapter extends RecyclerView.Adapter<BanqueteAdapter.Banque
         }
     }
 
-    public void addBanquetes(List<Banquete> nuevosBanquetes) {
-        if (this.banquetes != null && nuevosBanquetes != null) {
-            int startPosition = this.banquetes.size();
-            this.banquetes.addAll(nuevosBanquetes);
-            notifyItemRangeInserted(startPosition, nuevosBanquetes.size());
-        }
-    }
-
-    public void clearBanquetes() {
-        if (this.banquetes != null) {
-            int size = this.banquetes.size();
-            this.banquetes.clear();
-            notifyItemRangeRemoved(0, size);
-        }
-    }
-
     @Override
     public int getItemCount() {
         return banquetes != null ? banquetes.size() : 0;
     }
 
-    // ✅ VIEWHOLDER CLASS
+    // ✅ VIEWHOLDER CON IDs CORRECTOS
     static class BanqueteViewHolder extends RecyclerView.ViewHolder {
         ImageView imagenBanquete;
         TextView nombreBanquete;
@@ -472,14 +446,19 @@ public class BanqueteAdapter extends RecyclerView.Adapter<BanqueteAdapter.Banque
         TextView tiempoPreparacion;
         TextView dificultad;
 
-        // Campos opcionales (pueden no existir en algunos layouts)
+        // Campos opcionales
         TextView totalPlatillos;
         TextView totalIngredientes;
         TextView fechaCreacion;
         TextView nombreCreador;
-        ImageView iconoFavorito;
-        TextView totalLikes;
-        TextView totalComentarios;
+
+        // ✅ BOTONES DE INTERACCIÓN CON IDs CORRECTOS
+        ImageView likeButton;        // like_button
+        TextView likesCount;         // likes_count
+        ImageView commentButton;     // comment_button
+        TextView commentsCount;      // comments_count
+        ImageView shareButton;       // share_button
+        ImageView saveButton;        // save_button (favoritos)
 
         public BanqueteViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -491,14 +470,19 @@ public class BanqueteAdapter extends RecyclerView.Adapter<BanqueteAdapter.Banque
             tiempoPreparacion = itemView.findViewById(R.id.tiempo_preparacion);
             dificultad = itemView.findViewById(R.id.dificultad);
 
-            // Campos opcionales (pueden ser null)
+            // Campos opcionales
             totalPlatillos = itemView.findViewById(R.id.total_platillos);
             totalIngredientes = itemView.findViewById(R.id.total_ingredientes);
             fechaCreacion = itemView.findViewById(R.id.fecha_creacion);
             nombreCreador = itemView.findViewById(R.id.nombre_creador);
-            iconoFavorito = itemView.findViewById(R.id.icono_favorito);
-            totalLikes = itemView.findViewById(R.id.total_likes);
-            totalComentarios = itemView.findViewById(R.id.total_comentarios);
+
+            // ✅ BOTONES DE INTERACCIÓN CON IDs CORRECTOS
+            likeButton = itemView.findViewById(R.id.like_button);
+            likesCount = itemView.findViewById(R.id.likes_count);
+            commentButton = itemView.findViewById(R.id.comment_button);
+            commentsCount = itemView.findViewById(R.id.comments_count);
+            shareButton = itemView.findViewById(R.id.share_button);
+            saveButton = itemView.findViewById(R.id.save_button);
         }
     }
 }

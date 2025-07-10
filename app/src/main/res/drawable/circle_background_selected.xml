@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+
+    <!-- Fondo con color verde para indicar selección -->
+    <solid android:color="@color/verde" />
+
+    <!-- Borde opcional -->
+    <stroke
+        android:width="2dp"
+        android:color="@color/verde" />
+
+    <!-- Hacer el fondo ligeramente transparente -->
+    <solid android:color="#80006A35" />
+
+</shape>

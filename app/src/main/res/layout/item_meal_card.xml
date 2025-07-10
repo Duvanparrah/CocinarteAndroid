@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="3dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:background="@android:color/white">
+
+        <!-- Nombre de la comida -->
+        <TextView
+            android:id="@+id/tv_meal_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Desayuno"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#333333"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Información nutricional de la comida -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp"
+            android:background="#E8F5E8"
+            android:padding="8dp"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tv_meal_calories"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="495 kcal"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#2E8B57"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/tv_meal_proteins"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="20 P"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#2E8B57"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/tv_meal_carbs"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="52.5 C"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#2E8B57"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/tv_meal_fats"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="14.5 G"
+                android:textSize="12sp"
+                android:textStyle="bold"
+                android:textColor="#2E8B57"
+                android:gravity="center" />
+
+        </LinearLayout>
+
+        <!-- Contenido de la comida -->
+        <LinearLayout
+            android:id="@+id/ingredients_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#FFFAF0"
+            android:padding="12dp">
+
+            <!-- Los ingredientes se agregan dinámicamente aquí -->
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>

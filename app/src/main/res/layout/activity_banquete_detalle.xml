@@ -160,6 +160,142 @@
 
                 </LinearLayout>
 
+                <!-- ✅ SECCIÓN ESCALADO MEJORADA -->
+                <LinearLayout
+                    android:id="@+id/section_escalado"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:background="@drawable/rounded_background"
+                    android:padding="16dp"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:id="@+id/label_escalado"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🍽️ Ajustar para diferentes cantidades"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/verde"
+                        android:layout_marginBottom="12dp" />
+
+                    <!-- Primera fila: Label y controles de cantidad -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Cantidad de personas:"
+                            android:textColor="@color/negro"
+                            android:textSize="14sp"
+                            android:layout_marginEnd="12dp" />
+
+                        <!-- Botón menos -->
+                        <ImageButton
+                            android:id="@+id/btn_menos_personas"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/circle_button_background"
+                            android:src="@drawable/ic_minus"
+                            android:backgroundTint="@color/verde_claro"
+                            android:contentDescription="Disminuir personas"
+                            android:layout_marginEnd="8dp" />
+
+                        <!-- Campo de número -->
+                        <EditText
+                            android:id="@+id/edit_cantidad_personas"
+                            android:layout_width="80dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/rounded_edittext"
+                            android:gravity="center"
+                            android:inputType="number"
+                            android:text="8"
+                            android:textColor="@color/negro"
+                            android:textSize="16sp"
+                            android:textStyle="bold"
+                            android:maxLength="3"
+                            android:layout_marginEnd="8dp"
+                            tools:text="20" />
+
+                        <!-- Botón más -->
+                        <ImageButton
+                            android:id="@+id/btn_mas_personas"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:background="@drawable/circle_button_background"
+                            android:src="@drawable/ic_plus"
+                            android:backgroundTint="@color/verde_claro"
+                            android:contentDescription="Aumentar personas" />
+
+                    </LinearLayout>
+
+                    <!-- Segunda fila: Botón calcular centrado y más grande -->
+                    <Button
+                        android:id="@+id/btn_calcular_escalado"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@drawable/button_background"
+                        android:backgroundTint="@color/verde"
+                        android:text="Calcular"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:drawableStart="@drawable/rounded_background"
+                        android:drawablePadding="8dp"
+                        android:gravity="center"
+                        android:layout_marginTop="4dp" />
+
+                    <!-- Información del escalado -->
+                    <LinearLayout
+                        android:id="@+id/container_info_escalado"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:background="@drawable/rounded_background_light"
+                        android:padding="12dp"
+                        android:layout_marginTop="12dp"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:id="@+id/text_factor_escalado"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Factor de escalado: 2.5x"
+                            android:textColor="@color/verde_oscuro"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            tools:text="Factor de escalado: 2.5x" />
+
+                        <TextView
+                            android:id="@+id/text_metodo_calculo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Calculado con IA inteligente"
+                            android:textColor="@color/gris"
+                            android:textSize="12sp"
+                            android:layout_marginTop="2dp"
+                            tools:text="Calculado con IA inteligente" />
+
+                        <!-- ProgressBar para el cálculo -->
+                        <ProgressBar
+                            android:id="@+id/progress_escalado"
+                            android:layout_width="match_parent"
+                            android:layout_height="4dp"
+                            android:layout_marginTop="8dp"
+                            android:visibility="gone"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:progressTint="@color/verde" />
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
                 <!-- Sección de estadísticas e interacción -->
                 <LinearLayout
                     android:id="@+id/section_estadisticas"
@@ -210,9 +346,12 @@
                         android:layout_marginEnd="16dp">
 
                         <ImageView
+                            android:id="@+id/btn_comentarios_favoritos"
                             android:layout_width="24dp"
                             android:layout_height="24dp"
                             android:src="@drawable/chat"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:padding="2dp"
                             app:tint="@color/verde_oscuro"
                             android:contentDescription="Comentarios" />
 
@@ -311,8 +450,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:nestedScrollingEnabled="false"
-                        tools:listitem="@layout/item_platillo_banquete"
-                        tools:itemCount="3" />
+                        tools:itemCount="3"
+                        tools:listitem="@layout/item_platillo_banquete" />
 
                     <TextView
                         android:id="@+id/text_no_platillos"
@@ -335,15 +474,39 @@
                     android:orientation="vertical"
                     android:layout_marginBottom="16dp">
 
-                    <TextView
-                        android:id="@+id/label_ingredientes"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Ingredientes"
-                        android:textSize="18sp"
-                        android:textStyle="bold"
-                        android:textColor="@color/verde"
-                        android:layout_marginBottom="8dp" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="8dp">
+
+                        <TextView
+                            android:id="@+id/label_ingredientes"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Ingredientes"
+                            android:textSize="18sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/verde" />
+
+                        <!-- Indicador de escalado -->
+                        <TextView
+                            android:id="@+id/text_estado_escalado"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=""
+                            android:textColor="@color/verde_oscuro"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:background="@drawable/rounded_background_light"
+                            android:padding="6dp"
+                            android:visibility="gone"
+                            tools:text="✅ Escalado para 20 personas"
+                            tools:visibility="visible" />
+
+                    </LinearLayout>
 
                     <androidx.recyclerview.widget.RecyclerView
                         android:id="@+id/recycler_ingredientes"
