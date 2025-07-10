@@ -22,6 +22,8 @@ import com.camilo.cocinarte.api.ReaccionApi;
 import com.camilo.cocinarte.models.Comentario;
 import com.camilo.cocinarte.session.SessionManager;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -112,7 +114,14 @@ public class ComentariosAdapter extends RecyclerView.Adapter<ComentariosAdapter.
                 .setMessage("¿Estás seguro de que deseas eliminar este comentario?")
                 .setPositiveButton("Eliminar", (dialog, which) -> {
                     ReaccionApi api = ApiConfig.getClient(context).create(ReaccionApi.class);
-                    SessionManager sessionManager = SessionManager.getInstance(context.getApplicationContext());
+                    SessionManager sessionManager = null;
+                    try {
+                        sessionManager = SessionManager.getInstance(context.getApplicationContext());
+                    } catch (GeneralSecurityException e) {
+                        throw new RuntimeException(e);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                     String token = "Bearer " + sessionManager.getAuthToken();
 
                     api.eliminarComentario(token, comentario.getId()).enqueue(new Callback<ResponseBody>() {
@@ -148,7 +157,14 @@ public class ComentariosAdapter extends RecyclerView.Adapter<ComentariosAdapter.
                     String nuevoTexto = input.getText().toString().trim();
                     if (!nuevoTexto.isEmpty()) {
                         ReaccionApi api =   ApiConfig.getClient(context).create(ReaccionApi.class);
-                        SessionManager sessionManager = SessionManager.getInstance(context);
+                        SessionManager sessionManager = null;
+                        try {
+                            sessionManager = SessionManager.getInstance(context);
+                        } catch (GeneralSecurityException e) {
+                            throw new RuntimeException(e);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                         String token = "Bearer " + sessionManager.getAuthToken();
 
                         api.editarComentario(token, comentario.getId(), nuevoTexto).enqueue(new Callback<ResponseBody>() {

@@ -39,6 +39,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.GeneralSecurityException;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -72,7 +73,16 @@ public class CuentaConfiguracionActivity extends AppCompatActivity {
         binding = ActivityCuentaConfiguracionBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        sessionManager = SessionManager.getInstance(this);
+        // ✅ CORRECCIÓN: Inicializar SessionManager con manejo de excepciones
+        try {
+            sessionManager = SessionManager.getInstance(this);
+        } catch (GeneralSecurityException | IOException e) {
+            Log.e(TAG, "Error inicializando SessionManager: " + e.getMessage());
+            Toast.makeText(this, "Error de seguridad en la sesión", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         cloudinaryUploader = new CloudinaryUploader(this);
 
         setupViews();
@@ -93,7 +103,6 @@ public class CuentaConfiguracionActivity extends AppCompatActivity {
         binding.imageViewEditPhoto.setOnClickListener(v -> showImageSelectionDialog());
         binding.buttonSaveChanges.setOnClickListener(v -> saveChanges());
 
-
         // Listener para toolbar back button
         binding.toolbar.setNavigationOnClickListener(v -> finish());
     }
@@ -101,7 +110,7 @@ public class CuentaConfiguracionActivity extends AppCompatActivity {
     private void loadCurrentUserData() {
         SessionManager.SessionData sessionData = sessionManager.getSessionData();
 
-        // Cargar nombre
+        // ✅ CORRECCIÓN: Usar userName en lugar de name
         if (sessionData.userName != null && !sessionData.userName.trim().isEmpty()) {
             binding.editTextName.setText(sessionData.userName);
         }
@@ -111,7 +120,7 @@ public class CuentaConfiguracionActivity extends AppCompatActivity {
             binding.textViewEmail.setText(sessionData.email);
         }
 
-        // Cargar foto
+        // ✅ CORRECCIÓN: Usar userPhoto en lugar de photo
         currentPhotoUrl = sessionData.userPhoto;
         loadProfileImage(currentPhotoUrl);
 
@@ -290,55 +299,78 @@ public class CuentaConfiguracionActivity extends AppCompatActivity {
 
         // Si hay imagen nueva, subirla primero
         if (isImageChanged && selectedImageUri != null) {
-            //TODO: OBSOLETO? uploadImageAndSaveChanges(newName);
+            uploadImageAndUpdateProfile(newName);
+        } else {
+            // Solo actualizar nombre
+            Log.d(TAG, "Actualizando nombre: " + newName + " ---- Nombre actual: " + sessionManager.getUserName());
 
+            if (newName.equals(sessionManager.getUserName())) {
+                Toast.makeText(CuentaConfiguracionActivity.this, "Sin cambios", Toast.LENGTH_LONG).show();
+                showLoading(false);
+            } else {
+                saveUserChanges(newName, currentPhotoUrl);
+            }
+        }
+    }
+
+    // ✅ MÉTODO MEJORADO: Subir imagen y actualizar perfil
+    private void uploadImageAndUpdateProfile(String newName) {
+        try {
             AuthService authService = ApiConfig.getClient(getApplicationContext()).create(AuthService.class);
             String token = "Bearer " + sessionManager.getAuthToken();
 
-            Uri imageUri = selectedImageUri;
-            File file = createTempFileFromUri(imageUri);
-            if (file == null) return;
+            File file = createTempFileFromUri(selectedImageUri);
+            if (file == null) {
+                showLoading(false);
+                Toast.makeText(this, "Error al procesar la imagen", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             // Crear RequestBody para el archivo de la imagen
             RequestBody requestFile = RequestBody.create(MediaType.parse("image/*"), file);
 
-            // Crear MultipartBody.Part para la imagen (debe coincidir con lo que espera el backend, "foto")
+            // Crear MultipartBody.Part para la imagen
             MultipartBody.Part imagenPart = MultipartBody.Part.createFormData(
-                    "profileImage",              // Nombre del campo para el archivo (backend espera "foto")
+                    "profileImage",
                     file.getName(),
                     requestFile
             );
 
-
-            authService.updateProfileImage(imagenPart, token).enqueue(new Callback<>() {
+            authService.updateProfileImage(imagenPart, token).enqueue(new Callback<ProfileImageResponse>() {
                 @Override
                 public void onResponse(Call<ProfileImageResponse> call, Response<ProfileImageResponse> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         Log.d(TAG, "Imagen subida exitosamente: " + response.body().getProfileImageUrl());
                         saveUserChanges(newName, response.body().getProfileImageUrl());
+
+                        // Limpiar archivo temporal
+                        if (file.exists()) {
+                            file.delete();
+                        }
                     } else {
-                        Toast.makeText(getApplicationContext(), "Error al actualizar el usuario", Toast.LENGTH_SHORT).show();
+                        showLoading(false);
+                        Toast.makeText(getApplicationContext(), "Error al subir la imagen", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Error response: " + response.code() + " - " + response.message());
                     }
                 }
+
                 @Override
                 public void onFailure(Call<ProfileImageResponse> call, Throwable t) {
-                    t.printStackTrace();
+                    showLoading(false);
+                    Log.e(TAG, "Error al subir imagen: " + t.getMessage());
+                    Toast.makeText(getApplicationContext(), "Error de conexión al subir imagen", Toast.LENGTH_SHORT).show();
+
+                    // Limpiar archivo temporal
+                    if (file.exists()) {
+                        file.delete();
+                    }
                 }
             });
 
-
-
-
-        } else {
-            // Solo actualizar nombre
-            Log.d("|||actulizar nombre", newName+" ----   "+sessionManager.getUserName());
-
-            if(newName.equals(sessionManager.getUserName())){
-                Toast.makeText(CuentaConfiguracionActivity.this, "Sin cambios", Toast.LENGTH_LONG).show();
-                showLoading(false);
-            }else{
-                saveUserChanges(newName, currentPhotoUrl);
-            }
+        } catch (Exception e) {
+            Log.e(TAG, "Error en uploadImageAndUpdateProfile: " + e.getMessage());
+            showLoading(false);
+            Toast.makeText(this, "Error al procesar la imagen", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -372,37 +404,35 @@ public class CuentaConfiguracionActivity extends AppCompatActivity {
                     photoUrl
             );
 
-            usuarioService.actualizarUsuario(sessionManager.getUserId(), usuarioRequest, token).enqueue(new Callback<>() {
+            usuarioService.actualizarUsuario(String.valueOf(sessionManager.getUserId()), usuarioRequest, token).enqueue(new Callback<ApiResponse>() {
                 @Override
                 public void onResponse(Call<ApiResponse> call, Response<ApiResponse> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        //Usuario loginResponse = response.body();
+                    showLoading(false);
 
+                    if (response.isSuccessful() && response.body() != null) {
                         // Actualizar SessionManager
                         sessionManager.updateUserName(newName);
                         if (photoUrl != null) {
                             sessionManager.updateUserPhoto(photoUrl);
                         }
 
-                        // Aquí puedes hacer llamada a API para actualizar en el servidor
-                        // updateUserProfileOnServer(newName, photoUrl);
-
-                        showLoading(false);
                         Toast.makeText(getApplicationContext(), "Cambios guardados exitosamente", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "Perfil actualizado exitosamente");
 
-                        // Regresar a MainActivity y actualizar header
-                        getOnBackPressedDispatcher().onBackPressed();
-
+                        // Regresar a la activity anterior
                         finish();
 
-                        Toast.makeText(getApplicationContext(), "Usuario actualizada", Toast.LENGTH_SHORT).show();
                     } else {
                         Toast.makeText(getApplicationContext(), "Error al actualizar el usuario", Toast.LENGTH_SHORT).show();
+                        Log.e(TAG, "Error response: " + response.code() + " - " + response.message());
                     }
                 }
+
                 @Override
                 public void onFailure(Call<ApiResponse> call, Throwable t) {
-                    t.printStackTrace();
+                    showLoading(false);
+                    Log.e(TAG, "Error en la llamada API: " + t.getMessage());
+                    Toast.makeText(getApplicationContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -412,6 +442,7 @@ public class CuentaConfiguracionActivity extends AppCompatActivity {
             Toast.makeText(this, "Error al guardar cambios", Toast.LENGTH_SHORT).show();
         }
     }
+
     private void showLoading(boolean show) {
         binding.buttonSaveChanges.setEnabled(!show);
         binding.buttonSaveChanges.setText(show ? "Guardando..." : "Guardar cambios");
@@ -440,12 +471,15 @@ public class CuentaConfiguracionActivity extends AppCompatActivity {
         binding = null;
     }
 
-
     private File createTempFileFromUri(Uri uri) {
         try {
             InputStream inputStream = getApplicationContext().getContentResolver().openInputStream(uri);
-            String fileName = "imagen_" + System.currentTimeMillis() + ".jpg";
+            if (inputStream == null) {
+                Log.e(TAG, "No se pudo abrir InputStream para la URI");
+                return null;
+            }
 
+            String fileName = "imagen_" + System.currentTimeMillis() + ".jpg";
             File tempFile = new File(getApplicationContext().getCacheDir(), fileName);
             OutputStream outputStream = new FileOutputStream(tempFile);
 
@@ -458,9 +492,11 @@ public class CuentaConfiguracionActivity extends AppCompatActivity {
             outputStream.close();
             inputStream.close();
 
+            Log.d(TAG, "Archivo temporal creado: " + tempFile.getAbsolutePath() + " (" + tempFile.length() + " bytes)");
             return tempFile;
+
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.e(TAG, "Error creando archivo temporal: " + e.getMessage());
             return null;
         }
     }

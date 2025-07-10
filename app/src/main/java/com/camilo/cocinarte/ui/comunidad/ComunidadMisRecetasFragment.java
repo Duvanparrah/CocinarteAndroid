@@ -55,7 +55,7 @@ public class ComunidadMisRecetasFragment extends Fragment {
 
         setupClickListeners();
         cargarDatosUsuario();
-        cargarMisRecetas();
+        cargarMisRecetasConNutricion(); // ✅ MÉTODO ACTUALIZADO
     }
 
     private void setupClickListeners() {
@@ -104,7 +104,7 @@ public class ComunidadMisRecetasFragment extends Fragment {
                 // ✅ USAR MÉTODOS CORRECTOS DE SessionManager
                 String email = sessionManager.getEmail();
                 String nombre = sessionManager.getUserName();
-                String userId = sessionManager.getUserId();
+                String userId = String.valueOf(sessionManager.getUserId());
                 String token = sessionManager.getAuthToken();
                 fotoPerfil = sessionManager.getUserPhoto();
 
@@ -218,9 +218,9 @@ public class ComunidadMisRecetasFragment extends Fragment {
         Toast.makeText(getContext(), "Menú abierto", Toast.LENGTH_SHORT).show();
     }
 
-    // ✅ MÉTODO CORREGIDO: Variables declaradas como final
-    private void cargarMisRecetas() {
-        Log.d(TAG, "📋 Cargando MIS recetas específicamente");
+    // ✅ MÉTODO PRINCIPAL ACTUALIZADO: Cargar mis recetas CON nutrición calculada
+    private void cargarMisRecetasConNutricion() {
+        Log.d(TAG, "📋 Cargando MIS recetas con valores nutricionales calculados por IA");
 
         // ✅ OBTENER USUARIO Y TOKEN DE MANERA ROBUSTA
         LoginManager loginManager = new LoginManager(getContext());
@@ -239,7 +239,7 @@ public class ComunidadMisRecetasFragment extends Fragment {
                 SessionManager sessionManager = SessionManager.getInstance(getContext());
 
                 // ✅ USAR MÉTODOS CORRECTOS DE SessionManager
-                String userId = sessionManager.getUserId();
+                String userId = String.valueOf(sessionManager.getUserId());
                 String token = sessionManager.getAuthToken();
 
                 if (userId != null && token != null) {
@@ -275,17 +275,30 @@ public class ComunidadMisRecetasFragment extends Fragment {
         final int idUsuarioActual = usuarioFinal[0].getIdUsuario();
         Log.d(TAG, "👤 Cargando recetas del usuario ID: " + idUsuarioActual);
 
-        // ✅ CONTINUAR CON LA CARGA DE RECETAS NORMALMENTE
+        // ✅ USAR EL NUEVO ENDPOINT ESPECÍFICO PARA MIS RECETAS CON NUTRICIÓN
         RecetaApi recetaApi = ApiClient.getClient(getContext()).create(RecetaApi.class);
 
-        // INTENTAR PRIMERO EL ENDPOINT ESPECÍFICO /recetas/usuario
-        recetaApi.getMisRecetas("Bearer " + tokenFinal[0]).enqueue(new Callback<List<Receta>>() {
+        // ✅ INTENTAR PRIMERO EL ENDPOINT ESPECÍFICO /recetas/usuario (CON NUTRICIÓN)
+        recetaApi.obtenerMisRecetas("Bearer " + tokenFinal[0]).enqueue(new Callback<List<Receta>>() {
             @Override
             public void onResponse(Call<List<Receta>> call, Response<List<Receta>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     List<Receta> misRecetas = response.body();
-                    Log.d(TAG, "✅ MIS recetas cargadas desde endpoint específico: " + misRecetas.size());
-                    mostrarRecetas(misRecetas);
+                    Log.d(TAG, "✅ MIS recetas con NUTRICIÓN cargadas desde endpoint específico: " + misRecetas.size());
+
+                    // ✅ VERIFICAR QUE TODAS TIENEN VALORES NUTRICIONALES
+                    int recetasConNutricion = 0;
+                    for (Receta receta : misRecetas) {
+                        if (receta.getCalorias() > 0) {
+                            recetasConNutricion++;
+                            Log.d(TAG, "✅ " + receta.getTitulo() + " - Cal: " + receta.getCalorias() +
+                                    ", Prot: " + receta.getProteinas() + "g");
+                        }
+                    }
+
+                    Log.d(TAG, "📊 Mis recetas con nutrición: " + recetasConNutricion + "/" + misRecetas.size());
+
+                    mostrarRecetasConNutricion(misRecetas);
                 } else {
                     Log.w(TAG, "⚠️ Endpoint /recetas/usuario no disponible (código " + response.code() + "), usando método alternativo");
                     // Fallback: usar endpoint general y filtrar
@@ -307,7 +320,7 @@ public class ComunidadMisRecetasFragment extends Fragment {
         Log.d(TAG, "🔄 Usando endpoint general y filtrando por usuario ID: " + idUsuarioActual);
 
         RecetaApi recetaApi = ApiClient.getClient(getContext()).create(RecetaApi.class);
-        Call<List<Receta>> call = recetaApi.getRecetas("Bearer " + token);
+        Call<List<Receta>> call = recetaApi.obtenerTodasLasRecetasConAuth("Bearer " + token);
 
         call.enqueue(new Callback<List<Receta>>() {
             @Override
@@ -326,7 +339,7 @@ public class ComunidadMisRecetasFragment extends Fragment {
                     Log.d(TAG, "✅ Filtrado completado - Total: " + todasLasRecetas.size() +
                             ", Mis recetas: " + recetasDelUsuario.size());
 
-                    mostrarRecetas(recetasDelUsuario);
+                    mostrarRecetasConNutricion(recetasDelUsuario);
                 } else {
                     Log.e(TAG, "❌ Error al cargar recetas: " + response.code());
                     Toast.makeText(getContext(), "Error al cargar tus recetas", Toast.LENGTH_SHORT).show();
@@ -341,8 +354,8 @@ public class ComunidadMisRecetasFragment extends Fragment {
         });
     }
 
-    // ✅ MÉTODO PARA MOSTRAR LAS RECETAS EN LA INTERFAZ
-    private void mostrarRecetas(List<Receta> recetas) {
+    // ✅ MÉTODO ACTUALIZADO: Mostrar las recetas CON información nutricional en la interfaz
+    private void mostrarRecetasConNutricion(List<Receta> recetas) {
         LinearLayout contenedorPrincipal = binding.contenedorRecetas;
         contenedorPrincipal.removeAllViews();
         contenedorPrincipal.setOrientation(LinearLayout.VERTICAL);
@@ -350,7 +363,9 @@ public class ComunidadMisRecetasFragment extends Fragment {
         if (recetas.isEmpty()) {
             // Mostrar mensaje cuando no hay recetas
             TextView mensajeVacio = new TextView(getContext());
-            mensajeVacio.setText("¡Aún no tienes recetas!\n\nToca el botón 'CREAR RECETA' para empezar a compartir tus deliciosas creaciones.");
+            mensajeVacio.setText("¡Aún no tienes recetas!\n\n" +
+                    "Toca el botón 'CREAR RECETA' para empezar a compartir tus deliciosas creaciones.\n\n" +
+                    "📊 Todas tus recetas incluirán valores nutricionales calculados automáticamente con IA.");
             mensajeVacio.setTextSize(16);
             mensajeVacio.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             mensajeVacio.setPadding(32, 64, 32, 64);
@@ -369,7 +384,7 @@ public class ComunidadMisRecetasFragment extends Fragment {
 
         LayoutInflater inflater = LayoutInflater.from(getContext());
 
-        // ✅ CREAR LAYOUT EN GRID DE 2 COLUMNAS
+        // ✅ CREAR LAYOUT EN GRID DE 2 COLUMNAS CON INFORMACIÓN NUTRICIONAL
         for (int i = 0; i < recetas.size(); i += 2) {
             LinearLayout fila = new LinearLayout(getContext());
             fila.setLayoutParams(new LinearLayout.LayoutParams(
@@ -379,24 +394,47 @@ public class ComunidadMisRecetasFragment extends Fragment {
             fila.setOrientation(LinearLayout.HORIZONTAL);
 
             // Primera receta de la fila
-            View item1 = inflarItemReceta(inflater, fila, recetas.get(i), mitadAncho);
+            View item1 = inflarItemRecetaConNutricion(inflater, fila, recetas.get(i), mitadAncho);
             fila.addView(item1);
 
             // Segunda receta de la fila (si existe)
             if (i + 1 < recetas.size()) {
-                View item2 = inflarItemReceta(inflater, fila, recetas.get(i + 1), mitadAncho);
+                View item2 = inflarItemRecetaConNutricion(inflater, fila, recetas.get(i + 1), mitadAncho);
                 fila.addView(item2);
             }
 
             contenedorPrincipal.addView(fila);
         }
 
-        Log.d(TAG, "✅ " + recetas.size() + " recetas mostradas en interfaz");
+        // ✅ MOSTRAR ESTADÍSTICAS NUTRICIONALES
+        int recetasConNutricion = 0;
+        for (Receta receta : recetas) {
+            if (receta.getCalorias() > 0) {
+                recetasConNutricion++;
+            }
+        }
+
+        String mensaje = "✅ " + recetas.size() + " recetas cargadas";
+        if (recetasConNutricion > 0) {
+            mensaje += "\n📊 " + recetasConNutricion + " con valores nutricionales calculados por IA";
+        }
+
+        Toast.makeText(getContext(), mensaje, Toast.LENGTH_LONG).show();
+
+        Log.d(TAG, "✅ " + recetas.size() + " recetas mostradas en interfaz (" + recetasConNutricion + " con nutrición)");
     }
 
-    // ✅ MÉTODO PARA CREAR CADA ITEM DE RECETA
-    private View inflarItemReceta(LayoutInflater inflater, ViewGroup parent, Receta receta, int ancho) {
-        View item = inflater.inflate(R.layout.item_receta, parent, false);
+    // ✅ MÉTODO ACTUALIZADO: Crear cada item de receta CON información nutricional
+    private View inflarItemRecetaConNutricion(LayoutInflater inflater, ViewGroup parent, Receta receta, int ancho) {
+        // ✅ USAR EL LAYOUT NORMAL SI NO EXISTE EL LAYOUT CON NUTRICIÓN
+        View item;
+        try {
+            item = inflater.inflate(R.layout.item_receta_con_nutricion, parent, false);
+        } catch (Exception e) {
+            // Fallback al layout normal si no existe el layout con nutrición
+            Log.w(TAG, "Layout item_receta_con_nutricion no encontrado, usando layout normal");
+            item = inflater.inflate(R.layout.item_receta, parent, false);
+        }
 
         // Configurar ancho del item
         ViewGroup.LayoutParams params = item.getLayoutParams();
@@ -407,16 +445,61 @@ public class ComunidadMisRecetasFragment extends Fragment {
         ImageView ivImagen = item.findViewById(R.id.iv_imagen_receta);
         TextView tvNombre = item.findViewById(R.id.tv_nombre_receta);
 
+        // ✅ NUEVOS CAMPOS PARA INFORMACIÓN NUTRICIONAL (pueden no existir en el layout normal)
+        TextView tvCalorias = item.findViewById(R.id.tv_calorias);
+        TextView tvProteinas = item.findViewById(R.id.tv_proteinas);
+        TextView tvCarbohidratos = item.findViewById(R.id.tv_carbohidratos);
+        TextView tvGrasas = item.findViewById(R.id.tv_grasas);
+
         // Cargar imagen de la receta
-        Glide.with(this)
-                .load(receta.getImagen())
-                .centerCrop()
-                .placeholder(R.drawable.temp_plato)
-                .error(R.drawable.temp_plato)
-                .into(ivImagen);
+        if (ivImagen != null) {
+            Glide.with(this)
+                    .load(receta.getImagen())
+                    .centerCrop()
+                    .placeholder(R.drawable.temp_plato)
+                    .error(R.drawable.temp_plato)
+                    .into(ivImagen);
+        }
 
         // Establecer nombre de la receta
-        tvNombre.setText(receta.getTitulo());
+        if (tvNombre != null) {
+            tvNombre.setText(receta.getTitulo());
+        }
+
+        // ✅ CONFIGURAR INFORMACIÓN NUTRICIONAL SI ESTÁ DISPONIBLE Y LOS CAMPOS EXISTEN
+        if (receta.getCalorias() > 0) {
+            // Mostrar valores nutricionales calculados por IA
+            if (tvCalorias != null) {
+                tvCalorias.setText(receta.getCalorias() + " kcal");
+                tvCalorias.setVisibility(View.VISIBLE);
+            }
+
+            if (tvProteinas != null) {
+                tvProteinas.setText(String.format("%.1fg P", receta.getProteinas()));
+                tvProteinas.setVisibility(View.VISIBLE);
+            }
+
+            if (tvCarbohidratos != null) {
+                tvCarbohidratos.setText(String.format("%.1fg C", receta.getCarbohidratos()));
+                tvCarbohidratos.setVisibility(View.VISIBLE);
+            }
+
+            if (tvGrasas != null) {
+                tvGrasas.setText(String.format("%.1fg G", receta.getGrasas()));
+                tvGrasas.setVisibility(View.VISIBLE);
+            }
+
+            Log.d(TAG, "📊 " + receta.getTitulo() + " - Nutrición: " + receta.getCalorias() + " kcal, " +
+                    receta.getProteinas() + "g P, " + receta.getCarbohidratos() + "g C, " + receta.getGrasas() + "g G");
+        } else {
+            // Ocultar campos nutricionales si no hay datos
+            if (tvCalorias != null) tvCalorias.setVisibility(View.GONE);
+            if (tvProteinas != null) tvProteinas.setVisibility(View.GONE);
+            if (tvCarbohidratos != null) tvCarbohidratos.setVisibility(View.GONE);
+            if (tvGrasas != null) tvGrasas.setVisibility(View.GONE);
+
+            Log.w(TAG, "⚠️ " + receta.getTitulo() + " - Sin datos nutricionales");
+        }
 
         // ✅ CONFIGURAR CLICK PARA NAVEGAR AL DETALLE
         item.setOnClickListener(v -> {
@@ -433,18 +516,18 @@ public class ComunidadMisRecetasFragment extends Fragment {
         return item;
     }
 
-    // ✅ MÉTODO PÚBLICO PARA RECARGAR RECETAS (llamado después de crear una)
+    // ✅ MÉTODO PÚBLICO ACTUALIZADO: Recargar recetas con nutrición (llamado después de crear una)
     public void recargarMisRecetas() {
-        Log.d(TAG, "🔄 Recargando mis recetas después de crear una nueva");
-        cargarMisRecetas();
+        Log.d(TAG, "🔄 Recargando mis recetas con nutrición después de crear una nueva");
+        cargarMisRecetasConNutricion();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG, "🔄 Fragment resumido, recargando mis recetas");
+        Log.d(TAG, "🔄 Fragment resumido, recargando mis recetas con nutrición");
         // Recargar las recetas cada vez que se regresa a este fragment
-        cargarMisRecetas();
+        cargarMisRecetasConNutricion();
     }
 
     @Override

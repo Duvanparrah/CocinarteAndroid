@@ -211,7 +211,6 @@
     </string-array>
 
 
-
     <!-- ✅ AGREGAR ESTOS STRINGS AL ARCHIVO strings.xml EXISTENTE -->
 
     <!-- Banquetes - Textos generales -->
@@ -355,7 +354,6 @@
     <string name="funcion_proximamente">Función próximamente disponible</string>
     <string name="comentarios_proximamente">Comentarios próximamente disponibles</string>
     <string name="valoraciones_proximamente">Valoraciones próximamente disponibles</string>
-
 
 
 </resources>

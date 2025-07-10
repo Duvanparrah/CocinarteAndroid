@@ -66,7 +66,11 @@
         <action
             android:id="@+id/action_nutricion_to_comunidad"
             app:destination="@id/navegar_comunidad" />
+
     </fragment>
+
+
+
 
     <!-- Fragment de Comunidad -->
     <fragment

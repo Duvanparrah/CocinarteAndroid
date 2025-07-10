@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ✅ CAMBIAR DE CardView A MaterialCardView -->
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="3dp"
+    app:cardBackgroundColor="@color/white"
+    app:strokeWidth="1dp"
+    app:strokeColor="@android:color/darker_gray">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header con nombre y categoría -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/text_nombre_ingrediente"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:textColor="@color/negro"
+                android:text="Nombre del ingrediente" />
+
+            <TextView
+                android:id="@+id/text_categoria"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="@color/gris"
+                android:background="@drawable/chip_background"
+                android:padding="4dp"
+                android:text="🏷️ Categoría"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <!-- Unidad -->
+        <TextView
+            android:id="@+id/text_unidad"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="12sp"
+            android:textColor="@color/gris"
+            android:text="📏 Unidad"
+            android:visibility="gone" />
+
+        <!-- Cantidades -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/text_cantidad_original"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="14sp"
+                android:textColor="@color/gris"
+                android:text="Original: 100g" />
+
+            <TextView
+                android:id="@+id/text_cantidad_escalada"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="@color/verde"
+                android:text="Escalado: 200g" />
+
+        </LinearLayout>
+
+        <!-- Factores -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="4dp">
+
+            <TextView
+                android:id="@+id/text_factor_escala"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="12sp"
+                android:textColor="@color/gris"
+                android:text="Factor: 2.0x" />
+
+            <TextView
+                android:id="@+id/text_factor_ajuste"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="12sp"
+                android:textColor="@android:color/holo_orange_dark"
+                android:text="Ajuste IA: +10%"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <!-- Información de IA -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp">
+
+            <TextView
+                android:id="@+id/text_procesado_ia"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="12sp"
+                android:textColor="@android:color/holo_blue_dark"
+                android:text="🤖 Procesado con IA"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/text_razonamiento_ia"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textSize="11sp"
+                android:textColor="@color/gris"
+                android:text="💡 Razonamiento de IA"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+        <!-- Panel nutricional -->
+        <LinearLayout
+            android:id="@+id/panel_nutricional"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/text_calorias"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:textColor="@color/gris"
+                android:background="@drawable/chip_background"
+                android:padding="3dp"
+                android:layout_marginEnd="4dp"
+                android:text="⚡ 0 kcal" />
+
+            <TextView
+                android:id="@+id/text_proteinas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:textColor="@color/gris"
+                android:background="@drawable/chip_background"
+                android:padding="3dp"
+                android:layout_marginEnd="4dp"
+                android:text="🥩 0g" />
+
+            <TextView
+                android:id="@+id/text_carbohidratos"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:textColor="@color/gris"
+                android:background="@drawable/chip_background"
+                android:padding="3dp"
+                android:layout_marginEnd="4dp"
+                android:text="🌾 0g" />
+
+            <TextView
+                android:id="@+id/text_grasas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="10sp"
+                android:textColor="@color/gris"
+                android:background="@drawable/chip_background"
+                android:padding="3dp"
+                android:text="🥑 0g" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

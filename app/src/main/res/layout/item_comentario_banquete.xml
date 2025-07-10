@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:gravity="top">
+
+    <!-- Foto de perfil -->
+    <ImageView
+        android:id="@+id/imageViewPerfil"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginEnd="12dp"
+        android:src="@drawable/perfil"
+        android:scaleType="centerCrop"
+        android:background="@drawable/circle_background"
+        android:contentDescription="Foto de perfil" />
+
+    <!-- Contenido del comentario -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- Nombre del usuario -->
+        <TextView
+            android:id="@+id/textNombreUsuario"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nombre Usuario"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:textColor="@color/negro"
+            android:layout_marginBottom="4dp" />
+
+        <!-- Contenido del comentario -->
+        <TextView
+            android:id="@+id/textContenido"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Contenido del comentario aquí..."
+            android:textSize="14sp"
+            android:textColor="@color/negro"
+            android:layout_marginBottom="4dp" />
+
+        <!-- Fecha y estado -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/textFecha"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="12/07/2024 14:30"
+                android:textSize="12sp"
+                android:textColor="@color/gris" />
+
+            <TextView
+                android:id="@+id/textEditado"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="• editado"
+                android:textSize="12sp"
+                android:textColor="@color/gris"
+                android:layout_marginStart="8dp"
+                android:visibility="gone" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

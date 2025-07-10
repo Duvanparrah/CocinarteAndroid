@@ -2,398 +2,182 @@ package com.camilo.cocinarte.session;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Base64;
+import android.util.Log;
 
 import androidx.security.crypto.EncryptedSharedPreferences;
-import androidx.security.crypto.MasterKey;
-
-import com.camilo.cocinarte.utils.Constants;
+import androidx.security.crypto.MasterKeys;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
 public class SessionManager {
-
+    private static final String PREF_NAME = "secure_session";
     private static final String TAG = "SessionManager";
 
-    // Keys para SharedPreferences
-    private static final String KEY_EMAIL = "email";
-    private static final String KEY_PASSWORD = "password";
-    private static final String KEY_AUTH_TOKEN = "auth_token";
-    private static final String KEY_REFRESH_TOKEN = "refresh_token";
-    private static final String KEY_IS_LOGGED_IN = "is_logged_in";
-    private static final String KEY_SESSION_TIMESTAMP = "session_timestamp";
-    private static final String KEY_USER_ID = "user_id";
-    private static final String KEY_USER_NAME = "user_name";
-
-    // Nuevas keys para información adicional del usuario
-    private static final String KEY_USER_PHOTO = "user_photo";
-    private static final String KEY_USER_TYPE = "user_type";
-    private static final String KEY_IS_VERIFIED = "is_verified";
-
-    private SharedPreferences prefs;
-    private SharedPreferences.Editor editor;
-    private Context context;
-
-    // Singleton instance
     private static SessionManager instance;
+    private SharedPreferences prefs;
 
-    private SessionManager(Context context) {
-        this.context = context.getApplicationContext();
-        initializeEncryptedPreferences();
+    private SessionManager(Context context) throws GeneralSecurityException, IOException {
+        String masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC);
+
+        prefs = EncryptedSharedPreferences.create(
+                PREF_NAME,
+                masterKeyAlias,
+                context,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        );
     }
 
-    public static synchronized SessionManager getInstance(Context context) {
+    public static SessionManager getInstance(Context context) throws GeneralSecurityException, IOException {
         if (instance == null) {
-            instance = new SessionManager(context);
+            instance = new SessionManager(context.getApplicationContext());
         }
         return instance;
     }
 
-    /**
-     * Inicializa SharedPreferences encriptadas
-     */
-    private void initializeEncryptedPreferences() {
-        try {
-            MasterKey masterKey = new MasterKey.Builder(context)
-                    .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                    .build();
-
-            prefs = EncryptedSharedPreferences.create(
-                    context,
-                    "encrypted_session_prefs",
-                    masterKey,
-                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-            );
-
-            editor = prefs.edit();
-
-        } catch (GeneralSecurityException | IOException e) {
-            android.util.Log.e(TAG, "Error creating encrypted preferences", e);
-
-            // Borra todo lo que había antes (¡sólo útil para debug o errores!)
-            SharedPreferences legacyPrefs = context.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-            legacyPrefs.edit().clear().apply();
-
-            prefs = legacyPrefs;
-            editor = prefs.edit();
-        }
-
+    // Guardar sesión básica
+    public void saveUserSession(String email, String password, String token) {
+        prefs.edit()
+                .putString("email", email)
+                .putString("password", password)
+                .putString("token", token)
+                .apply();
     }
 
-    /**
-     * Guarda la sesión completa del usuario con toda la información
-     */
+    // Guardar sesión completa
     public void saveCompleteUserSession(String email, String password, String token,
                                         String userId, String userName, String userPhoto,
                                         String userType, boolean isVerified) {
-        editor.putString(KEY_EMAIL, email);
-        editor.putString(KEY_PASSWORD, encodePassword(password));
-        editor.putString(KEY_AUTH_TOKEN, token);
-        editor.putString(KEY_USER_ID, userId);
-        editor.putString(KEY_USER_NAME, userName);
-        editor.putString(KEY_USER_PHOTO, userPhoto);
-        editor.putString(KEY_USER_TYPE, userType);
-        editor.putBoolean(KEY_IS_VERIFIED, isVerified);
-        editor.putBoolean(KEY_IS_LOGGED_IN, true);
-        editor.putLong(KEY_SESSION_TIMESTAMP, System.currentTimeMillis());
-        editor.apply();
+        prefs.edit()
+                .putString("email", email)
+                .putString("password", password)
+                .putString("token", token)
+                .putString("user_id", userId)
+                .putString("user_name", userName)
+                .putString("user_photo", userPhoto)
+                .putString("user_type", userType)
+                .putBoolean("is_verified", isVerified)
+                .apply();
     }
 
-    /**
-     * Guarda la sesión completa del usuario
-     */
-    public void saveUserSession(String email, String password, String token) {
-        editor.putString(KEY_EMAIL, email);
-        editor.putString(KEY_PASSWORD, encodePassword(password));
-        editor.putString(KEY_AUTH_TOKEN, token);
-        editor.putBoolean(KEY_IS_LOGGED_IN, true);
-        editor.putLong(KEY_SESSION_TIMESTAMP, System.currentTimeMillis());
-        editor.apply();
-    }
-
-    /**
-     * Guarda información adicional del usuario
-     */
-    public void saveUserInfo(String userId, String userName) {
-        editor.putString(KEY_USER_ID, userId);
-        editor.putString(KEY_USER_NAME, userName);
-        editor.apply();
-    }
-
-    /**
-     * Guarda información completa del usuario
-     */
-    public void saveUserInfo(String userId, String userName, String userPhoto, String userType, boolean isVerified) {
-        editor.putString(KEY_USER_ID, userId);
-        editor.putString(KEY_USER_NAME, userName);
-        editor.putString(KEY_USER_PHOTO, userPhoto);
-        editor.putString(KEY_USER_TYPE, userType);
-        editor.putBoolean(KEY_IS_VERIFIED, isVerified);
-        editor.apply();
-    }
-
-    /**
-     * Actualiza solo la foto de perfil
-     */
-
-
-    // ... métodos existentes ...
-
-    /**
-     * Obtiene el token de autenticación
-     */
-    public String getAuthToken() {
-        return prefs.getString(KEY_AUTH_TOKEN, null);
-    }
-
-    /**
-     * Obtiene el refresh token
-     */
-    public String getRefreshToken() {
-        return prefs.getString(KEY_REFRESH_TOKEN, null);
-    }
-
-    /**
-     * Obtiene el email del usuario
-     */
-    public String getEmail() {
-        return prefs.getString(KEY_EMAIL, null);
-    }
-
-    /**
-     * Obtiene la contraseña decodificada
-     */
-    public String getPassword() {
-        String encoded = prefs.getString(KEY_PASSWORD, null);
-        return encoded != null ? decodePassword(encoded) : null;
-    }
-
-    /**
-     * Obtiene el ID del usuario
-     */
-    public String getUserId() {
-        return prefs.getString(KEY_USER_ID, null);
-    }
-
-    /**
-     * Obtiene el nombre del usuario
-     */
-    public String getUserName() {
-        return prefs.getString(KEY_USER_NAME, null);
-    }
-
-    /**
-     * Obtiene la foto de perfil del usuario
-     */
-    public String getUserPhoto() {
-        return prefs.getString(KEY_USER_PHOTO, null);
-    }
-
-    /**
-     * Obtiene el tipo de usuario
-     */
-    public String getUserType() {
-        return prefs.getString(KEY_USER_TYPE, "usuario");
-    }
-
-    /**
-     * Verifica si el usuario está verificado
-     */
-    public boolean isUserVerified() {
-        return prefs.getBoolean(KEY_IS_VERIFIED, false);
-    }
-
-    /**
-     * Verifica si el usuario está logueado
-     */
-    public boolean isLoggedIn() {
-        return prefs.getBoolean(KEY_IS_LOGGED_IN, false);
-    }
-
-    /**
-     * Verifica si existe un token válido
-     */
-    public boolean hasValidToken() {
-        String token = getAuthToken();
-        return token != null && !token.isEmpty();
-    }
-
-    /**
-     * Verifica si la sesión ha expirado
-     */
-    public boolean isSessionExpired() {
-        long loginTime = prefs.getLong(KEY_SESSION_TIMESTAMP, 0);
-        long currentTime = System.currentTimeMillis();
-        return (currentTime - loginTime) > Constants.SESSION_DURATION_MILLIS;
-    }
-
-    /**
-     * Renueva el timestamp de la sesión
-     */
-    public void renewSession() {
-        editor.putLong(KEY_SESSION_TIMESTAMP, System.currentTimeMillis());
-        editor.apply();
-    }
-
-    /**
-     * Actualiza el token
-     */
-    public void updateToken(String newToken) {
-        saveAuthToken(newToken);
-    }
-
-    /**
-     * Guarda el token de autenticación
-     */
-    public void saveAuthToken(String token) {
-        editor.putString(KEY_AUTH_TOKEN, token);
-        editor.putLong(KEY_SESSION_TIMESTAMP, System.currentTimeMillis());
-        editor.apply();
-    }
-
-    /**
-     * Guarda el refresh token
-     */
-    public void saveRefreshToken(String refreshToken) {
-        editor.putString(KEY_REFRESH_TOKEN, refreshToken);
-        editor.apply();
-    }
-
-    /**
-     * Limpia solo el token
-     */
-    public void clearToken() {
-        editor.remove(KEY_AUTH_TOKEN);
-        editor.remove(KEY_REFRESH_TOKEN);
-        editor.apply();
-    }
-
-    /**
-     * Cierra la sesión del usuario
-     */
-    public void logout() {
-        editor.clear();
-        editor.apply();
-    }
-
-    /**
-     * Verifica si existe un usuario registrado
-     */
-    public boolean isUserExist() {
-        return prefs.contains(KEY_EMAIL);
-    }
-
-    /**
-     * Verifica si las credenciales coinciden con las guardadas
-     */
-    public boolean isUserRegistered(String email, String password) {
-        String savedEmail = getEmail();
-        String savedPassword = getPassword();
-        return email.equals(savedEmail) && password.equals(savedPassword);
-    }
-
-    /**
-     * Obtiene todos los datos de la sesión
-     */
-    public SessionData getSessionData() {
-        return new SessionData(
-                getEmail(),
-                getPassword(),
-                getAuthToken(),
-                getRefreshToken(),
-                getUserId(),
-                getUserName(),
-                getUserPhoto(),
-                getUserType(),
-                isUserVerified(),
-                isLoggedIn(),
-                !isSessionExpired()
-        );
-    }
-
-    /**
-     * Codifica la contraseña en Base64
-     */
-    private String encodePassword(String password) {
-        if (password == null) return null;
-        return Base64.encodeToString(password.getBytes(), Base64.NO_WRAP);
-    }
-
-    /**
-     * Decodifica la contraseña de Base64
-     */
-    private String decodePassword(String encoded) {
-        if (encoded == null) return null;
-        return new String(Base64.decode(encoded, Base64.NO_WRAP));
-    }
-
-    /**
-     * Guarda solo email y contraseña (para registro)
-     */
     public void saveUser(String email, String password) {
-        editor.putString(KEY_EMAIL, email);
-        editor.putString(KEY_PASSWORD, encodePassword(password));
-        editor.apply();
+        prefs.edit()
+                .putString("email", email)
+                .putString("password", password)
+                .apply();
     }
 
-    /**
-     * Clase para encapsular los datos de sesión
-     */
-    public static class SessionData {
-        public final String email;
-        public final String password;
-        public final String token;
-        public final String refreshToken;
-        public final String userId;
-        public final String userName;
-        public final String userPhoto;
-        public final String userType;
-        public final boolean isVerified;
-        public final boolean isLoggedIn;
-        public final boolean isSessionValid;
+    // ✅ MÉTODO AGREGADO: saveAuthToken
+    public void saveAuthToken(String token) {
+        prefs.edit()
+                .putString("token", token)
+                .apply();
+        Log.d(TAG, "Token guardado exitosamente");
+    }
 
-        public SessionData(String email, String password, String token, String refreshToken,
-                           String userId, String userName, String userPhoto, String userType,
-                           boolean isVerified, boolean isLoggedIn, boolean isSessionValid) {
-            this.email = email;
-            this.password = password;
-            this.token = token;
-            this.refreshToken = refreshToken;
-            this.userId = userId;
-            this.userName = userName;
-            this.userPhoto = userPhoto;
-            this.userType = userType;
-            this.isVerified = isVerified;
-            this.isLoggedIn = isLoggedIn;
-            this.isSessionValid = isSessionValid;
+    public String getAuthToken() {
+        return prefs.getString("token", null);
+    }
+
+    public boolean isLoggedIn() {
+        return getAuthToken() != null && getUserId() != -1;
+    }
+
+    public boolean isSessionExpired() {
+        return false; // puedes implementar lógica de expiración si lo necesitas
+    }
+
+    public boolean hasValidToken() {
+        return getAuthToken() != null;
+    }
+
+    public int getUserId() {
+        try {
+            return Integer.parseInt(prefs.getString("user_id", "-1"));
+        } catch (NumberFormatException e) {
+            return -1;
         }
     }
 
-    /**
-     * Actualiza solo el nombre del usuario
-     */
+    public String getEmail() {
+        return prefs.getString("email", null);
+    }
+
+    public String getUserName() {
+        return prefs.getString("user_name", null);
+    }
+
+    public String getUserPhoto() {
+        return prefs.getString("user_photo", null);
+    }
+
+    public String getUserType() {
+        return prefs.getString("user_type", null);
+    }
+
+    public boolean isUserVerified() {
+        return prefs.getBoolean("is_verified", false);
+    }
+
+    public SessionData getSessionData() {
+        SessionData data = new SessionData();
+        data.email = getEmail();
+        data.userName = getUserName();
+        data.userPhoto = getUserPhoto();
+        data.userType = getUserType();
+        data.token = getAuthToken();
+        data.userId = getUserId();
+        data.isVerified = isUserVerified();
+        return data;
+    }
+
     public void updateUserName(String newName) {
-        editor.putString(KEY_USER_NAME, newName);
-        editor.apply();
-        android.util.Log.d(TAG, "Nombre actualizado: " + newName);
+        prefs.edit().putString("user_name", newName).apply();
     }
 
-    public void updateUserPhoto(String newPhotoUrl) {
-        editor.putString(KEY_USER_PHOTO, newPhotoUrl);
-        editor.apply();
-        android.util.Log.d(TAG, "Foto actualizada: " + newPhotoUrl);
+    public void updateUserPhoto(String photoUrl) {
+        prefs.edit().putString("user_photo", photoUrl).apply();
     }
 
-    public void updateUserInfo(String userId, String userName, String userPhoto, String userType, boolean isVerified) {
-        editor.putString(KEY_USER_ID, userId);
-        editor.putString(KEY_USER_NAME, userName);
-        editor.putString(KEY_USER_PHOTO, userPhoto);
-        editor.putString(KEY_USER_TYPE, userType);
-        editor.putBoolean(KEY_IS_VERIFIED, isVerified);
-        editor.apply();
-        android.util.Log.d(TAG, "Información del usuario actualizada completamente");
+    // ✅ MÉTODOS ADICIONALES ÚTILES
+    public void saveUserInfo(String userId, String userName, String userPhoto,
+                             String userType, boolean isVerified) {
+        prefs.edit()
+                .putString("user_id", userId)
+                .putString("user_name", userName)
+                .putString("user_photo", userPhoto)
+                .putString("user_type", userType)
+                .putBoolean("is_verified", isVerified)
+                .apply();
+        Log.d(TAG, "Información del usuario actualizada");
     }
 
+    public void logout() {
+        prefs.edit().clear().apply();
+        Log.d(TAG, "Sesión cerrada");
+    }
+
+    public static class SessionData {
+        public String email;
+        public String userName;
+        public String userPhoto;
+        public String userType;
+        public String token;
+        public int userId;
+        public boolean isVerified;
+
+        @Override
+        public String toString() {
+            return "SessionData{" +
+                    "email='" + email + '\'' +
+                    ", userName='" + userName + '\'' +
+                    ", userPhoto='" + userPhoto + '\'' +
+                    ", userType='" + userType + '\'' +
+                    ", token='" + (token != null ? "PRESENTE" : "NULL") + '\'' +
+                    ", userId=" + userId +
+                    ", isVerified=" + isVerified +
+                    '}';
+        }
+    }
 }

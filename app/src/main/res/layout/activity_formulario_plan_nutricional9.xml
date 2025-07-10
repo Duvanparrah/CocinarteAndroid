@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/rootConstraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F5F5F5">
@@ -10,771 +12,445 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:orientation="vertical">
 
             <!-- Header -->
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp">
+                android:layout_marginBottom="16dp"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="8dp"
+                android:background="@android:color/white">
 
+                <!-- Botón atrás -->
                 <ImageView
                     android:id="@+id/btn_back"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:padding="12dp"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
                     android:src="@drawable/atras"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:contentDescription="Volver atrás" />
 
+                <!-- Logo centrado -->
                 <ImageView
-                    android:layout_width="120dp"
-                    android:layout_height="40dp"
+                    android:layout_width="160dp"
+                    android:layout_height="50dp"
                     android:layout_centerInParent="true"
                     android:src="@drawable/cosinart"
+                    android:scaleType="centerInside"
                     android:contentDescription="@string/app_name" />
-
             </RelativeLayout>
 
-            <!-- Contador de calorías circular -->
-            <RelativeLayout
-                android:layout_width="200dp"
-                android:layout_height="200dp"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="24dp">
-
-                <!-- Círculo de fondo -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_centerInParent="true"
-                    android:background="@drawable/circle_background" />
-
-                <!-- Círculo de progreso -->
-                <ProgressBar
-                    android:id="@+id/calories_progress"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_centerInParent="true"
-                    android:indeterminate="false"
-                    android:max="100"
-                    android:progress="75"
-                    android:progressDrawable="@drawable/circular_progress" />
-
-                <!-- Puntos indicadores alrededor del círculo -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginTop="-10dp"
-                    android:orientation="horizontal"
-                    android:gravity="center">
-
-                    <TextView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:text="D"
-                        android:textSize="10sp"
-                        android:textColor="#8B4513"
-                        android:background="@drawable/circle_background"
-                        android:gravity="center"
-                        android:layout_marginHorizontal="8dp" />
-
-                    <TextView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:text="A"
-                        android:textSize="10sp"
-                        android:textColor="#4169E1"
-                        android:background="@drawable/circleindicator"
-                        android:gravity="center"
-                        android:layout_marginHorizontal="8dp" />
-
-                    <TextView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:text="C"
-                        android:textSize="10sp"
-                        android:textColor="#32CD32"
-                        android:background="@drawable/circleindicator"
-                        android:gravity="center"
-                        android:layout_marginHorizontal="8dp" />
-
-                    <TextView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:text="S"
-                        android:textSize="10sp"
-                        android:textColor="#FF6347"
-                        android:background="@drawable/circleindicator"
-                        android:gravity="center"
-                        android:layout_marginHorizontal="8dp" />
-
-                </LinearLayout>
-
-                <!-- Contenido central -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerInParent="true"
-                    android:orientation="vertical"
-                    android:gravity="center">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="495 kcal"
-                        android:textSize="24sp"
-                        android:textStyle="bold"
-                        android:textColor="#333333" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="1978 Kcal"
-                        android:textSize="14sp"
-                        android:textColor="#666666"
-                        android:layout_marginTop="4dp" />
-
-                </LinearLayout>
-
-            </RelativeLayout>
-
-            <!-- Indicadores nutricionales con barras de progreso -->
-            <LinearLayout
+            <!-- Calendario Semanal -->
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="24dp"
-                android:gravity="center"
-                android:paddingHorizontal="16dp">
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="4dp"
+                android:background="@android:color/white">
 
-                <!-- Carbohidratos -->
                 <LinearLayout
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:orientation="vertical"
-                    android:gravity="center">
+                    android:padding="16dp">
 
-                    <View
-                        android:layout_width="12dp"
-                        android:layout_height="12dp"
-                        android:background="@drawable/circle_brown"
-                        android:layout_marginBottom="4dp" />
+                    <!-- Días de la semana -->
+                    <LinearLayout
+                        android:id="@+id/week_days_container"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_marginBottom="16dp">
 
-                    <TextView
+                        <TextView
+                            android:id="@+id/day_monday"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:text="L\n13"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="#666666"
+                            android:gravity="center"
+                            android:background="@drawable/day_selector_background"
+                            android:layout_marginHorizontal="4dp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                        <TextView
+                            android:id="@+id/day_tuesday"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:text="M\n14"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="#666666"
+                            android:gravity="center"
+                            android:background="@drawable/day_selector_background"
+                            android:layout_marginHorizontal="4dp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                        <TextView
+                            android:id="@+id/day_wednesday"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:text="M\n15"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="#666666"
+                            android:gravity="center"
+                            android:background="@drawable/day_selector_background"
+                            android:layout_marginHorizontal="4dp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                        <TextView
+                            android:id="@+id/day_thursday"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:text="J\n16"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="@android:color/white"
+                            android:gravity="center"
+                            android:background="@drawable/day_selected_background"
+                            android:layout_marginHorizontal="4dp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                        <TextView
+                            android:id="@+id/day_friday"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:text="V\n17"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="#666666"
+                            android:gravity="center"
+                            android:background="@drawable/day_selector_background"
+                            android:layout_marginHorizontal="4dp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                        <TextView
+                            android:id="@+id/day_saturday"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:text="S\n18"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="#666666"
+                            android:gravity="center"
+                            android:background="@drawable/day_selector_background"
+                            android:layout_marginHorizontal="4dp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                        <TextView
+                            android:id="@+id/day_sunday"
+                            android:layout_width="0dp"
+                            android:layout_height="48dp"
+                            android:layout_weight="1"
+                            android:text="D\n19"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:textColor="#666666"
+                            android:gravity="center"
+                            android:background="@drawable/day_selector_background"
+                            android:layout_marginHorizontal="4dp"
+                            android:clickable="true"
+                            android:focusable="true" />
+
+                    </LinearLayout>
+
+                    <!-- Contador de calorías circular -->
+                    <RelativeLayout
+                        android:layout_width="160dp"
+                        android:layout_height="160dp"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginBottom="16dp">
+
+                        <!-- Círculo de fondo -->
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerInParent="true"
+                            android:background="@drawable/circle_background_fallback" />
+
+                        <!-- Círculo de progreso -->
+                        <ProgressBar
+                            android:id="@+id/calories_progress"
+                            style="?android:attr/progressBarStyleHorizontal"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:layout_centerInParent="true"
+                            android:indeterminate="false"
+                            android:max="100"
+                            android:progress="25"
+                            android:progressDrawable="@drawable/circular_progress_fallback" />
+
+                        <!-- Contenido central -->
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <TextView
+                                android:id="@+id/tv_calories_consumed"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="438 kcal"
+                                android:textSize="22sp"
+                                android:textStyle="bold"
+                                android:textColor="#333333" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="-------"
+                                android:textSize="10sp"
+                                android:textColor="#999999" />
+
+                            <TextView
+                                android:id="@+id/tv_calories_total"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="1754 Kcal"
+                                android:textSize="14sp"
+                                android:textColor="#666666" />
+
+                        </LinearLayout>
+
+                    </RelativeLayout>
+
+                    <!-- Indicadores nutricionales -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center"
+                        android:layout_marginBottom="16dp">
+
+                        <!-- Carbohidratos -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginBottom="4dp">
+
+                                <View
+                                    android:layout_width="8dp"
+                                    android:layout_height="8dp"
+                                    android:background="@drawable/circle_green_indicator"
+                                    android:layout_marginEnd="4dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Carbohidratos"
+                                    android:textSize="10sp"
+                                    android:textColor="#666666" />
+
+                            </LinearLayout>
+
+                            <ProgressBar
+                                android:layout_width="80dp"
+                                android:layout_height="6dp"
+                                android:layout_marginBottom="4dp"
+                                style="?android:attr/progressBarStyleHorizontal"
+                                android:progress="80"
+                                android:max="100"
+                                android:progressDrawable="@drawable/progress_bar_green" />
+
+                            <TextView
+                                android:id="@+id/tv_carbohidratos"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="63 g"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:textColor="#333333" />
+
+                        </LinearLayout>
+
+                        <!-- Proteínas -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginBottom="4dp">
+
+                                <View
+                                    android:layout_width="8dp"
+                                    android:layout_height="8dp"
+                                    android:background="@drawable/circle_blue_indicator"
+                                    android:layout_marginEnd="4dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Proteínas"
+                                    android:textSize="10sp"
+                                    android:textColor="#666666" />
+
+                            </LinearLayout>
+
+                            <ProgressBar
+                                android:layout_width="80dp"
+                                android:layout_height="6dp"
+                                android:layout_marginBottom="4dp"
+                                style="?android:attr/progressBarStyleHorizontal"
+                                android:progress="60"
+                                android:max="100"
+                                android:progressDrawable="@drawable/progress_bar_blue" />
+
+                            <TextView
+                                android:id="@+id/tv_proteinas"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="38 g"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:textColor="#333333" />
+
+                        </LinearLayout>
+
+                        <!-- Grasas -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical"
+                                android:layout_marginBottom="4dp">
+
+                                <View
+                                    android:layout_width="8dp"
+                                    android:layout_height="8dp"
+                                    android:background="@drawable/circle_orange_indicator"
+                                    android:layout_marginEnd="4dp" />
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Grasas"
+                                    android:textSize="10sp"
+                                    android:textColor="#666666" />
+
+                            </LinearLayout>
+
+                            <ProgressBar
+                                android:layout_width="80dp"
+                                android:layout_height="6dp"
+                                android:layout_marginBottom="4dp"
+                                style="?android:attr/progressBarStyleHorizontal"
+                                android:progress="40"
+                                android:max="100"
+                                android:progressDrawable="@drawable/progress_bar_orange" />
+
+                            <TextView
+                                android:id="@+id/tv_grasas"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="16 g"
+                                android:textSize="12sp"
+                                android:textStyle="bold"
+                                android:textColor="#333333" />
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                    <!-- Indicador de agua -->
+                    <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Carbohidratos"
-                        android:textSize="10sp"
-                        android:textColor="#666666"
-                        android:textAlignment="center" />
+                        android:layout_gravity="start"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
 
-                    <!-- Barra de progreso Carbohidratos -->
-                    <ProgressBar
-                        android:layout_width="60dp"
-                        android:layout_height="4dp"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginBottom="4dp"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:progress="75"
-                        android:max="100"
-                        android:progressDrawable="@drawable/progress_bar_brown" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="2.8 litros por día"
+                            android:textSize="12sp"
+                            android:textColor="#333333"
+                            android:layout_marginEnd="8dp" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="202 g"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:textColor="#333333" />
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/water_icon"/>
+
+                    </LinearLayout>
 
                 </LinearLayout>
 
-                <!-- Proteínas -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
+            </androidx.cardview.widget.CardView>
 
-                    <View
-                        android:layout_width="12dp"
-                        android:layout_height="12dp"
-                        android:background="@drawable/circle_gray"
-                        android:layout_marginBottom="4dp" />
+            <!-- ✅ CONTENEDOR DINÁMICO: Lista de Comidas Generadas -->
+            <LinearLayout
+                android:id="@+id/meals_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="16dp"
+                android:paddingBottom="32dp">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Proteínas"
-                        android:textSize="10sp"
-                        android:textColor="#666666"
-                        android:textAlignment="center" />
-
-                    <!-- Barra de progreso Proteínas -->
-                    <ProgressBar
-                        android:layout_width="60dp"
-                        android:layout_height="4dp"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginBottom="4dp"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:progress="60"
-                        android:max="100"
-                        android:progressDrawable="@drawable/progress_bar_gray" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="144 g"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:textColor="#333333" />
-
-                </LinearLayout>
-
-                <!-- Grasas -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical"
-                    android:gravity="center">
-
-                    <View
-                        android:layout_width="12dp"
-                        android:layout_height="12dp"
-                        android:background="@drawable/circle_blue"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Grasas"
-                        android:textSize="10sp"
-                        android:textColor="#666666"
-                        android:textAlignment="center" />
-
-                    <!-- Barra de progreso Grasas -->
-                    <ProgressBar
-                        android:layout_width="60dp"
-                        android:layout_height="4dp"
-                        android:layout_marginTop="4dp"
-                        android:layout_marginBottom="4dp"
-                        style="?android:attr/progressBarStyleHorizontal"
-                        android:progress="40"
-                        android:max="100"
-                        android:progressDrawable="@drawable/progress_bar_blue" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="60 g"
-                        android:textSize="12sp"
-                        android:textStyle="bold"
-                        android:textColor="#333333" />
-
-                </LinearLayout>
+                <!-- Las comidas se generarán dinámicamente aquí -->
 
             </LinearLayout>
-
-            <!-- Sección de litros por día -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:orientation="horizontal"
-                android:layout_marginBottom="32dp"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="1.8 litros por día"
-                    android:textSize="14sp"
-                    android:textColor="#333333"
-                    android:layout_marginEnd="8dp" />
-
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/vasos_de_agua"
-                    android:contentDescription="Agua" />
-
-            </LinearLayout>
-
-            <!-- Título Desayuno -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Desayuno"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#333333"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="16dp" />
-
-            <!-- Card Desayuno -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                android:layout_marginHorizontal="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp"
-                    android:background="#E8F5E8">
-
-                    <!-- Header de la card -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="12dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="495 kcal"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:background="@drawable/rounded_white_bg"
-                            android:padding="4dp"
-                            android:layout_marginEnd="8dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="20 P"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:background="@drawable/rounded_white_bg"
-                            android:padding="4dp"
-                            android:layout_marginEnd="8dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="52.5 C"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:background="@drawable/rounded_white_bg"
-                            android:padding="4dp"
-                            android:layout_marginEnd="8dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="14.5 G"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:background="@drawable/rounded_white_bg"
-                            android:padding="4dp" />
-
-                    </LinearLayout>
-
-                    <!-- Descripción -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pan integral (2 rebanadas):"
-                        android:textSize="14sp"
-                        android:textColor="#333333"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Aguacate (1/4 pieza, aproximadamente 50 g)"
-                        android:textSize="14sp"
-                        android:textColor="#666666"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Huevo (1 grande):"
-                        android:textSize="14sp"
-                        android:textColor="#666666"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Fresas (1 taza)"
-                        android:textSize="14sp"
-                        android:textColor="#666666" />
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <!-- Título Almuerzo -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Almuerzo"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#333333"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="16dp" />
-
-            <!-- Card Almuerzo -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                android:layout_marginHorizontal="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp"
-                    android:background="#E8F5E8">
-
-                    <!-- Header de la card -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="12dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="495 kcal"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:background="@drawable/rounded_white_bg"
-                            android:padding="4dp"
-                            android:layout_marginEnd="8dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="20 P"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:background="@drawable/rounded_white_bg"
-                            android:padding="4dp"
-                            android:layout_marginEnd="8dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="52.5 C"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:background="@drawable/rounded_white_bg"
-                            android:padding="4dp"
-                            android:layout_marginEnd="8dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="14.5 G"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:background="@drawable/rounded_white_bg"
-                            android:padding="4dp" />
-
-                    </LinearLayout>
-
-                    <!-- Descripción -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pan integral (2 rebanadas):"
-                        android:textSize="14sp"
-                        android:textColor="#333333"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Aguacate (1/4 pieza, aproximadamente 50 g)"
-                        android:textSize="14sp"
-                        android:textColor="#666666"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Huevo (1 grande):"
-                        android:textSize="14sp"
-                        android:textColor="#666666"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Fresas (1 taza)"
-                        android:textSize="14sp"
-                        android:textColor="#666666" />
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <!-- Título Cena -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Cena"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#333333"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="16dp" />
-
-            <!-- Card Cena -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                android:layout_marginHorizontal="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp"
-                    android:background="#E8F5E8">
-
-                    <!-- Header de la card -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="12dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="495 kcal"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:background="@drawable/rounded_white_bg"
-                            android:padding="4dp"
-                            android:layout_marginEnd="8dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="20 P"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:background="@drawable/rounded_white_bg"
-                            android:padding="4dp"
-                            android:layout_marginEnd="8dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="52.5 C"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:background="@drawable/rounded_white_bg"
-                            android:padding="4dp"
-                            android:layout_marginEnd="8dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="14.5 G"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:background="@drawable/rounded_white_bg"
-                            android:padding="4dp" />
-
-                    </LinearLayout>
-
-                    <!-- Descripción -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pan integral (2 rebanadas):"
-                        android:textSize="14sp"
-                        android:textColor="#333333"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Aguacate (1/4 pieza, aproximadamente 50 g)"
-                        android:textSize="14sp"
-                        android:textColor="#666666"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Huevo (1 grande):"
-                        android:textSize="14sp"
-                        android:textColor="#666666"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Fresas (1 taza)"
-                        android:textSize="14sp"
-                        android:textColor="#666666" />
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
-
-            <!-- Título Snack -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Snack"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:textColor="#333333"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginBottom="16dp" />
-
-            <!-- Card Snack -->
-            <androidx.cardview.widget.CardView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                app:cardCornerRadius="12dp"
-                app:cardElevation="4dp"
-                android:layout_marginHorizontal="8dp">
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="16dp"
-                    android:background="#E8F5E8">
-
-                    <!-- Header de la card -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:layout_marginBottom="12dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="495 kcal"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:background="@drawable/rounded_white_bg"
-                            android:padding="4dp"
-                            android:layout_marginEnd="8dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="20 P"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:background="@drawable/rounded_white_bg"
-                            android:padding="4dp"
-                            android:layout_marginEnd="8dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="52.5 C"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:background="@drawable/rounded_white_bg"
-                            android:padding="4dp"
-                            android:layout_marginEnd="8dp" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="14.5 G"
-                            android:textSize="14sp"
-                            android:textStyle="bold"
-                            android:background="@drawable/rounded_white_bg"
-                            android:padding="4dp" />
-
-                    </LinearLayout>
-
-                    <!-- Descripción -->
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Pan integral (2 rebanadas):"
-                        android:textSize="14sp"
-                        android:textColor="#333333"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Aguacate (1/4 pieza, aproximadamente 50 g)"
-                        android:textSize="14sp"
-                        android:textColor="#666666"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Huevo (1 grande):"
-                        android:textSize="14sp"
-                        android:textColor="#666666"
-                        android:layout_marginBottom="4dp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Fresas (1 taza)"
-                        android:textSize="14sp"
-                        android:textColor="#666666" />
-
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
 
         </LinearLayout>
 
     </ScrollView>
 
-    <!-- Bottom navigation -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        app:menu="@menu/bottom_nav_menu"
-        app:itemIconTint="@color/black"
-        app:itemTextColor="@color/black"
-        app:labelVisibilityMode="labeled"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
+    <!-- ✅ SIN BOTONES - Los botones fueron eliminados completamente -->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

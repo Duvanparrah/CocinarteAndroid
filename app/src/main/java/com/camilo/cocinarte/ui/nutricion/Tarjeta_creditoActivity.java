@@ -1,9 +1,11 @@
 package com.camilo.cocinarte.ui.nutricion;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -18,13 +20,22 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.camilo.cocinarte.R;
+import com.camilo.cocinarte.api.ApiService;
+import com.camilo.cocinarte.utils.SessionManager;
 
 public class Tarjeta_creditoActivity extends AppCompatActivity {
+
+    private static final String TAG = "TarjetaCreditoActivity";
 
     private EditText edtNombre, edtCC, edtNumeroTarjeta, edtFechaExpiracion, edtCVC;
     private TextView txtPais;
     private Button btnFinalizarCompra;
     private ImageButton btnBack;
+    private String tipoPlan;
+
+    // Servicios
+    private ApiService apiService;
+    private SessionManager sessionManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +43,7 @@ public class Tarjeta_creditoActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_tarjeta_credito);
 
-        // Configurar insets para el modo edge-to-edge de forma segura
+        // Configurar insets
         View rootView = findViewById(android.R.id.content);
         ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -40,13 +51,20 @@ public class Tarjeta_creditoActivity extends AppCompatActivity {
             return insets;
         });
 
-        // Inicializar vistas
+        // Inicializar servicios
+        apiService = new ApiService(this);
+        sessionManager = new SessionManager(this);
+
+        // Obtener el tipo de plan del intent
+        tipoPlan = getIntent().getStringExtra("tipo_plan");
+        if (tipoPlan == null) {
+            tipoPlan = "pro"; // Por defecto
+        }
+
+        Log.d(TAG, "💳 Iniciando pago para plan: " + tipoPlan);
+
         inicializarVistas();
-
-        // Configurar eventos
         configurarEventos();
-
-        // Configurar formateador para fecha de expiración
         configurarFormatoFecha();
     }
 
@@ -62,13 +80,10 @@ public class Tarjeta_creditoActivity extends AppCompatActivity {
     }
 
     private void configurarEventos() {
-        // Botón regresar
         btnBack.setOnClickListener(v -> finish());
-
-        // Botón finalizar compra
         btnFinalizarCompra.setOnClickListener(v -> {
             if (validarDatos()) {
-                finalizarCompra();
+                procesarPagoConBackend();
             }
         });
     }
@@ -79,28 +94,19 @@ public class Tarjeta_creditoActivity extends AppCompatActivity {
             String separador = "/";
 
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // No necesario para el formateo
-            }
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // No necesario para el formateo
-            }
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (isFormatting) {
-                    return;
-                }
+                if (isFormatting) return;
 
                 isFormatting = true;
-
-                // Eliminar caracteres no numéricos
                 String texto = s.toString().replaceAll("[^\\d]", "");
-
-                // Formatear MM/AA
                 StringBuilder formateado = new StringBuilder();
+
                 for (int i = 0; i < texto.length() && i < 4; i++) {
                     if (i == 2) {
                         formateado.append(separador);
@@ -109,40 +115,34 @@ public class Tarjeta_creditoActivity extends AppCompatActivity {
                 }
 
                 s.replace(0, s.length(), formateado.toString());
-
                 isFormatting = false;
             }
         });
     }
 
     private boolean validarDatos() {
-        // Validar nombre
         if (TextUtils.isEmpty(edtNombre.getText())) {
             mostrarError("Por favor, ingrese su nombre");
             return false;
         }
 
-        // Validar CC
         if (TextUtils.isEmpty(edtCC.getText())) {
             mostrarError("Por favor, ingrese su número de CC");
             return false;
         }
 
-        // Validar número de tarjeta
         String numeroTarjeta = edtNumeroTarjeta.getText().toString();
         if (TextUtils.isEmpty(numeroTarjeta) || numeroTarjeta.length() < 13 || numeroTarjeta.length() > 16) {
             mostrarError("Por favor, ingrese un número de tarjeta válido");
             return false;
         }
 
-        // Validar fecha de expiración
         String fechaExp = edtFechaExpiracion.getText().toString();
         if (TextUtils.isEmpty(fechaExp) || fechaExp.length() != 5 || !fechaExp.contains("/")) {
             mostrarError("Por favor, ingrese una fecha de expiración válida (MM/AA)");
             return false;
         }
 
-        // Validar mes
         try {
             int mes = Integer.parseInt(fechaExp.substring(0, 2));
             if (mes < 1 || mes > 12) {
@@ -154,7 +154,6 @@ public class Tarjeta_creditoActivity extends AppCompatActivity {
             return false;
         }
 
-        // Validar CVC
         String cvc = edtCVC.getText().toString();
         if (TextUtils.isEmpty(cvc) || cvc.length() < 3 || cvc.length() > 4) {
             mostrarError("Por favor, ingrese un código CVC válido");
@@ -168,22 +167,76 @@ public class Tarjeta_creditoActivity extends AppCompatActivity {
         Toast.makeText(this, mensaje, Toast.LENGTH_SHORT).show();
     }
 
-    private void finalizarCompra() {
-        // Aquí recogemos y procesamos la información
-        String nombre = edtNombre.getText().toString();
-        String cc = edtCC.getText().toString();
-        String numeroTarjeta = edtNumeroTarjeta.getText().toString();
-        String fechaExpiracion = edtFechaExpiracion.getText().toString();
-        String cvc = edtCVC.getText().toString();
-        String pais = txtPais.getText().toString();
+    /**
+     * 💳 MÉTODO PRINCIPAL - Procesar pago con el backend
+     */
+    private void procesarPagoConBackend() {
+        Log.d(TAG, "💳 Iniciando procesamiento de pago con backend...");
 
-        // Aquí iría el código para procesar el pago con la información recolectada
-        // Por ejemplo, crear un objeto con los datos o enviarlos a un servicio
+        String token = sessionManager.getToken();
+        if (token == null || token.isEmpty()) {
+            Toast.makeText(this, "Error: Debes iniciar sesión para procesar el pago", Toast.LENGTH_LONG).show();
+            return;
+        }
 
-        // Mostrar mensaje de confirmación
-        Toast.makeText(this, "Pago procesado con éxito", Toast.LENGTH_LONG).show();
+        // Deshabilitar botón para evitar doble click
+        btnFinalizarCompra.setEnabled(false);
+        btnFinalizarCompra.setText("Procesando...");
 
-        // Cerrar la actividad
-        finish();
+        // Crear referencia única para el pago
+        String referenciaPago = "CARD_" + sessionManager.getUserId() + "_" + System.currentTimeMillis();
+
+        // Obtener datos de la tarjeta
+        String nombreTitular = edtNombre.getText().toString().trim();
+        String numeroTarjeta = edtNumeroTarjeta.getText().toString().trim();
+
+        Log.d(TAG, "📋 Datos del pago:");
+        Log.d(TAG, "  - Tipo plan: " + tipoPlan);
+        Log.d(TAG, "  - Referencia: " + referenciaPago);
+        Log.d(TAG, "  - Titular: " + nombreTitular);
+
+        // Procesar pago
+        apiService.procesarPagoPlanPro(
+                token,
+                "tarjeta", // método de pago
+                referenciaPago,
+                49900.0, // monto en pesos colombianos
+                new ApiService.PagoCallback() {
+                    @Override
+                    public void onSuccess(String message, String referencia) {
+                        Log.d(TAG, "✅ Pago procesado exitosamente: " + referencia);
+
+                        runOnUiThread(() -> {
+                            Toast.makeText(Tarjeta_creditoActivity.this,
+                                    "✅ " + message, Toast.LENGTH_LONG).show();
+
+                            // Ir al formulario de plan nutricional
+                            Intent intent = new Intent(Tarjeta_creditoActivity.this, formulario_plan_nutricional.class);
+                            intent.putExtra("nombre_usuario", nombreTitular);
+                            intent.putExtra("metodo_pago", "tarjeta");
+                            intent.putExtra("tipo_plan", tipoPlan);
+                            intent.putExtra("referencia_pago", referencia);
+                            intent.putExtra("pago_procesado", true);
+
+                            startActivity(intent);
+                            finish();
+                        });
+                    }
+
+                    @Override
+                    public void onError(String error) {
+                        Log.e(TAG, "❌ Error procesando pago: " + error);
+
+                        runOnUiThread(() -> {
+                            // Rehabilitar botón
+                            btnFinalizarCompra.setEnabled(true);
+                            btnFinalizarCompra.setText("Finalizar Compra");
+
+                            Toast.makeText(Tarjeta_creditoActivity.this,
+                                    "Error procesando pago: " + error, Toast.LENGTH_LONG).show();
+                        });
+                    }
+                }
+        );
     }
 }

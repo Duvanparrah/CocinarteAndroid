@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 
+
 import com.camilo.cocinarte.MainActivity;
 import com.camilo.cocinarte.api.LoginManager;
 import com.camilo.cocinarte.databinding.ActivityInicioSesionBinding;
@@ -18,6 +19,9 @@ import com.camilo.cocinarte.models.LoginResponse;
 import com.camilo.cocinarte.session.SessionManager;
 import com.camilo.cocinarte.utils.Resource;
 import com.camilo.cocinarte.viewmodels.AuthViewModel;
+
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 public class InicioSesionActivity extends AppCompatActivity {
 
@@ -32,13 +36,21 @@ public class InicioSesionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        sessionManager = SessionManager.getInstance(this);
+        // ✅ CORRECCIÓN: Inicializar SessionManager con manejo de excepciones
+        try {
+            sessionManager = SessionManager.getInstance(this);
+        } catch (GeneralSecurityException | IOException e) {
+            Log.e(TAG, "❌ Error inicializando SessionManager: " + e.getMessage(), e);
+            Toast.makeText(this, "Error de seguridad en la aplicación", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+
         loginManager = new LoginManager(this);
         authViewModel = new ViewModelProvider(this).get(AuthViewModel.class);
 
         // ✅ Validar si ya hay sesión activa
-        if (loginManager.hasActiveSession() ||
-                (sessionManager.isLoggedIn() && sessionManager.hasValidToken() && !sessionManager.isSessionExpired())) {
+        if (hasActiveSession()) {
             Log.d(TAG, "✅ Sesión activa detectada, redirigiendo a MainActivity...");
             navigateToMain();
             return;
@@ -51,6 +63,19 @@ public class InicioSesionActivity extends AppCompatActivity {
         setupViews();
         observeViewModel();
         setupTextWatchers();
+    }
+
+    // ✅ MÉTODO MEJORADO: Verificar sesión activa con manejo de errores
+    private boolean hasActiveSession() {
+        try {
+            return loginManager.hasActiveSession() ||
+                    (sessionManager.isLoggedIn() &&
+                            sessionManager.hasValidToken() &&
+                            !sessionManager.isSessionExpired());
+        } catch (Exception e) {
+            Log.e(TAG, "Error verificando sesión activa: " + e.getMessage());
+            return false;
+        }
     }
 
     private void setupViews() {
@@ -109,6 +134,17 @@ public class InicioSesionActivity extends AppCompatActivity {
         String password = binding.editTextPassword.getText() != null ?
                 binding.editTextPassword.getText().toString() : "";
 
+        // Validación básica
+        if (email.isEmpty()) {
+            binding.textInputLayoutEmail.setError("El email es requerido");
+            return;
+        }
+
+        if (password.isEmpty()) {
+            binding.textInputLayoutPassword.setError("La contraseña es requerida");
+            return;
+        }
+
         authViewModel.clearErrors();
 
         authViewModel.login(email, password).observe(this, resource -> {
@@ -120,6 +156,8 @@ public class InicioSesionActivity extends AppCompatActivity {
                     showLoading(false);
                     if (resource.data != null) {
                         handleLoginSuccess(resource.data, email, password);
+                    } else {
+                        Toast.makeText(this, "Error: respuesta vacía del servidor", Toast.LENGTH_LONG).show();
                     }
                     break;
                 case ERROR:
@@ -127,6 +165,7 @@ public class InicioSesionActivity extends AppCompatActivity {
                     String errorMessage = resource.message != null ?
                             resource.message : "Error al iniciar sesión";
                     Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
+                    Log.e(TAG, "Error en login: " + errorMessage);
                     break;
             }
         });
@@ -136,9 +175,16 @@ public class InicioSesionActivity extends AppCompatActivity {
         try {
             Log.d(TAG, "🚀 Login exitoso, guardando datos...");
 
+            // Verificar que tenemos un token válido
+            if (loginResponse.getToken() == null || loginResponse.getToken().trim().isEmpty()) {
+                Toast.makeText(this, "Error: no se recibió token de autenticación", Toast.LENGTH_LONG).show();
+                return;
+            }
+
             if (loginResponse.getUser() != null) {
                 LoginResponse.UserData user = loginResponse.getUser();
 
+                // Guardar sesión completa
                 sessionManager.saveCompleteUserSession(
                         email,
                         password,
@@ -149,27 +195,33 @@ public class InicioSesionActivity extends AppCompatActivity {
                         user.getTipo_usuario(),
                         user.isVerified()
                 );
-                Log.d(TAG, "✅ Guardado en SessionManager");
+                Log.d(TAG, "✅ Guardado en SessionManager - Usuario: " + user.getNombre());
 
+                // Guardar en LoginManager
                 loginManager.saveToken(loginResponse.getToken());
                 loginManager.saveUser(user);
                 Log.d(TAG, "✅ Guardado en LoginManager");
-                loginManager.debugPrintUserData();
+
+                // Debug: imprimir datos del usuario (opcional)
+                // loginManager.debugPrintUserData();
             } else {
+                // Sesión básica sin datos del usuario
                 sessionManager.saveUserSession(email, password, loginResponse.getToken());
                 loginManager.saveToken(loginResponse.getToken());
                 Log.d(TAG, "✅ Guardado login básico sin user info");
             }
 
-            Toast.makeText(this,
-                    loginResponse.getMessage() != null ? loginResponse.getMessage() : "¡Bienvenido!",
-                    Toast.LENGTH_SHORT).show();
+            // Mostrar mensaje de bienvenida
+            String welcomeMessage = loginResponse.getMessage() != null ?
+                    loginResponse.getMessage() : "¡Bienvenido!";
+            Toast.makeText(this, welcomeMessage, Toast.LENGTH_SHORT).show();
 
+            // Navegar a la pantalla principal
             navigateToMain();
 
         } catch (Exception e) {
             Log.e(TAG, "❌ Error al guardar sesión: " + e.getMessage(), e);
-            Toast.makeText(this, "Error al guardar la sesión", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Error al guardar la sesión: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -186,24 +238,40 @@ public class InicioSesionActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("EMAIL")) {
             String email = intent.getStringExtra("EMAIL");
-            if (email != null) {
+            if (email != null && !email.trim().isEmpty()) {
                 binding.editTextEmail.setText(email);
+                Log.d(TAG, "Email pre-cargado desde intent: " + email);
             }
         }
     }
 
     private void navigateToMain() {
         Log.d(TAG, "🏠 Navegando a MainActivity...");
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.putExtra("fragment_to_show", "inicio");
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
-        finish();
+        try {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.putExtra("fragment_to_show", "inicio");
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+            finish();
+        } catch (Exception e) {
+            Log.e(TAG, "Error navegando a MainActivity: " + e.getMessage(), e);
+            Toast.makeText(this, "Error al navegar a la pantalla principal", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         binding = null;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Verificar sesión al volver a la activity
+        if (sessionManager != null && hasActiveSession()) {
+            Log.d(TAG, "Sesión detectada en onResume, navegando a MainActivity");
+            navigateToMain();
+        }
     }
 }

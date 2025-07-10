@@ -22,7 +22,7 @@ public class BanquetePlatillo implements Serializable {
         this.imagen = imagen;
     }
 
-    // ✅ GETTERS Y SETTERS
+    // ✅ GETTERS Y SETTERS BÁSICOS
     public int getId_platillo() { return id_platillo; }
     public void setId_platillo(int id_platillo) { this.id_platillo = id_platillo; }
 
@@ -35,10 +35,19 @@ public class BanquetePlatillo implements Serializable {
         this.nombre = nombre_platillo; // Sincronizar alias
     }
 
-    public String getNombre() { return nombre != null ? nombre : nombre_platillo; }
+    public String getNombre() {
+        // Priorizar nombre_platillo, luego nombre
+        if (nombre_platillo != null && !nombre_platillo.trim().isEmpty()) {
+            return nombre_platillo;
+        }
+        return nombre != null ? nombre : "Sin nombre";
+    }
+
     public void setNombre(String nombre) {
         this.nombre = nombre;
-        this.nombre_platillo = nombre; // Sincronizar
+        if (this.nombre_platillo == null || this.nombre_platillo.trim().isEmpty()) {
+            this.nombre_platillo = nombre; // Sincronizar si no existe nombre_platillo
+        }
     }
 
     public String getDescripcion() { return descripcion; }
@@ -47,10 +56,19 @@ public class BanquetePlatillo implements Serializable {
         this.preparacion = descripcion; // Sincronizar alias
     }
 
-    public String getPreparacion() { return preparacion != null ? preparacion : descripcion; }
+    public String getPreparacion() {
+        // Priorizar descripcion, luego preparacion
+        if (descripcion != null && !descripcion.trim().isEmpty()) {
+            return descripcion;
+        }
+        return preparacion != null ? preparacion : "";
+    }
+
     public void setPreparacion(String preparacion) {
         this.preparacion = preparacion;
-        this.descripcion = preparacion; // Sincronizar
+        if (this.descripcion == null || this.descripcion.trim().isEmpty()) {
+            this.descripcion = preparacion; // Sincronizar si no existe descripcion
+        }
     }
 
     public String getImagen() { return imagen; }
@@ -66,6 +84,42 @@ public class BanquetePlatillo implements Serializable {
             return imagen;
         }
         return imagen;
+    }
+
+    public boolean tieneDescripcion() {
+        String desc = getDescripcion();
+        return desc != null && !desc.trim().isEmpty();
+    }
+
+    public boolean tieneNombre() {
+        String nom = getNombre();
+        return nom != null && !nom.trim().isEmpty() && !nom.equals("Sin nombre");
+    }
+
+    // ✅ MÉTODOS DE COMPATIBILIDAD (para evitar errores)
+
+    /**
+     * Método de compatibilidad - devuelve descripción como preparación
+     */
+    public String getTiempoPreparacion() {
+        // Como no tienes este campo, devolver null o una descripción por defecto
+        return null; // o "No especificado"
+    }
+
+    /**
+     * Método de compatibilidad - devuelve dificultad genérica
+     */
+    public String getDificultad() {
+        // Como no tienes este campo, devolver null o una dificultad por defecto
+        return null; // o "Media"
+    }
+
+    /**
+     * Método de compatibilidad - devuelve categoría genérica
+     */
+    public String getCategoria() {
+        // Como no tienes este campo, devolver null o una categoría por defecto
+        return null; // o "Platillo principal"
     }
 
     @Override

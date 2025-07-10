@@ -13,6 +13,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 
 public class AuthRepository {
     private static final String TAG = "AuthRepository";
@@ -27,7 +28,13 @@ public class AuthRepository {
     private AuthRepository(Application application) {
         this.application = application;
         this.authService = ApiClient.getClient(application).create(AuthService.class);
-        this.sessionManager = SessionManager.getInstance(application);
+        try {
+            this.sessionManager = SessionManager.getInstance(application);
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public static synchronized AuthRepository getInstance(Application application) {

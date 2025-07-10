@@ -1,191 +1,220 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    tools:context=".ui.nutricion.formulario_plan_nutricional_2">
+    android:fitsSystemWindows="true"
+    tools:context=".ui.nutricion.formulario_plan_nutricional_3">
 
-    <!-- Flecha regreso -->
-    <ImageView
-        android:id="@+id/backArrow"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:src="@drawable/atras"
-        android:contentDescription="@string/back_arrow"
-        android:padding="6dp"
-        android:layout_margin="16dp"
+    <!-- Contenedor con scroll para pantallas pequeñas -->
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:fillViewport="true"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <!-- Logo cocinArte -->
-    <ImageView
-        android:id="@+id/logoImage"
-        android:layout_width="160dp"
-        android:layout_height="50dp"
-        android:src="@drawable/cosinart"
-        android:layout_marginTop="20dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Barra de progreso -->
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Horizontal"
-        android:layout_width="0dp"
-        android:layout_height="8dp"
-        android:progress="33"
-        android:progressTint="@color/verde"
-        android:backgroundTint="@android:color/darker_gray"
-        android:layout_marginTop="12dp"
-        android:layout_marginStart="32dp"
-        android:layout_marginEnd="32dp"
-        app:layout_constraintTop_toBottomOf="@id/logoImage"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Imagen central -->
-    <ImageView
-        android:id="@+id/imagenObjetivo"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:src="@drawable/cedula"
-        android:layout_marginTop="12dp"
-        app:layout_constraintTop_toBottomOf="@id/progressBar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Título -->
-    <TextView
-        android:id="@+id/titulo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/titulo_formulario"
-        android:textStyle="bold"
-        android:textSize="18sp"
-        android:textColor="@android:color/black"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/imagenObjetivo"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Descripción -->
-    <TextView
-        android:id="@+id/descripcion"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/descripcion_formulario"
-        android:textAlignment="center"
-        android:textSize="14sp"
-        android:textColor="@android:color/black"
-        android:layout_marginTop="4dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        app:layout_constraintTop_toBottomOf="@id/titulo"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Layout con Spinners -->
-    <LinearLayout
-        android:id="@+id/opcionesLayout"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        app:layout_constraintTop_toBottomOf="@id/descripcion"
+        app:layout_constraintBottom_toTopOf="@id/btnContinuar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- Spinner Sexo -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/sexo" />
-            <Spinner
-                android:id="@+id/spinnerSexo"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:minHeight="48dp"
-                android:layout_weight="1"
-                android:entries="@array/sexo_array" />
-        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <!-- Spinner Edad -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/edad" />
-            <Spinner
-                android:id="@+id/spinnerEdad"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:minHeight="48dp"
-                android:layout_weight="1"
-                android:entries="@array/edad_array" />
-        </LinearLayout>
+            <!-- Barra superior -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingTop="24dp">
 
-        <!-- Spinner Altura -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
-            <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/altura" />
-            <Spinner
-                android:id="@+id/spinnerAltura"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:minHeight="48dp"
-                android:layout_weight="1"
-                android:entries="@array/altura_array" />
-        </LinearLayout>
+                <ImageView
+                    android:id="@+id/backArrow"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/atras"
+                    android:contentDescription="Atrás"
+                    android:layout_marginEnd="16dp" />
 
-        <!-- Spinner Peso -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
+                <ImageView
+                    android:id="@+id/logoImage"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/cosinart" />
+
+                <View
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="16dp" />
+            </LinearLayout>
+
+            <!-- Barra de progreso -->
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="8dp"
+                android:progress="66"
+                android:progressTint="@color/verde"
+                android:backgroundTint="@android:color/darker_gray"
+                android:layout_marginTop="12dp" />
+
+            <!-- Imagen central -->
             <ImageView
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/peso" />
-            <Spinner
-                android:id="@+id/spinnerPeso"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:minHeight="48dp"
-                android:layout_weight="1"
-                android:entries="@array/peso_array" />
+                android:id="@+id/imagenObjetivo"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:src="@drawable/cedula"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp" />
+
+            <!-- Título -->
+            <TextView
+                android:id="@+id/titulo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Información Personal"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:textColor="@android:color/black"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="8dp" />
+
+            <!-- Descripción -->
+            <TextView
+                android:id="@+id/descripcion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Por favor, completa todos los campos para personalizar tu plan nutricional."
+                android:textAlignment="center"
+                android:textSize="14sp"
+                android:textColor="@android:color/black"
+                android:layout_marginTop="4dp"
+                android:layout_marginHorizontal="12dp" />
+
+            <!-- Layout con campos -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="16dp">
+
+                <!-- Campo sexo -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_vertical">
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/sexo"
+                        android:layout_marginEnd="12dp" />
+                    <Spinner
+                        android:id="@+id/spinnerSexo"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:padding="12dp" />
+                </LinearLayout>
+
+                <!-- Edad -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_vertical">
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/edad"
+                        android:layout_marginEnd="12dp" />
+                    <EditText
+                        android:id="@+id/editTextEdad"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:hint="Edad (años)"
+                        android:inputType="number"
+                        android:maxLength="3"
+                        android:padding="12dp"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!-- Altura -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_vertical">
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/altura"
+                        android:layout_marginEnd="12dp" />
+                    <EditText
+                        android:id="@+id/editTextAltura"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:hint="Altura (centímetros)"
+                        android:inputType="number"
+                        android:maxLength="3"
+                        android:padding="12dp"
+                        android:textSize="14sp" />
+                </LinearLayout>
+
+                <!-- Peso -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="12dp"
+                    android:gravity="center_vertical">
+                    <ImageView
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@drawable/peso"
+                        android:layout_marginEnd="12dp" />
+                    <EditText
+                        android:id="@+id/editTextPeso"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:hint="Peso (kilogramos)"
+                        android:inputType="numberDecimal"
+                        android:maxLength="5"
+                        android:padding="12dp"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
+    </ScrollView>
 
     <!-- Botón continuar -->
     <Button
         android:id="@+id/btnContinuar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/continuar"
+        android:text="Continuar"
         android:backgroundTint="@color/verde"
         android:textColor="@android:color/white"
-        android:layout_marginTop="16dp"
-        app:layout_constraintTop_toBottomOf="@id/opcionesLayout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Menú inferior -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="@android:color/white"
-        app:menu="@menu/bottom_nav_menu"
-        app:itemIconTint="@color/black"
-        app:itemTextColor="@color/black"
-        app:labelVisibilityMode="labeled"
+        android:layout_marginBottom="16dp"
+        android:paddingHorizontal="32dp"
+        android:paddingVertical="12dp"
+        app:cornerRadius="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
-

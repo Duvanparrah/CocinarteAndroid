@@ -10,7 +10,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class ApiConfig {
 
-    private static final String BASE_URL = "https://cocinarte-backend-production.up.railway.app/api/";
+    private static final String BASE_URL = "https://cocinarte-backend-production.up.railway.app/";
     private static Retrofit retrofit = null;
 
     public static Retrofit getClient(Context context) {

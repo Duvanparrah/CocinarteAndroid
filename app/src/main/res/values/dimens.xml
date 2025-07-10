@@ -12,4 +12,18 @@
     <dimen name="card_margin">8dp</dimen>
     <dimen name="card_corner_radius">12dp</dimen>
     <dimen name="card_elevation">4dp</dimen>
+
+
+    <!-- Card elevations -->
+    <dimen name="card_elevation_normal">4dp</dimen>
+    <dimen name="card_elevation_selected">12dp</dimen>
+
+    <!-- Other common dimensions you might need -->
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_medium">16dp</dimen>
+    <dimen name="margin_large">24dp</dimen>
+    <dimen name="padding_small">8dp</dimen>
+    <dimen name="padding_medium">16dp</dimen>
+    <dimen name="padding_large">24dp</dimen>
+
 </resources>

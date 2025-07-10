@@ -16,6 +16,8 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 
 import com.camilo.cocinarte.MainActivity;
@@ -45,6 +47,8 @@ public class ComunidadFragment extends Fragment {
     private AdapterComunidad adapter;
     private Handler handler = new Handler();
     private DrawerLayout drawerLayout;
+    private SessionManager sessionManager;
+    private LoginManager loginManager;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -57,6 +61,16 @@ public class ComunidadFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        // Inicializar managers
+        try {
+            sessionManager = SessionManager.getInstance(requireContext());
+        } catch (GeneralSecurityException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        loginManager = new LoginManager(requireContext());
+
         // Obtener referencia al DrawerLayout desde MainActivity
         if (getActivity() instanceof MainActivity) {
             MainActivity mainActivity = (MainActivity) getActivity();
@@ -66,177 +80,221 @@ public class ComunidadFragment extends Fragment {
         listView = view.findViewById(R.id.contenedor_recetas);
 
         setupClickListeners();
-        cargarRecetasUsuariosConReacciones(); // ✅ CAMBIO PRINCIPAL
+        cargarRecetasDeUsuariosRegulares(); // ✅ MÉTODO PRINCIPAL ACTUALIZADO
     }
 
-    // ✅ NUEVO MÉTODO: Solo cargar recetas de usuarios regulares
-    private void cargarRecetasUsuariosConReacciones() {
+    /**
+     * ✅ MÉTODO ACTUALIZADO: Usar endpoints existentes y filtrar del lado del cliente
+     */
+    private void cargarRecetasDeUsuariosRegulares() {
         mostrarCargando(true);
 
-        Log.d(TAG, "🔍 Cargando SOLO recetas de usuarios regulares (sin administradores)");
-
-        // ✅ VERIFICAR TOKEN ANTES DE HACER LA LLAMADA
-        String tokenGuardado = getValidToken();
-        if (tokenGuardado == null) {
-            Log.e(TAG, "No se pudo obtener un token válido");
-            mostrarCargando(false);
-            Toast.makeText(getContext(), "Error de autenticación. Por favor, inicia sesión nuevamente.", Toast.LENGTH_LONG).show();
-            return;
-        }
+        Log.d(TAG, "👥 Cargando SOLO recetas de USUARIOS REGULARES para pantalla de COMUNIDAD");
 
         RecetaApi recetaApi = ApiClient.getClient(getContext()).create(RecetaApi.class);
 
-        // ✅ USAR EL ENDPOINT ESPECÍFICO PARA USUARIOS SOLAMENTE
-        recetaApi.getRecetasUsuarios("Bearer " + tokenGuardado).enqueue(new Callback<List<Receta>>() {
-            @Override
-            public void onResponse(@NonNull Call<List<Receta>> call, @NonNull Response<List<Receta>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<Receta> recetas = response.body();
+        // ✅ VERIFICAR AUTENTICACIÓN
+        boolean tieneAutenticacion = sessionManager.isLoggedIn() && sessionManager.hasValidToken();
 
-                    Log.d(TAG, "✅ Recetas de USUARIOS cargadas: " + recetas.size());
-                    Log.d(TAG, "🚫 Recetas de administradores filtradas automáticamente");
+        if (tieneAutenticacion) {
+            Log.d(TAG, "🔐 Usuario autenticado: Cargando todas las recetas y filtrando usuarios");
+            String token = sessionManager.getAuthToken();
 
-                    // ✅ VERIFICAR QUE TODAS SON DE USUARIOS REGULARES (LOG DE VERIFICACIÓN)
-                    int usuariosRegulares = 0;
-                    int administradores = 0;
-                    for (Receta receta : recetas) {
-                        if (receta.getCreador() != null) {
-                            if ("usuario".equals(receta.getCreador().getTipo_usuario())) {
-                                usuariosRegulares++;
-                            } else {
-                                administradores++;
-                                Log.w(TAG, "⚠️ ADVERTENCIA: Receta de admin detectada: " + receta.getTitulo() +
-                                        " - Tipo: " + receta.getCreador().getTipo_usuario());
-                            }
-                        }
-                    }
+            // ✅ USAR ENDPOINT EXISTENTE
+            recetaApi.obtenerTodasLasRecetasConAuth("Bearer " + token)
+                    .enqueue(new CallbackRecetasConFiltro(true));
+        } else {
+            Log.d(TAG, "🌐 Usuario NO autenticado: Cargando todas las recetas y filtrando usuarios");
 
-                    Log.d(TAG, "📊 Estadísticas finales - Usuarios: " + usuariosRegulares + ", Admins: " + administradores);
-
-                    // ✅ CREAR ADAPTER CON VALIDACIÓN DE USUARIO
-                    adapter = createAdapterSafely(recetas);
-
-                    if (adapter != null) {
-                        listView.setAdapter(adapter);
-                        adapter.actualizarReacciones(() -> mostrarCargando(false));
-
-                        // Mostrar mensaje informativo si no hay recetas
-                        if (recetas.isEmpty()) {
-                            Toast.makeText(getContext(), "No hay recetas de usuarios para mostrar", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Log.e(TAG, "No se pudo crear el adapter");
-                        mostrarCargando(false);
-                        Toast.makeText(getContext(), "Error al cargar la interfaz", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Log.e(TAG, "❌ Error al cargar recetas de usuarios: " + response.code());
-
-                    // Si falla, intentar endpoint general como fallback
-                    if (response.code() == 404) {
-                        Log.w(TAG, "Endpoint usuarios-only no disponible, usando endpoint general con filtro");
-                        cargarRecetasConFiltroLocal();
-                    } else {
-                        mostrarCargando(false);
-                        Toast.makeText(getContext(), "Error al cargar recetas: " + response.code(), Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<List<Receta>> call, @NonNull Throwable t) {
-                Log.e(TAG, "❌ Error de conexión al cargar recetas de usuarios: " + t.getMessage());
-
-                // Como fallback, intentar el endpoint general
-                Log.w(TAG, "Intentando endpoint general como fallback");
-                cargarRecetasConFiltroLocal();
-            }
-        });
+            // ✅ USAR ENDPOINT EXISTENTE SIN AUTH
+            recetaApi.obtenerTodasLasRecetas()
+                    .enqueue(new CallbackRecetasConFiltro(false));
+        }
     }
 
-    // ✅ MÉTODO FALLBACK: Usar endpoint general y filtrar localmente
-    private void cargarRecetasConFiltroLocal() {
-        Log.d(TAG, "🔄 Usando endpoint general y filtrando localmente");
+    /**
+     * ✅ CALLBACK CON FILTRADO DEL LADO DEL CLIENTE PARA USUARIOS REGULARES
+     */
+    private class CallbackRecetasConFiltro implements Callback<List<Receta>> {
+        private final boolean conAutenticacion;
 
-        String tokenGuardado = getValidToken();
-        if (tokenGuardado == null) {
-            mostrarCargando(false);
-            return;
+        public CallbackRecetasConFiltro(boolean conAutenticacion) {
+            this.conAutenticacion = conAutenticacion;
         }
 
-        RecetaApi recetaApi = ApiClient.getClient(getContext()).create(RecetaApi.class);
+        @Override
+        public void onResponse(@NonNull Call<List<Receta>> call, @NonNull Response<List<Receta>> response) {
+            if (response.isSuccessful() && response.body() != null) {
+                List<Receta> todasLasRecetas = response.body();
 
-        recetaApi.getRecetas("Bearer " + tokenGuardado).enqueue(new Callback<List<Receta>>() {
-            @Override
-            public void onResponse(@NonNull Call<List<Receta>> call, @NonNull Response<List<Receta>> response) {
-                if (response.isSuccessful() && response.body() != null) {
-                    List<Receta> todasLasRecetas = response.body();
+                Log.d(TAG, "✅ Todas las recetas cargadas: " + todasLasRecetas.size());
 
-                    // ✅ FILTRAR LOCALMENTE SOLO USUARIOS REGULARES
-                    List<Receta> recetasUsuarios = new ArrayList<>();
-                    for (Receta receta : todasLasRecetas) {
-                        if (receta.getCreador() != null && "usuario".equals(receta.getCreador().getTipo_usuario())) {
+                // ✅ FILTRAR SOLO USUARIOS REGULARES
+                List<Receta> recetasUsuarios = new ArrayList<>();
+
+                for (Receta receta : todasLasRecetas) {
+                    if (receta.getCreador() != null) {
+                        String tipoUsuario = receta.getCreador().getTipo_usuario();
+
+                        // ✅ FILTRAR SOLO USUARIOS REGULARES
+                        if ("usuario".equals(tipoUsuario)) {
                             recetasUsuarios.add(receta);
                         }
                     }
+                }
 
-                    Log.d(TAG, "✅ Filtro local aplicado - Total: " + todasLasRecetas.size() +
-                            ", Solo usuarios: " + recetasUsuarios.size());
+                Log.d(TAG, "✅ Recetas de USUARIOS REGULARES filtradas: " + recetasUsuarios.size());
 
-                    adapter = createAdapterSafely(recetasUsuarios);
-                    if (adapter != null) {
-                        listView.setAdapter(adapter);
+                // ✅ VERIFICAR VALORES NUTRICIONALES
+                int conNutricion = 0;
+                for (Receta receta : recetasUsuarios) {
+                    if (receta.getCalorias() > 0 || (receta.getNutricion() != null && receta.getNutricion().getCalorias() > 0)) {
+                        conNutricion++;
+                    }
+                }
+
+                Log.d(TAG, "📊 Estadísticas COMUNIDAD - Recetas usuarios: " + recetasUsuarios.size() + ", Con nutrición: " + conNutricion);
+
+                // ✅ CREAR ADAPTER ESPECÍFICO PARA COMUNIDAD
+                adapter = createAdapterSafely(recetasUsuarios, conAutenticacion);
+
+                if (adapter != null) {
+                    listView.setAdapter(adapter);
+
+                    if (conAutenticacion) {
                         adapter.actualizarReacciones(() -> mostrarCargando(false));
                     } else {
                         mostrarCargando(false);
                     }
+
+                    // ✅ MENSAJE INFORMATIVO
+                    String mensaje = "👥 " + recetasUsuarios.size() + " recetas de usuarios cargadas";
+                    if (conNutricion > 0) {
+                        mensaje += " (" + conNutricion + " con nutrición)";
+                    }
+                    Toast.makeText(getContext(), mensaje, Toast.LENGTH_SHORT).show();
+
                 } else {
-                    Log.e(TAG, "❌ Error al cargar recetas: " + response.code());
+                    Log.e(TAG, "No se pudo crear el adapter para comunidad");
                     mostrarCargando(false);
-                    Toast.makeText(getContext(), "Error al cargar recetas", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Error al cargar la interfaz", Toast.LENGTH_SHORT).show();
                 }
-            }
 
-            @Override
-            public void onFailure(@NonNull Call<List<Receta>> call, @NonNull Throwable t) {
-                Log.e(TAG, "❌ Error de conexión: " + t.getMessage());
+                // Mostrar mensaje si no hay recetas
+                if (recetasUsuarios.isEmpty()) {
+                    Toast.makeText(getContext(), "No hay recetas de usuarios para mostrar", Toast.LENGTH_SHORT).show();
+                }
+
+            } else {
+                Log.e(TAG, "❌ Error al cargar recetas: " + response.code());
+                manejarErrorCarga("Error al cargar recetas: " + response.code());
+            }
+        }
+
+        @Override
+        public void onFailure(@NonNull Call<List<Receta>> call, @NonNull Throwable t) {
+            Log.e(TAG, "❌ Error de conexión al cargar recetas", t);
+            manejarErrorCarga("Error de conexión: " + t.getMessage());
+        }
+    }
+
+    /**
+     * ✅ BÚSQUEDA CON FILTRADO DEL LADO DEL CLIENTE PARA USUARIOS
+     */
+    private void performSearch() {
+        String query = binding.searchEditText.getText().toString().trim();
+
+        if (query.isEmpty()) {
+            Toast.makeText(getContext(), "Ingrese un término de búsqueda", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Log.d(TAG, "🔍 Buscando '" + query + "' en recetas de USUARIOS REGULARES");
+
+        mostrarCargando(true);
+        RecetaApi recetaApi = ApiClient.getClient(getContext()).create(RecetaApi.class);
+        boolean tieneAutenticacion = sessionManager.isLoggedIn() && sessionManager.hasValidToken();
+
+        if (tieneAutenticacion) {
+            String token = sessionManager.getAuthToken();
+            // ✅ USAR ENDPOINT EXISTENTE DE BÚSQUEDA
+            recetaApi.buscarRecetasConAuth(query, "Bearer " + token)
+                    .enqueue(new CallbackBusquedaConFiltro(query));
+        } else {
+            // ✅ USAR ENDPOINT EXISTENTE DE BÚSQUEDA SIN AUTH
+            recetaApi.buscarRecetas(query)
+                    .enqueue(new CallbackBusquedaConFiltro(query));
+        }
+    }
+
+    /**
+     * ✅ CALLBACK PARA BÚSQUEDA CON FILTRADO DE USUARIOS
+     */
+    private class CallbackBusquedaConFiltro implements Callback<List<Receta>> {
+        private final String query;
+
+        public CallbackBusquedaConFiltro(String query) {
+            this.query = query;
+        }
+
+        @Override
+        public void onResponse(@NonNull Call<List<Receta>> call, @NonNull Response<List<Receta>> response) {
+            if (response.isSuccessful() && response.body() != null) {
+                List<Receta> todosLosResultados = response.body();
+
+                // ✅ FILTRAR SOLO USUARIOS REGULARES
+                List<Receta> resultadosUsuarios = new ArrayList<>();
+                for (Receta receta : todosLosResultados) {
+                    if (receta.getCreador() != null) {
+                        String tipoUsuario = receta.getCreador().getTipo_usuario();
+                        if ("usuario".equals(tipoUsuario)) {
+                            resultadosUsuarios.add(receta);
+                        }
+                    }
+                }
+
+                Log.d(TAG, "✅ Búsqueda completada: " + resultadosUsuarios.size() + " resultados de usuarios para '" + query + "'");
+
+                // ✅ CREAR ADAPTER CON RESULTADOS
+                boolean tieneAuth = sessionManager.isLoggedIn() && sessionManager.hasValidToken();
+                adapter = createAdapterSafely(resultadosUsuarios, tieneAuth);
+
+                if (adapter != null) {
+                    listView.setAdapter(adapter);
+
+                    if (tieneAuth) {
+                        adapter.actualizarReacciones(() -> mostrarCargando(false));
+                    } else {
+                        mostrarCargando(false);
+                    }
+                }
+
+                // ✅ MOSTRAR MENSAJE
+                if (resultadosUsuarios.isEmpty()) {
+                    Toast.makeText(getContext(), "No se encontraron recetas de usuarios para: " + query, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getContext(), "✅ " + resultadosUsuarios.size() + " recetas de usuarios encontradas", Toast.LENGTH_SHORT).show();
+                }
+
+            } else {
+                Log.e(TAG, "❌ Error en búsqueda: " + response.code());
                 mostrarCargando(false);
-                Toast.makeText(getContext(), "Error de conexión", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Error en la búsqueda", Toast.LENGTH_SHORT).show();
             }
-        });
-    }
-
-    // ✅ MÉTODO PARA OBTENER TOKEN VÁLIDO DESDE CUALQUIER MANAGER
-    private String getValidToken() {
-        // Intentar primero con SessionManager
-        try {
-            SessionManager sessionManager = SessionManager.getInstance(requireContext());
-            if (sessionManager != null && sessionManager.getAuthToken() != null) {
-                Log.d(TAG, "Token obtenido desde SessionManager");
-                return sessionManager.getAuthToken();
-            }
-        } catch (Exception e) {
-            Log.w(TAG, "Error al obtener token desde SessionManager: " + e.getMessage());
         }
 
-        // Si falla, intentar con LoginManager
-        try {
-            LoginManager loginManager = new LoginManager(requireContext());
-            String token = loginManager.getToken();
-            if (token != null && !token.trim().isEmpty()) {
-                Log.d(TAG, "Token obtenido desde LoginManager");
-                return token;
-            }
-        } catch (Exception e) {
-            Log.w(TAG, "Error al obtener token desde LoginManager: " + e.getMessage());
+        @Override
+        public void onFailure(@NonNull Call<List<Receta>> call, @NonNull Throwable t) {
+            Log.e(TAG, "❌ Error de conexión en búsqueda", t);
+            mostrarCargando(false);
+            Toast.makeText(getContext(), "Error de conexión en búsqueda", Toast.LENGTH_SHORT).show();
         }
-
-        Log.e(TAG, "No se pudo obtener token desde ningún manager");
-        return null;
     }
 
-    // ✅ MÉTODO PARA CREAR ADAPTER DE FORMA SEGURA
-    private AdapterComunidad createAdapterSafely(List<Receta> recetas) {
+    /**
+     * ✅ MÉTODO PARA CREAR ADAPTER DE FORMA SEGURA
+     */
+    private AdapterComunidad createAdapterSafely(List<Receta> recetas, boolean conAutenticacion) {
         try {
             return new AdapterComunidad(getContext(), recetas, new AdapterComunidad.OnRecetaClickListener() {
                 @Override
@@ -250,31 +308,10 @@ public class ComunidadFragment extends Fragment {
 
                 @Override
                 public void onComentariosClick(Receta receta) {
-                    // ✅ USAR TU IMPLEMENTACIÓN COMPLETA DE COMENTARIOS
-                    try {
-                        JSONObject cache = ReaccionCache.getReacciones(receta.getIdReceta());
-                        JSONArray comentarios = new JSONArray();
-                        if (cache != null && cache.has("comentarios")) {
-                            comentarios = cache.optJSONArray("comentarios");
-                        }
-
-                        // ✅ USAR TU ComentariosBottomSheetFragment DE FAVORITOS
-                        com.camilo.cocinarte.ui.favoritos.ComentariosBottomSheetFragment modal =
-                                com.camilo.cocinarte.ui.favoritos.ComentariosBottomSheetFragment.newInstance(comentarios, receta.getIdReceta());
-
-                        modal.setComentariosListener(new com.camilo.cocinarte.ui.favoritos.ComentariosBottomSheetFragment.ComentariosListener() {
-                            @Override
-                            public void onComentariosCerrados() {
-                                // Al cerrar el modal, recargamos reacciones
-                                if (adapter != null) {
-                                    adapter.actualizarReacciones(null);
-                                }
-                            }
-                        });
-                        modal.show(getParentFragmentManager(), "ComentariosBottomSheet");
-                    } catch (Exception e) {
-                        Log.e(TAG, "Error al abrir comentarios: " + e.getMessage());
-                        Toast.makeText(getContext(), "Error al cargar comentarios", Toast.LENGTH_SHORT).show();
+                    if (conAutenticacion) {
+                        abrirComentarios(receta);
+                    } else {
+                        Toast.makeText(getContext(), "Inicia sesión para ver comentarios", Toast.LENGTH_SHORT).show();
                     }
                 }
             });
@@ -284,24 +321,62 @@ public class ComunidadFragment extends Fragment {
         }
     }
 
-    // ✅ MÉTODO DE CARGA SIMPLE (solo usa Toast)
-    private void mostrarCargando(boolean mostrar) {
-        // Usar Toast como indicador de carga simple
-        if (mostrar && getContext() != null) {
-            Toast.makeText(getContext(), "Cargando recetas...", Toast.LENGTH_SHORT).show();
+    /**
+     * ✅ ABRIR COMENTARIOS (solo si hay autenticación)
+     */
+    private void abrirComentarios(Receta receta) {
+        try {
+            JSONObject cache = ReaccionCache.getReacciones(receta.getIdReceta());
+            JSONArray comentarios = new JSONArray();
+            if (cache != null && cache.has("comentarios")) {
+                comentarios = cache.optJSONArray("comentarios");
+            }
+
+            com.camilo.cocinarte.ui.favoritos.ComentariosBottomSheetFragment modal =
+                    com.camilo.cocinarte.ui.favoritos.ComentariosBottomSheetFragment.newInstance(comentarios, receta.getIdReceta());
+
+            modal.setComentariosListener(new com.camilo.cocinarte.ui.favoritos.ComentariosBottomSheetFragment.ComentariosListener() {
+                @Override
+                public void onComentariosCerrados() {
+                    if (adapter != null) {
+                        adapter.actualizarReacciones(null);
+                    }
+                }
+            });
+            modal.show(getParentFragmentManager(), "ComentariosBottomSheet");
+        } catch (Exception e) {
+            Log.e(TAG, "Error al abrir comentarios: " + e.getMessage());
+            Toast.makeText(getContext(), "Error al cargar comentarios", Toast.LENGTH_SHORT).show();
         }
-        // No hacer nada cuando mostrar=false, ya que el Toast desaparece automáticamente
+    }
+
+    /**
+     * ✅ MANEJAR ERRORES DE CARGA
+     */
+    private void manejarErrorCarga(String mensaje) {
+        mostrarCargando(false);
+        Toast.makeText(getContext(), mensaje, Toast.LENGTH_LONG).show();
+    }
+
+    /**
+     * ✅ MOSTRAR INDICADOR DE CARGA
+     */
+    private void mostrarCargando(boolean mostrar) {
+        if (mostrar && getContext() != null) {
+            Toast.makeText(getContext(), "👥 Cargando recetas de usuarios...", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void setupClickListeners() {
         binding.searchButton.setOnClickListener(v -> performSearch());
 
-        // ✅ BUSCAR EL BOTÓN DE MENÚ POR findViewById COMO ALTERNATIVA SEGURA
+        // Botón de menú
         View menuButton = getView() != null ? getView().findViewById(R.id.menu_button) : null;
         if (menuButton != null) {
             menuButton.setOnClickListener(v -> openMenu());
         }
 
+        // Tabs
         binding.misRecetasTab.setOnClickListener(v ->
                 Navigation.findNavController(requireView())
                         .navigate(R.id.action_navegar_comunidad_to_navegar_comunidad_mis_recetas));
@@ -309,14 +384,11 @@ public class ComunidadFragment extends Fragment {
         binding.comunidadTab.setOnClickListener(v ->
                 Toast.makeText(getContext(), "Ya estás en Comunidad", Toast.LENGTH_SHORT).show());
 
-        // ✅ CONFIGURAR OTROS POSIBLES BOTONES DE MENÚ CON DIFERENTES NOMBRES
         setupMenuButtons();
     }
 
-    // ✅ MÉTODO PARA CONFIGURAR BOTONES DE MENÚ CON DIFERENTES POSIBLES NOMBRES
     private void setupMenuButtons() {
         if (getView() != null) {
-            // Intentar diferentes IDs comunes para botones de menú
             String[] menuButtonIds = {
                     "menu_button", "btn_menu", "menuBtn", "hamburger_button",
                     "drawer_button", "navigation_button", "toolbar_menu"
@@ -330,70 +402,13 @@ public class ComunidadFragment extends Fragment {
                         if (button != null) {
                             button.setOnClickListener(v -> openMenu());
                             Log.d(TAG, "Botón de menú configurado con ID: " + buttonId);
-                            break; // Solo configurar el primero que encontremos
+                            break;
                         }
                     }
                 } catch (Exception e) {
                     // Continuar con el siguiente ID si hay error
                 }
             }
-        }
-    }
-
-    // ✅ BÚSQUEDA MEJORADA - Solo en recetas de usuarios
-    private void performSearch() {
-        String query = binding.searchEditText.getText().toString().trim();
-        if (!query.isEmpty()) {
-            Log.d(TAG, "🔍 Buscando '" + query + "' solo en recetas de usuarios");
-
-            String tokenGuardado = getValidToken();
-            if (tokenGuardado == null) return;
-
-            mostrarCargando(true);
-            RecetaApi recetaApi = ApiClient.getClient(getContext()).create(RecetaApi.class);
-
-            // Usar búsqueda y filtrar resultados
-            recetaApi.buscarRecetas(query, "Bearer " + tokenGuardado).enqueue(new Callback<List<Receta>>() {
-                @Override
-                public void onResponse(@NonNull Call<List<Receta>> call, @NonNull Response<List<Receta>> response) {
-                    if (response.isSuccessful() && response.body() != null) {
-                        List<Receta> resultados = response.body();
-
-                        // Filtrar solo usuarios regulares
-                        List<Receta> resultadosUsuarios = new ArrayList<>();
-                        for (Receta receta : resultados) {
-                            if (receta.getCreador() != null && "usuario".equals(receta.getCreador().getTipo_usuario())) {
-                                resultadosUsuarios.add(receta);
-                            }
-                        }
-
-                        Log.d(TAG, "✅ Búsqueda completada - Encontrados: " + resultadosUsuarios.size() + " de usuarios");
-
-                        adapter = createAdapterSafely(resultadosUsuarios);
-                        if (adapter != null) {
-                            listView.setAdapter(adapter);
-                            adapter.actualizarReacciones(() -> mostrarCargando(false));
-                        } else {
-                            mostrarCargando(false);
-                        }
-
-                        if (resultadosUsuarios.isEmpty()) {
-                            Toast.makeText(getContext(), "No se encontraron recetas de usuarios para: " + query, Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        mostrarCargando(false);
-                        Toast.makeText(getContext(), "Error en la búsqueda", Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                @Override
-                public void onFailure(@NonNull Call<List<Receta>> call, @NonNull Throwable t) {
-                    mostrarCargando(false);
-                    Toast.makeText(getContext(), "Error de conexión en búsqueda", Toast.LENGTH_SHORT).show();
-                }
-            });
-        } else {
-            Toast.makeText(getContext(), "Ingrese un término de búsqueda", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -409,13 +424,17 @@ public class ComunidadFragment extends Fragment {
         }
     }
 
-    // ✅ MÉTODO PÚBLICO PARA RECARGAR RECETAS (llamado después de crear una receta)
+    /**
+     * ✅ MÉTODO PÚBLICO: Recargar recetas (llamado desde MainActivity)
+     */
     public void recargarRecetas() {
-        Log.d(TAG, "🔄 Recargando recetas después de crear una nueva");
-        cargarRecetasUsuariosConReacciones();
+        Log.d(TAG, "🔄 Recargando recetas de usuarios regulares");
+        cargarRecetasDeUsuariosRegulares();
     }
 
-    // ✅ MÉTODOS PARA NAVEGAR PROGRAMÁTICAMENTE USANDO MAINACTIVITY
+    /**
+     * ✅ MÉTODO PÚBLICO: Navegar a fragment específico
+     */
     public void navigateToFragment(int fragmentId) {
         if (getActivity() instanceof MainActivity) {
             ((MainActivity) getActivity()).navigateToFragment(fragmentId);
@@ -434,11 +453,17 @@ public class ComunidadFragment extends Fragment {
         navigateToFragment(R.id.navigation_nutricion);
     }
 
-    // ✅ MÉTODO PARA NAVEGAR DESPUÉS DE CREAR UNA RECETA
+    /**
+     * ✅ MÉTODO PARA CUANDO SE CREA UNA RECETA NUEVA
+     */
     public void onRecetaCreated() {
-        Toast.makeText(getContext(), "Receta creada exitosamente", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(),
+                "🎉 Receta creada exitosamente\n📊 Con valores nutricionales calculados por IA",
+                Toast.LENGTH_LONG).show();
+
         // Recargar recetas para mostrar la nueva
         recargarRecetas();
+
         // Navegar a mis recetas
         Navigation.findNavController(requireView())
                 .navigate(R.id.action_navegar_comunidad_to_navegar_comunidad_mis_recetas);
@@ -447,13 +472,19 @@ public class ComunidadFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG, "🔄 Fragment resumido, actualizando recetas");
+        Log.d(TAG, "🔄 Fragment resumido, actualizando recetas de usuarios");
+
         if (adapter != null) {
             mostrarCargando(true);
-            adapter.actualizarReacciones(() -> mostrarCargando(false));
+            boolean tieneAuth = sessionManager.isLoggedIn() && sessionManager.hasValidToken();
+            if (tieneAuth) {
+                adapter.actualizarReacciones(() -> mostrarCargando(false));
+            } else {
+                mostrarCargando(false);
+            }
         } else {
             // Si no hay adapter, cargar recetas desde cero
-            cargarRecetasUsuariosConReacciones();
+            cargarRecetasDeUsuariosRegulares();
         }
     }
 
